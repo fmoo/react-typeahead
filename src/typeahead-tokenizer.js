@@ -160,7 +160,7 @@ var TypeaheadSelector = React.createClass({
         }.bind(this)}>
         { result }
       </TypeaheadOption>;
-    }.bind(this));
+    }, this);
     return <div>{ results }</div>;
   },
 
@@ -311,7 +311,7 @@ var TypeaheadTokenizer = React.createClass({
   _renderTokens: function() {
     var result = this.state.selected.map(function(selected) {
       return <Token key={ selected } onRemove={ this._removeTokenForValue }>{ selected }</Token>;
-    }.bind(this));
+    }, this);
     return result;
   },
 
