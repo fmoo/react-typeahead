@@ -18,7 +18,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
+    onKeyDown: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -39,16 +39,16 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
 
     return {
       // The set of all options... Does this need to be state?  I guess for lazy load...
-      'options': sortedOptions,
+      options: sortedOptions,
 
       // The currently visible set of options
-      'visible': this.getOptionsForValue(this.props.defaultValue, this.props.options),
+      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
       // This should be called something else, "entryValue"
-      'entryValue': this.props.defaultValue,
+      entryValue: this.props.defaultValue,
 
       // A valid typeahead value
-      'selection': null,
+      selection: null
     };
   },
 
@@ -134,34 +134,34 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
   propTypes: {
     options: React.PropTypes.array,
     selectionIndex: React.PropTypes.number,
-    onOptionSelected: React.PropTypes.func,
+    onOptionSelected: React.PropTypes.func
   },
 
   getDefaultProps: function() {
     return {
-      selectionIndex: null
+      selectionIndex: null,
+      onOptionSelected: function(option) { }
     };
   },
 
   getInitialState: function() {
     return {
       selectionIndex: this.props.selectionIndex,
-      selection: this.getSelectionForIndex(this.props.selectionIndex),
+      selection: this.getSelectionForIndex(this.props.selectionIndex)
     };
   },
 
   render: function() {
-    var i = 0;
-    var results = this.props.options.map(function(result) {
-      return TypeaheadOption( {ref:result, key:result, onClick:function() {
-          if (this.props.onOptionSelected) {
-            this.props.onOptionSelected(result);
-          }
+    var results = this.props.options.map(function(result, i) {
+      return TypeaheadOption( {ref:result, key:result, 
+        hover:this.state.selectionIndex === i,
+        onClick:function() {
+          this.props.onOptionSelected(result);
           return false;
         }.bind(this)}, 
          result 
       );
-    }.bind(this));
+    }, this);
     return React.DOM.div(null,  results );
   },
 
@@ -192,7 +192,6 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
       }
     } else {
       newIndex = this.state.selectionIndex + delta;
-      this.refs[this.state.selection].setHover(false);
     }
     if (newIndex < 0) {
       newIndex += this.props.options.length;
@@ -200,7 +199,6 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
       newIndex -= this.props.options.length;
     }
     var newSelection = this.getSelectionForIndex(newIndex);
-    this.refs[this.getSelectionForIndex(newIndex)].setHover(true);
     this.setState({selectionIndex: newIndex,
                    selection: newSelection});
   },
@@ -218,7 +216,7 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
 var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
   propTypes: {
     onClick: React.PropTypes.func,
-    children: React.PropTypes.string,
+    children: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -229,7 +227,7 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
 
   getInitialState: function() {
     return {
-      hover: false,
+      hover: false
     };
   },
 
@@ -239,13 +237,9 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
     ));
   },
 
-  setHover: function(hover) {
-    this.setState({hover: hover});
-  },
-
   _getClasses: function() {
     var classes = "typeahead-option";
-    if (this.state.hover) {
+    if (this.props.hover) {
       classes += " hover";
     }
     return classes;
@@ -260,7 +254,7 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
 var Token = React.createClass({displayName: 'Token',
   propTypes: {
     children: React.PropTypes.string,
-    onRemove: React.PropTypes.func,
+    onRemove: React.PropTypes.func
   },
 
   render: function() {
@@ -311,7 +305,7 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
   _renderTokens: function() {
     var result = this.state.selected.map(function(selected) {
       return Token( {key: selected,  onRemove: this._removeTokenForValue },  selected );
-    }.bind(this));
+    }, this);
     return result;
   },
 
@@ -321,23 +315,26 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
   },
 
   _onKeyDown: function(event) {
-    if (event.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-      // If there are no tokens, abort early
-      if (!this.state.selected.length) {
-        return true;
-      }
-
-      // Remove token ONLY when bksp pressed at beginning of line
-      // without a selection
-      var entry = this.refs.typeahead.refs.entry.getDOMNode();
-      if (entry.selectionStart == entry.selectionEnd &&
-          entry.selectionStart == 0) {
-        this._removeTokenForValue(
-          this.state.selected[this.state.selected.length-1]);
-        return false;
-      }
+    // We only care about intercepting backspaces
+    if (event.keyCode !== KeyEvent.DOM_VK_BACK_SPACE) {
       return true;
     }
+
+    // No tokens
+    if (!this.state.selected.length) {
+      return true;
+    }
+
+    // Remove token ONLY when bksp pressed at beginning of line
+    // without a selection
+    var entry = this.refs.typeahead.refs.entry.getDOMNode();
+    if (entry.selectionStart == entry.selectionEnd &&
+        entry.selectionStart == 0) {
+      this._removeTokenForValue(
+        this.state.selected[this.state.selected.length - 1]);
+      return false;
+    }
+
     return true;
   },
 
