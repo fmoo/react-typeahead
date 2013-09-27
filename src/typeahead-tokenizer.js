@@ -39,16 +39,16 @@ var Typeahead = React.createClass({
 
     return {
       // The set of all options... Does this need to be state?  I guess for lazy load...
-      'options': sortedOptions,
+      options: sortedOptions,
 
       // The currently visible set of options
-      'visible': this.getOptionsForValue(this.props.defaultValue, this.props.options),
+      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
       // This should be called something else, "entryValue"
-      'entryValue': this.props.defaultValue,
+      entryValue: this.props.defaultValue,
 
       // A valid typeahead value
-      'selection': null,
+      selection: null,
     };
   },
 
