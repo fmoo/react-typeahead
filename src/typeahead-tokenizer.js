@@ -151,7 +151,6 @@ var TypeaheadSelector = React.createClass({
   },
 
   render: function() {
-    var i = 0;
     var results = this.props.options.map(function(result) {
       return <TypeaheadOption ref={result} key={result} onClick={function() {
           if (this.props.onOptionSelected) {
