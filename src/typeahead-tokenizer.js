@@ -321,23 +321,26 @@ var TypeaheadTokenizer = React.createClass({
   },
 
   _onKeyDown: function(event) {
-    if (event.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-      // If there are no tokens, abort early
-      if (!this.state.selected.length) {
-        return true;
-      }
-
-      // Remove token ONLY when bksp pressed at beginning of line
-      // without a selection
-      var entry = this.refs.typeahead.refs.entry.getDOMNode();
-      if (entry.selectionStart == entry.selectionEnd &&
-          entry.selectionStart == 0) {
-        this._removeTokenForValue(
-          this.state.selected[this.state.selected.length-1]);
-        return false;
-      }
+    // We only care about intercepting backspaces
+    if (event.keyCode !== KeyEvent.DOM_VK_BACK_SPACE) {
       return true;
     }
+
+    // No tokens
+    if (!this.state.selected.length) {
+      return true;
+    }
+
+    // Remove token ONLY when bksp pressed at beginning of line
+    // without a selection
+    var entry = this.refs.typeahead.refs.entry.getDOMNode();
+    if (entry.selectionStart == entry.selectionEnd &&
+        entry.selectionStart == 0) {
+      this._removeTokenForValue(
+        this.state.selected[this.state.selected.length - 1]);
+      return false;
+    }
+
     return true;
   },
 
