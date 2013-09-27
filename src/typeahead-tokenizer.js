@@ -117,7 +117,7 @@ var Typeahead = React.createClass({
   },
 
   render: function() {
-    return <div>
+    return <div class="typeahead">
       <input ref="entry" type="text" defaultValue={this.state.entryValue}
         onChange={ this._onTextEntryUpdated } onKeyDown={this._onKeyDown} />
       { this._renderIncrementalSearchResults() }
@@ -161,7 +161,7 @@ var TypeaheadSelector = React.createClass({
         { result }
       </TypeaheadOption>;
     }, this);
-    return <div>{ results }</div>;
+    return <div class="typeahead-selector">{ results }</div>;
   },
 
   setSelectionIndex: function(index) {
@@ -265,7 +265,7 @@ var Token = React.createClass({
   },
 
   render: function() {
-    return <div>
+    return <div class="typeahead-token">
       {this.props.children}
       {this._makeCloseButton()}
     </div>;
