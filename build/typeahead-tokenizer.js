@@ -1,17 +1,12 @@
 /** @jsx React.DOM */
 
+
 /**
- * PolyFills make me sad
+ * A "typeahead", an auto-completing text input
+ *
+ * Renders an text input that shows options nearby that you can use the
+ * keyboard or mouse to select.  Requires CSS for MASSIVE DAMAGE.
  */
-var KeyEvent = KeyEvent || {};
-KeyEvent.DOM_VK_UP = KeyEvent.DOM_VK_UP || 38;
-KeyEvent.DOM_VK_DOWN = KeyEvent.DOM_VK_DOWN || 40;
-KeyEvent.DOM_VK_BACK_SPACE = KeyEvent.DOM_VK_BACK_SPACE || 8;
-KeyEvent.DOM_VK_RETURN = KeyEvent.DOM_VK_RETURN || 13;
-KeyEvent.DOM_VK_ENTER = KeyEvent.DOM_VK_ENTER || 14;
-KeyEvent.DOM_VK_ESCAPE = KeyEvent.DOM_VK_ESCAPE || 27;
-
-
 var Typeahead = React.createClass({displayName: 'Typeahead',
   propTypes: {
     // TODO: maxVisible: React.PropTypes.number,
@@ -130,6 +125,10 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
   }
 });
 
+/**
+ * Container for the options rendered as part of the autocompletion process
+ * of the typeahead
+ */
 var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
   propTypes: {
     options: React.PropTypes.array,
@@ -213,6 +212,10 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
 
 });
 
+
+/**
+ * A single option within the TypeaheadSelector
+ */
 var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
   propTypes: {
     onClick: React.PropTypes.func,
@@ -251,6 +254,10 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
 });
 
 
+/**
+ * Encapsulates the rendering of an option that has been "selected" in a
+ * TypeaheadTokenizer
+ */
 var Token = React.createClass({displayName: 'Token',
   propTypes: {
     children: React.PropTypes.string,
@@ -279,6 +286,11 @@ var Token = React.createClass({displayName: 'Token',
 });
 
 
+/**
+ * A typeahead that, when an option is selected, instead of simply filling
+ * the text entry widget, prepends a renderable "token", that may be deleted
+ * by pressing backspace on the beginning of the line with the keyboard.
+ */
 var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
   propTypes: {
     options: React.PropTypes.array,
@@ -368,3 +380,15 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
     )
   }
 });
+
+
+/**
+ * PolyFills make me sad
+ */
+var KeyEvent = KeyEvent || {};
+KeyEvent.DOM_VK_UP = KeyEvent.DOM_VK_UP || 38;
+KeyEvent.DOM_VK_DOWN = KeyEvent.DOM_VK_DOWN || 40;
+KeyEvent.DOM_VK_BACK_SPACE = KeyEvent.DOM_VK_BACK_SPACE || 8;
+KeyEvent.DOM_VK_RETURN = KeyEvent.DOM_VK_RETURN || 13;
+KeyEvent.DOM_VK_ENTER = KeyEvent.DOM_VK_ENTER || 14;
+KeyEvent.DOM_VK_ESCAPE = KeyEvent.DOM_VK_ESCAPE || 27;
