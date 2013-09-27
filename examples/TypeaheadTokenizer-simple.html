@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script src="http://fb.me/react-0.4.1.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.4.1.js"></script>
+    <script src="../build/typeahead-tokenizer.js"></script>
+  </head>
+  <body>
+    <style>
+    .hover {
+      border-style: dotted;
+      border-width: 1px;
+    }
+    </style>
+
+    <div id="example"></div>
+    <script type="text/jsx">
+      /** @jsx React.DOM */
+      React.renderComponent(
+        <TypeaheadTokenizer defaultValue="foo"
+          options={
+            ["foobar", "spameggs", "hameggs",
+             "spamfoo", "spam"]} />,
+        document.getElementById("example")
+      );
+    </script>
+  </body>
+</html>
