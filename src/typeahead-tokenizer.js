@@ -18,7 +18,7 @@ var Typeahead = React.createClass({
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
+    onKeyDown: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -48,7 +48,7 @@ var Typeahead = React.createClass({
       entryValue: this.props.defaultValue,
 
       // A valid typeahead value
-      selection: null,
+      selection: null
     };
   },
 
@@ -134,7 +134,7 @@ var TypeaheadSelector = React.createClass({
   propTypes: {
     options: React.PropTypes.array,
     selectionIndex: React.PropTypes.number,
-    onOptionSelected: React.PropTypes.func,
+    onOptionSelected: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -147,7 +147,7 @@ var TypeaheadSelector = React.createClass({
   getInitialState: function() {
     return {
       selectionIndex: this.props.selectionIndex,
-      selection: this.getSelectionForIndex(this.props.selectionIndex),
+      selection: this.getSelectionForIndex(this.props.selectionIndex)
     };
   },
 
@@ -216,7 +216,7 @@ var TypeaheadSelector = React.createClass({
 var TypeaheadOption = React.createClass({
   propTypes: {
     onClick: React.PropTypes.func,
-    children: React.PropTypes.string,
+    children: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -227,7 +227,7 @@ var TypeaheadOption = React.createClass({
 
   getInitialState: function() {
     return {
-      hover: false,
+      hover: false
     };
   },
 
@@ -258,7 +258,7 @@ var TypeaheadOption = React.createClass({
 var Token = React.createClass({
   propTypes: {
     children: React.PropTypes.string,
-    onRemove: React.PropTypes.func,
+    onRemove: React.PropTypes.func
   },
 
   render: function() {
