@@ -139,7 +139,8 @@ var TypeaheadSelector = React.createClass({
 
   getDefaultProps: function() {
     return {
-      selectionIndex: null
+      selectionIndex: null,
+      onOptionSelected: function(option) { }
     };
   },
 
@@ -153,9 +154,7 @@ var TypeaheadSelector = React.createClass({
   render: function() {
     var results = this.props.options.map(function(result) {
       return <TypeaheadOption ref={result} key={result} onClick={function() {
-          if (this.props.onOptionSelected) {
-            this.props.onOptionSelected(result);
-          }
+          this.props.onOptionSelected(result);
           return false;
         }.bind(this)}>
         { result }
