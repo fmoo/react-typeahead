@@ -61,14 +61,22 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
   },
 
   _renderIncrementalSearchResults: function() {
+    // Nothing has been entered into the textbox
     if (!this.state.entryValue) {
       return "";
     }
+
+    // Something was just selected
     if (this.state.selection) {
       return "";
     }
 
-    return TypeaheadSelector( {ref:"sel", options:this.state.visible, 
+    // There are no typeahead / autocomplete suggestions
+    if (!this.state.visible.length) {
+      return "";
+    }
+
+    return TypeaheadSelector( {ref:"sel", options: this.state.visible, 
               onOptionSelected: this._onOptionSelected } );
   },
 
