@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 /**
- * Bullshit PolyFills
+ * PolyFills make me sad
  */
 var KeyEvent = KeyEvent || {};
 KeyEvent.DOM_VK_UP = KeyEvent.DOM_VK_UP || 38;
