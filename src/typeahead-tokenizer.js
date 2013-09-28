@@ -281,16 +281,14 @@ var Token = React.createClass({
 
   _makeCloseButton: function() {
     if (!this.props.onRemove) {
-      console.log("NO ONREMOVE FUNCTION");
       return "";
     }
-    return 
-      <a class="token-close" href="#" onClick={function() {
+    return (
+      <a class="typeahead-token-close" href="#" onClick={function() {
           this.props.onRemove(this.props.children);
-          return true;
-        }}>
-        x
-      </a>;
+          return false;
+        }.bind(this)}>&#x00d7;</a>
+    );
   }
 });
 
