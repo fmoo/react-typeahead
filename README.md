@@ -11,4 +11,4 @@ Examples
 
 * [Typeahead Tokenizer with simple styling][1]
 
-[1]: https://github.com/fmoo/react-typeahead/blob/master/examples/TypeaheadTokenizer-simple.html
+[1]: http://htmlpreview.github.io/?https://github.com/fmoo/react-typeahead/blob/master/examples/TypeaheadTokenizer-simple.html
