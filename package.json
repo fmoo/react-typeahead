@@ -1,0 +1,24 @@
+{
+  "name": "react-typeahead",
+  "version": "0.0.1",
+  "description": "React-based typeahead and typeahead-tokenizer",
+  "keywords": ["react", "typeahead", "tokenizer"],
+  "homepage": "https://github.com/fmoo/react-typeahead",
+  "bugs": {
+    "url": "https://github.com/fmoo/react-typeahead/issues",
+    "email": "ruibalp@gmail.com"
+  },
+  "license": "ISC",
+  "author": {
+    "name": "Peter Ruibal",
+    "email": "ruibalp@gmail.com",
+    "url": "https://github.com/fmoo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fmoo/react-typeahead.git"
+  },
+  "dependencies": {
+    "React": "git://github.com/facebook/react.git"
+  }
+}
