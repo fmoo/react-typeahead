@@ -20,5 +20,6 @@
   },
   "dependencies": {
     "React": "git://github.com/facebook/react.git"
-  }
+  },
+  "main": "src/react-tokenizer.js"
 }
