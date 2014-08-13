@@ -23,9 +23,10 @@
     "url": "https://github.com/fmoo/react-typeahead.git"
   },
   "dependencies": {
+    "fuzzy": "^0.1.0",
     "react": "^0.11.0"
   },
-  "main": "src/react-tokenizer.js",
+  "main": "src/react-typeahead.js",
   "devDependencies": {
     "browserify": "^5.9.3",
     "react-tools": "^0.11.1",

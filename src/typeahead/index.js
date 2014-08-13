@@ -5,6 +5,7 @@
 var React = window.React || require('react');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
+var fuzzy = require('fuzzy');
 
 /**
  * A "typeahead", an auto-completing text input
@@ -54,9 +55,9 @@ var Typeahead = React.createClass({
 
   getOptionsForValue: function(value, options) {
     // TODO: add a prop for maximumVisible
-    var result = options.filter(function(option) {
-      return option.indexOf(value) != -1;
-    }.bind(this));
+    var result = fuzzy.filter(value, options).map(function(res) {
+      return res.string;
+    });
     return result;
   },
 
@@ -81,8 +82,12 @@ var Typeahead = React.createClass({
       return "";
     }
 
-    return <TypeaheadSelector ref="sel" options={ this.state.visible }
-              onOptionSelected={ this._onOptionSelected } />;
+    return (
+      <TypeaheadSelector
+        ref="sel" options={ this.state.visible }
+        onOptionSelected={ this._onOptionSelected }
+        customClass={this.props.customOptionClass} />
+   );
   },
 
   _onOptionSelected: function(option) {
@@ -130,8 +135,10 @@ var Typeahead = React.createClass({
   },
 
   render: function() {
+    var classList = this.props.customInputClass || "";
     return <div class="typeahead">
       <input ref="entry" type="text" defaultValue={this.state.entryValue}
+        className={classList}
         onChange={ this._onTextEntryUpdated } onKeyDown={this._onKeyDown} />
       { this._renderIncrementalSearchResults() }
     </div>;
