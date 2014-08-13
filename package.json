@@ -2,7 +2,11 @@
   "name": "react-typeahead",
   "version": "0.0.1",
   "description": "React-based typeahead and typeahead-tokenizer",
-  "keywords": ["react", "typeahead", "tokenizer"],
+  "keywords": [
+    "react",
+    "typeahead",
+    "tokenizer"
+  ],
   "homepage": "https://github.com/fmoo/react-typeahead",
   "bugs": {
     "url": "https://github.com/fmoo/react-typeahead/issues",
@@ -19,7 +23,20 @@
     "url": "https://github.com/fmoo/react-typeahead.git"
   },
   "dependencies": {
-    "React": "git://github.com/facebook/react.git"
+    "react": "^0.11.0"
   },
-  "main": "src/react-tokenizer.js"
+  "main": "src/react-tokenizer.js",
+  "devDependencies": {
+    "browserify": "^5.9.3",
+    "react-tools": "^0.11.1",
+    "reactify": "^0.14.0"
+  },
+  "scripts": {
+    "build": "browserify src/react-typeahead.js -s ReactTypeahead -u react -o build/react-typeahead.js"
+  },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  }
 }

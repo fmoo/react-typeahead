@@ -1,5 +1,180 @@
-/** @jsx React.DOM */
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactTypeahead=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ * PolyFills make me sad
+ */
+var KeyEvent = KeyEvent || {};
+KeyEvent.DOM_VK_UP = KeyEvent.DOM_VK_UP || 38;
+KeyEvent.DOM_VK_DOWN = KeyEvent.DOM_VK_DOWN || 40;
+KeyEvent.DOM_VK_BACK_SPACE = KeyEvent.DOM_VK_BACK_SPACE || 8;
+KeyEvent.DOM_VK_RETURN = KeyEvent.DOM_VK_RETURN || 13;
+KeyEvent.DOM_VK_ENTER = KeyEvent.DOM_VK_ENTER || 14;
+KeyEvent.DOM_VK_ESCAPE = KeyEvent.DOM_VK_ESCAPE || 27;
 
+module.exports = KeyEvent;
+
+},{}],2:[function(require,module,exports){
+var Typeahead = require('./typeahead');
+var Tokenizer = require('./tokenizer');
+
+module.exports = {
+  Typeahead: Typeahead,
+  Tokenizer: Tokenizer
+};
+
+},{"./tokenizer":3,"./typeahead":5}],3:[function(require,module,exports){
+/**
+ * @jsx React.DOM
+ */
+
+var React = window.React || require('react');
+var Token = require('./token');
+var KeyEvent = require('../keyevent');
+var Typeahead = require('../typeahead');
+
+/**
+ * A typeahead that, when an option is selected, instead of simply filling
+ * the text entry widget, prepends a renderable "token", that may be deleted
+ * by pressing backspace on the beginning of the line with the keyboard.
+ */
+var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
+  propTypes: {
+    options: React.PropTypes.array,
+    defaultSelected: React.PropTypes.array,
+    defaultValue: React.PropTypes.string
+  },
+
+  getInitialState: function() {
+    return {
+      selected: this.props.defaultSelected
+    };
+  },
+
+  getDefaultProps: function() {
+    return {
+      options: [],
+      defaultSelected: [],
+      defaultValue: ""
+    };
+  },
+
+  // TODO: Support initialized tokens
+  //
+  _renderTokens: function() {
+    var result = this.state.selected.map(function(selected) {
+      return Token({key: selected, onRemove:  this._removeTokenForValue}, selected );
+    }, this);
+    return result;
+  },
+
+  _getOptionsForTypeahead: function() {
+    // return this.props.options without this.selected
+    return this.props.options
+  },
+
+  _onKeyDown: function(event) {
+    // We only care about intercepting backspaces
+    if (event.keyCode !== KeyEvent.DOM_VK_BACK_SPACE) {
+      return true;
+    }
+
+    // No tokens
+    if (!this.state.selected.length) {
+      return true;
+    }
+
+    // Remove token ONLY when bksp pressed at beginning of line
+    // without a selection
+    var entry = this.refs.typeahead.refs.entry.getDOMNode();
+    if (entry.selectionStart == entry.selectionEnd &&
+        entry.selectionStart == 0) {
+      this._removeTokenForValue(
+        this.state.selected[this.state.selected.length - 1]);
+      return false;
+    }
+
+    return true;
+  },
+
+  _removeTokenForValue: function(value) {
+    var index = this.state.selected.indexOf(value);
+    if (index == -1) {
+      return false;
+    }
+
+    this.state.selected.splice(index, 1);
+    this.setState({selected: this.state.selected});
+    return false;
+  },
+
+  _addTokenForValue: function(value) {
+    if (this.state.selected.indexOf(value) != -1) {
+      return;
+    }
+    this.state.selected.push(value);
+    this.setState({selected: this.state.selected});
+    this.refs.typeahead.setEntryText("");
+  },
+
+  render: function() {
+    return React.DOM.div(null, 
+       this._renderTokens(), 
+      Typeahead({ref: "typeahead", options: this._getOptionsForTypeahead(), 
+        defaultValue: this.props.defaultValue, 
+        onOptionSelected: this._addTokenForValue, 
+        onKeyDown: this._onKeyDown})
+    )
+  }
+});
+
+module.exports = TypeaheadTokenizer;
+
+},{"../keyevent":1,"../typeahead":5,"./token":4,"react":undefined}],4:[function(require,module,exports){
+/**
+ * @jsx React.DOM
+ */
+
+var React = window.React || require('react');
+
+/**
+ * Encapsulates the rendering of an option that has been "selected" in a
+ * TypeaheadTokenizer
+ */
+var Token = React.createClass({displayName: 'Token',
+  propTypes: {
+    children: React.PropTypes.string,
+    onRemove: React.PropTypes.func
+  },
+
+  render: function() {
+    return React.DOM.div({class: "typeahead-token"}, 
+      this.props.children, 
+      this._makeCloseButton()
+    );
+  },
+
+  _makeCloseButton: function() {
+    if (!this.props.onRemove) {
+      return "";
+    }
+    return (
+      React.DOM.a({class: "typeahead-token-close", href: "#", onClick: function() {
+          this.props.onRemove(this.props.children);
+          return false;
+        }.bind(this)}, "×")
+    );
+  }
+});
+
+module.exports = Token;
+
+},{"react":undefined}],5:[function(require,module,exports){
+/**
+ * @jsx React.DOM
+ */
+
+var React = window.React || require('react');
+var TypeaheadSelector = require('./selector');
+var KeyEvent = require('../keyevent');
 
 /**
  * A "typeahead", an auto-completing text input
@@ -76,8 +251,8 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
       return "";
     }
 
-    return TypeaheadSelector( {ref:"sel", options: this.state.visible, 
-              onOptionSelected: this._onOptionSelected } );
+    return TypeaheadSelector({ref: "sel", options:  this.state.visible, 
+              onOptionSelected:  this._onOptionSelected});
   },
 
   _onOptionSelected: function(option) {
@@ -125,13 +300,73 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
   },
 
   render: function() {
-    return React.DOM.div( {className:"typeahead"}, 
-      React.DOM.input( {ref:"entry", type:"text", defaultValue:this.state.entryValue,
-        onChange: this._onTextEntryUpdated,  onKeyDown:this._onKeyDown} ),
+    return React.DOM.div({class: "typeahead"}, 
+      React.DOM.input({ref: "entry", type: "text", defaultValue: this.state.entryValue, 
+        onChange:  this._onTextEntryUpdated, onKeyDown: this._onKeyDown}), 
        this._renderIncrementalSearchResults() 
     );
   }
 });
+
+module.exports = Typeahead;
+
+},{"../keyevent":1,"./selector":7,"react":undefined}],6:[function(require,module,exports){
+/**
+ * @jsx React.DOM
+ */
+
+var React = window.React || require('react');
+
+/**
+ * A single option within the TypeaheadSelector
+ */
+var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
+  propTypes: {
+    onClick: React.PropTypes.func,
+    children: React.PropTypes.string
+  },
+
+  getDefaultProps: function() {
+    return {
+      onClick: function() { return false; }
+    };
+  },
+
+  getInitialState: function() {
+    return {
+      hover: false
+    };
+  },
+
+  render: function() {
+    return React.DOM.div(null, React.DOM.a({href: "#", class: this._getClasses(), onClick: this._onClick}, 
+       this.props.children
+    ));
+  },
+
+  _getClasses: function() {
+    var classes = "typeahead-option";
+    if (this.props.hover) {
+      classes += " hover";
+    }
+    return classes;
+  },
+
+  _onClick: function() {
+    return this.props.onClick();
+  }
+});
+
+
+module.exports = TypeaheadOption;
+
+},{"react":undefined}],7:[function(require,module,exports){
+/**
+ * @jsx React.DOM
+ */
+
+var React = window.React || require('react');
+var TypeaheadOption = require('./option');
 
 /**
  * Container for the options rendered as part of the autocompletion process
@@ -160,16 +395,16 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
 
   render: function() {
     var results = this.props.options.map(function(result, i) {
-      return TypeaheadOption( {ref:result, key:result, 
-        hover:this.state.selectionIndex === i,
-        onClick:function() {
+      return TypeaheadOption({ref: result, key: result, 
+        hover: this.state.selectionIndex === i, 
+        onClick: function() {
           this.props.onOptionSelected(result);
           return false;
         }.bind(this)}, 
-         result 
+        result 
       );
     }, this);
-    return React.DOM.div( {className:"typeahead-selector"},  results );
+    return React.DOM.div({class: "typeahead-selector"}, results );
   },
 
   setSelectionIndex: function(index) {
@@ -220,182 +455,7 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
 
 });
 
+module.exports = TypeaheadSelector;
 
-/**
- * A single option within the TypeaheadSelector
- */
-var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
-  propTypes: {
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.string
-  },
-
-  getDefaultProps: function() {
-    return {
-      onClick: function() { return false; }
-    };
-  },
-
-  getInitialState: function() {
-    return {
-      hover: false
-    };
-  },
-
-  render: function() {
-    return React.DOM.div(null, React.DOM.a( {href:"#", className:this._getClasses(), onClick:this._onClick}, 
-       this.props.children 
-    ));
-  },
-
-  _getClasses: function() {
-    var classes = "typeahead-option";
-    if (this.props.hover) {
-      classes += " hover";
-    }
-    return classes;
-  },
-
-  _onClick: function() {
-    return this.props.onClick();
-  }
+},{"./option":6,"react":undefined}]},{},[2])(2)
 });
-
-
-/**
- * Encapsulates the rendering of an option that has been "selected" in a
- * TypeaheadTokenizer
- */
-var Token = React.createClass({displayName: 'Token',
-  propTypes: {
-    children: React.PropTypes.string,
-    onRemove: React.PropTypes.func
-  },
-
-  render: function() {
-    return React.DOM.div( {className:"typeahead-token"}, 
-      this.props.children,
-      this._makeCloseButton()
-    );
-  },
-
-  _makeCloseButton: function() {
-    if (!this.props.onRemove) {
-      return "";
-    }
-    return (
-      React.DOM.a( {className:"typeahead-token-close", href:"#", onClick:function() {
-          this.props.onRemove(this.props.children);
-          return false;
-        }.bind(this)}, "×")
-    );
-  }
-});
-
-
-/**
- * A typeahead that, when an option is selected, instead of simply filling
- * the text entry widget, prepends a renderable "token", that may be deleted
- * by pressing backspace on the beginning of the line with the keyboard.
- */
-var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
-  propTypes: {
-    options: React.PropTypes.array,
-    defaultSelected: React.PropTypes.array,
-    defaultValue: React.PropTypes.string
-  },
-
-  getInitialState: function() {
-    return {
-      selected: this.props.defaultSelected
-    };
-  },
-
-  getDefaultProps: function() {
-    return {
-      options: [],
-      defaultSelected: [],
-      defaultValue: ""
-    };
-  },
-
-  // TODO: Support initialized tokens
-  //
-  _renderTokens: function() {
-    var result = this.state.selected.map(function(selected) {
-      return Token( {key: selected,  onRemove: this._removeTokenForValue },  selected );
-    }, this);
-    return result;
-  },
-
-  _getOptionsForTypeahead: function() {
-    // return this.props.options without this.selected
-    return this.props.options
-  },
-
-  _onKeyDown: function(event) {
-    // We only care about intercepting backspaces
-    if (event.keyCode !== KeyEvent.DOM_VK_BACK_SPACE) {
-      return true;
-    }
-
-    // No tokens
-    if (!this.state.selected.length) {
-      return true;
-    }
-
-    // Remove token ONLY when bksp pressed at beginning of line
-    // without a selection
-    var entry = this.refs.typeahead.refs.entry.getDOMNode();
-    if (entry.selectionStart == entry.selectionEnd &&
-        entry.selectionStart == 0) {
-      this._removeTokenForValue(
-        this.state.selected[this.state.selected.length - 1]);
-      return false;
-    }
-
-    return true;
-  },
-
-  _removeTokenForValue: function(value) {
-    var index = this.state.selected.indexOf(value);
-    if (index == -1) {
-      return false;
-    }
-
-    this.state.selected.splice(index, 1);
-    this.setState({selected: this.state.selected});
-    return false;
-  },
-
-  _addTokenForValue: function(value) {
-    if (this.state.selected.indexOf(value) != -1) {
-      return;
-    }
-    this.state.selected.push(value);
-    this.setState({selected: this.state.selected});
-    this.refs.typeahead.setEntryText("");
-  },
-
-  render: function() {
-    return React.DOM.div(null, 
-       this._renderTokens(), 
-      Typeahead( {ref:"typeahead", options:this._getOptionsForTypeahead(),
-        defaultValue:this.props.defaultValue, 
-        onOptionSelected:this._addTokenForValue, 
-        onKeyDown:this._onKeyDown} )
-    )
-  }
-});
-
-
-/**
- * PolyFills make me sad
- */
-var KeyEvent = KeyEvent || {};
-KeyEvent.DOM_VK_UP = KeyEvent.DOM_VK_UP || 38;
-KeyEvent.DOM_VK_DOWN = KeyEvent.DOM_VK_DOWN || 40;
-KeyEvent.DOM_VK_BACK_SPACE = KeyEvent.DOM_VK_BACK_SPACE || 8;
-KeyEvent.DOM_VK_RETURN = KeyEvent.DOM_VK_RETURN || 13;
-KeyEvent.DOM_VK_ENTER = KeyEvent.DOM_VK_ENTER || 14;
-KeyEvent.DOM_VK_ESCAPE = KeyEvent.DOM_VK_ESCAPE || 27;
