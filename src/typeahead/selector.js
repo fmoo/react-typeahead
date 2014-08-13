@@ -32,14 +32,17 @@ var TypeaheadSelector = React.createClass({
 
   render: function() {
     var results = this.props.options.map(function(result, i) {
-      return <TypeaheadOption ref={result} key={result} 
-        hover={this.state.selectionIndex === i}
-        onClick={function() {
-          this.props.onOptionSelected(result);
-          return false;
-        }.bind(this)}>
-        { result }
-      </TypeaheadOption>;
+      return (
+        <TypeaheadOption ref={result} key={result} 
+          hover={this.state.selectionIndex === i}
+          customClass={this.props.customClass}
+          onClick={function() {
+            this.props.onOptionSelected(result);
+            return false;
+          }.bind(this)}>
+          { result }
+        </TypeaheadOption>
+      )
     }, this);
     return <div class="typeahead-selector">{ results }</div>;
   },

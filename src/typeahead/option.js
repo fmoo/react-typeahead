@@ -26,20 +26,27 @@ var TypeaheadOption = React.createClass({
   },
 
   render: function() {
-    return <div><a href="#" class={this._getClasses()} onClick={this._onClick}>
-      { this.props.children }
-    </a></div>;
+    return (
+      <div>
+        <a href="#" className={this._getClasses()} onClick={this._onClick}>
+          { this.props.children }
+        </a>
+      </div>
+    );
   },
 
   _getClasses: function() {
-    var classes = "typeahead-option";
+    var classes = ["typeahead-option"];
     if (this.props.hover) {
-      classes += " hover";
+      classes.push("hover");
     }
-    return classes;
+    if (this.props.customClass) {
+      classes.push(this.props.customClass);
+    }
+    return classes.join(' ');
   },
 
-  _onClick: function() {
+  _onClick: function(e) {
     return this.props.onClick();
   }
 });
