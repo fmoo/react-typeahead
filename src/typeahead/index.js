@@ -15,7 +15,7 @@ var fuzzy = require('fuzzy');
  */
 var Typeahead = React.createClass({
   propTypes: {
-    // TODO: maxVisible: React.PropTypes.number,
+    maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
@@ -58,6 +58,10 @@ var Typeahead = React.createClass({
     var result = fuzzy.filter(value, options).map(function(res) {
       return res.string;
     });
+
+    if (this.props.maxVisible) {
+      result = result.slice(0, this.props.maxVisible);
+    }
     return result;
   },
 
@@ -86,7 +90,7 @@ var Typeahead = React.createClass({
       <TypeaheadSelector
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
-        customClass={this.props.customOptionClass} />
+        customclassName={this.props.customOptionClass} />
    );
   },
 
@@ -130,18 +134,20 @@ var Typeahead = React.createClass({
     } else {
       return this.props.onKeyDown(event);
     }
-    // Don't propagate the keystroke back to the DOM/browser 
+    // Don't propagate the keystroke back to the DOM/browser
     return false;
   },
 
   render: function() {
     var classList = this.props.customInputClass || "";
-    return <div class="typeahead">
-      <input ref="entry" type="text" defaultValue={this.state.entryValue}
-        className={classList}
-        onChange={ this._onTextEntryUpdated } onKeyDown={this._onKeyDown} />
-      { this._renderIncrementalSearchResults() }
-    </div>;
+    return (
+      <div className="typeahead">
+        <input ref="entry" type="text" defaultValue={this.state.entryValue}
+          className={classList}
+          onChange={ this._onTextEntryUpdated } onKeyDown={this._onKeyDown} />
+        { this._renderIncrementalSearchResults() }
+      </div>
+    );
   }
 });
 

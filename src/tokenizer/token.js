@@ -15,7 +15,7 @@ var Token = React.createClass({
   },
 
   render: function() {
-    return <div class="typeahead-token">
+    return <div className="typeahead-token">
       {this.props.children}
       {this._makeCloseButton()}
     </div>;
@@ -26,7 +26,7 @@ var Token = React.createClass({
       return "";
     }
     return (
-      <a class="typeahead-token-close" href="#" onClick={function() {
+      <a className="typeahead-token-close" href="#" onClick={function() {
           this.props.onRemove(this.props.children);
           return false;
         }.bind(this)}>&#x00d7;</a>
