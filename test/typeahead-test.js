@@ -18,21 +18,6 @@ var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
 describe('Typeahead Component', function() {
 
-  context('invalid props', function() {
-    it('throws as expected', function() {
-      var propTypes = Object.keys(Typeahead.propTypes);
-      var args = _.zipObject(propTypes, _.map(propTypes, function(){
-        // NaN destroyer of worlds! this simulates passing in a mismatched
-        // type. `undefined` gets overridden by any defaultProps, plus how
-        // often do you get to use NaN?
-        return NaN;
-      }));
-      assert.throws(function(){
-        TestUtils.renderIntoDocument(Typeahead(args));
-      });
-    });
-  });
-
   context('sanity', function() {
     beforeEach(function() {
       this.component = TestUtils.renderIntoDocument(Typeahead({
