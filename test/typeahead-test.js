@@ -81,15 +81,38 @@ describe('Typeahead Component', function() {
 
   });
 
-  context('maxVisible', function() {
-    it('should limit the result set based on the maxVisible option', function() {
-      var component = TestUtils.renderIntoDocument(Typeahead({
-        options: BEATLES,
-        maxVisible: 1
-      }));
-      var results = simulateTextInput(component, 'o');
-      assert.equal(results.length, 1);
+  describe('options', function() {
+
+    context('maxVisible', function() {
+      it('should limit the result set based on the maxVisible option', function() {
+        var component = TestUtils.renderIntoDocument(Typeahead({
+          options: BEATLES,
+          maxVisible: 1
+        }));
+        var results = simulateTextInput(component, 'o');
+        assert.equal(results.length, 1);
+      });
     });
+
+    context('customEntryClass', function() {
+      it('should add a custom class to the typeahead input', function() {
+        var component = TestUtils.renderIntoDocument(Typeahead({
+          options: BEATLES,
+          customEntryClass: 'topcoat-search-input'
+        }));
+
+        var classList = component.refs.entry.getDOMNode().classList.toString();
+        assert.equal(classList, 'topcoat-search-input');
+      });
+    });
+
+    context('customOptionClass', function() {
+      it('should add a custom class to the typeahead option anchors', function() {
+      
+      });
+    
+    });
+
   });
 
 });

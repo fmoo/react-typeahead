@@ -27,11 +27,11 @@ var TypeaheadOption = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <li className={this.props.customLIClass}>
         <a href="#" className={this._getClasses()} onClick={this._onClick}>
           { this.props.children }
         </a>
-      </div>
+      </li>
     );
   },
 

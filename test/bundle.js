@@ -6021,7 +6021,7 @@ var ObjectPrototype = Object.prototype;
 var FunctionPrototype = Function.prototype;
 var StringPrototype = String.prototype;
 var NumberPrototype = Number.prototype;
-var _Array_slice_ = ArrayPrototype.slice;
+var array_slice = ArrayPrototype.slice;
 var array_splice = ArrayPrototype.splice;
 var array_push = ArrayPrototype.push;
 var array_unshift = ArrayPrototype.unshift;
@@ -6178,7 +6178,7 @@ defineProperties(FunctionPrototype, {
         // 3. Let A be a new (possibly empty) internal list of all of the
         //   argument values provided after thisArg (arg1, arg2 etc), in order.
         // XXX slicedArgs will stand in for "A" if used
-        var args = _Array_slice_.call(arguments, 1); // for normal call
+        var args = array_slice.call(arguments, 1); // for normal call
         // 4. Let F be a new native ECMAScript object.
         // 11. Set the [[Prototype]] internal property of F to the standard
         //   built-in Function prototype object as specified in 15.3.3.1.
@@ -6209,7 +6209,7 @@ defineProperties(FunctionPrototype, {
 
                 var result = target.apply(
                     this,
-                    args.concat(_Array_slice_.call(arguments))
+                    args.concat(array_slice.call(arguments))
                 );
                 if (Object(result) === result) {
                     return result;
@@ -6238,7 +6238,7 @@ defineProperties(FunctionPrototype, {
                 // equiv: target.call(this, ...boundArgs, ...args)
                 return target.apply(
                     that,
-                    args.concat(_Array_slice_.call(arguments))
+                    args.concat(array_slice.call(arguments))
                 );
 
             }
@@ -6351,7 +6351,7 @@ defineProperties(ArrayPrototype, {
         var args = arguments;
         this.length = Math.max(toInteger(this.length), 0);
         if (arguments.length > 0 && typeof deleteCount !== 'number') {
-            args = _Array_slice_.call(arguments);
+            args = array_slice.call(arguments);
             if (args.length < 2) {
                 args.push(this.length - start);
             } else {
@@ -34894,6 +34894,10 @@ var fuzzy = require('fuzzy');
  */
 var Typeahead = React.createClass({displayName: 'Typeahead',
   propTypes: {
+    customLIClass: React.PropTypes.string,
+    customEntryClass: React.PropTypes.string,
+    customOptionClass: React.PropTypes.string,
+    customSelectorClass: React.PropTypes.string,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
@@ -34968,7 +34972,9 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
       TypeaheadSelector({
         ref: "sel", options:  this.state.visible, 
         onOptionSelected:  this._onOptionSelected, 
-        customclassName: this.props.customOptionClass})
+        customLIClass: this.props.customLIClass, 
+        customSelectorClass: this.props.customSelectorClass, 
+        customOptionClass: this.props.customOptionClass})
    );
   },
 
@@ -35017,11 +35023,10 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
   },
 
   render: function() {
-    var classList = this.props.customInputClass || "";
     return (
       React.DOM.div({className: "typeahead"}, 
         React.DOM.input({ref: "entry", type: "text", defaultValue: this.state.entryValue, 
-          className: classList, 
+          className: this.props.customEntryClass, 
           onChange:  this._onTextEntryUpdated, onKeyDown: this._onKeyDown}), 
          this._renderIncrementalSearchResults() 
       )
@@ -35061,7 +35066,7 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
 
   render: function() {
     return (
-      React.DOM.div(null, 
+      React.DOM.li({className: this.props.customLiClass || ""}, 
         React.DOM.a({href: "#", className: this._getClasses(), onClick: this._onClick}, 
            this.props.children
         )
@@ -35103,6 +35108,8 @@ var TypeaheadOption = require('./option');
 var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
   propTypes: {
     options: React.PropTypes.array,
+    customOptionClass: React.PropTypes.string,
+    customSelectorClass: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func
   },
@@ -35122,17 +35129,19 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
   },
 
   render: function() {
+    var classList = "typeahead-selector " + this.props.customSelectorClass;
     var results = this.props.options.map(function(result, i) {
       return (
         TypeaheadOption({ref: result, key: result, 
           hover: this.state.selectionIndex === i, 
-          customclassName: this.props.customClass, 
+          customLIClass: this.props.customLIClass, 
+          customClass: this.props.customOptionClass, 
           onClick: this._onClick.bind(this, result)}, 
           result 
         )
       );
     }, this);
-    return React.DOM.div({className: "typeahead-selector"}, results );
+    return React.DOM.ul({className: "typeahead-selector"}, results );
   },
 
   setSelectionIndex: function(index) {
@@ -35304,15 +35313,38 @@ describe('Typeahead Component', function() {
 
   });
 
-  context('maxVisible', function() {
-    it('should limit the result set based on the maxVisible option', function() {
-      var component = TestUtils.renderIntoDocument(Typeahead({
-        options: BEATLES,
-        maxVisible: 1
-      }));
-      var results = simulateTextInput(component, 'o');
-      assert.equal(results.length, 1);
+  describe('options', function() {
+
+    context('maxVisible', function() {
+      it('should limit the result set based on the maxVisible option', function() {
+        var component = TestUtils.renderIntoDocument(Typeahead({
+          options: BEATLES,
+          maxVisible: 1
+        }));
+        var results = simulateTextInput(component, 'o');
+        assert.equal(results.length, 1);
+      });
     });
+
+    context('customEntryClass', function() {
+      it('should add a custom class to the typeahead input', function() {
+        var component = TestUtils.renderIntoDocument(Typeahead({
+          options: BEATLES,
+          customEntryClass: 'topcoat-search-input'
+        }));
+
+        var classList = component.refs.entry.getDOMNode().classList.toString();
+        assert.equal(classList, 'topcoat-search-input');
+      });
+    });
+
+    context('customOptionClass', function() {
+      it('should add a custom class to the typeahead option anchors', function() {
+      
+      });
+    
+    });
+
   });
 
 });

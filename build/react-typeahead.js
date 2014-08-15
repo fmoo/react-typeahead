@@ -284,7 +284,7 @@ var Token = React.createClass({displayName: 'Token',
   },
 
   render: function() {
-    return React.DOM.div({class: "typeahead-token"}, 
+    return React.DOM.div({className: "typeahead-token"}, 
       this.props.children, 
       this._makeCloseButton()
     );
@@ -295,7 +295,7 @@ var Token = React.createClass({displayName: 'Token',
       return "";
     }
     return (
-      React.DOM.a({class: "typeahead-token-close", href: "#", onClick: function() {
+      React.DOM.a({className: "typeahead-token-close", href: "#", onClick: function() {
           this.props.onRemove(this.props.children);
           return false;
         }.bind(this)}, "×")
@@ -323,6 +323,10 @@ var fuzzy = require('fuzzy');
  */
 var Typeahead = React.createClass({displayName: 'Typeahead',
   propTypes: {
+    customLIClass: React.PropTypes.string,
+    customEntryClass: React.PropTypes.string,
+    customOptionClass: React.PropTypes.string,
+    customSelectorClass: React.PropTypes.string,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
@@ -362,7 +366,6 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
   },
 
   getOptionsForValue: function(value, options) {
-    // TODO: add a prop for maximumVisible
     var result = fuzzy.filter(value, options).map(function(res) {
       return res.string;
     });
@@ -398,7 +401,9 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
       TypeaheadSelector({
         ref: "sel", options:  this.state.visible, 
         onOptionSelected:  this._onOptionSelected, 
-        customClass: this.props.customOptionClass})
+        customLIClass: this.props.customLIClass, 
+        customSelectorClass: this.props.customSelectorClass, 
+        customOptionClass: this.props.customOptionClass})
    );
   },
 
@@ -447,11 +452,10 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
   },
 
   render: function() {
-    var classList = this.props.customInputClass || "";
-    return (
-      React.DOM.div({class: "typeahead"}, 
+    return this.transferPropsTo(
+      React.DOM.div({className: "typeahead"}, 
         React.DOM.input({ref: "entry", type: "text", defaultValue: this.state.entryValue, 
-          className: classList, 
+          className: this.props.customEntryClass, 
           onChange:  this._onTextEntryUpdated, onKeyDown: this._onKeyDown}), 
          this._renderIncrementalSearchResults() 
       )
@@ -491,7 +495,7 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
 
   render: function() {
     return (
-      React.DOM.div(null, 
+      React.DOM.li({className: this.props.customLIClass}, 
         React.DOM.a({href: "#", className: this._getClasses(), onClick: this._onClick}, 
            this.props.children
         )
@@ -533,6 +537,8 @@ var TypeaheadOption = require('./option');
 var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
   propTypes: {
     options: React.PropTypes.array,
+    customOptionClass: React.PropTypes.string,
+    customSelectorClass: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func
   },
@@ -552,17 +558,19 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
   },
 
   render: function() {
+    var classList = "typeahead-selector " + this.props.customSelectorClass;
     var results = this.props.options.map(function(result, i) {
       return (
         TypeaheadOption({ref: result, key: result, 
           hover: this.state.selectionIndex === i, 
-          customClass: this.props.customClass, 
+          customLIClass: this.props.customLIClass, 
+          customClass: this.props.customOptionClass, 
           onClick: this._onClick.bind(this, result)}, 
           result 
         )
       );
     }, this);
-    return React.DOM.div({class: "typeahead-selector"}, results );
+    return React.DOM.ul({className: classList}, results );
   },
 
   setSelectionIndex: function(index) {
