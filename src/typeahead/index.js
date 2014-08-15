@@ -54,7 +54,6 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
-    // TODO: add a prop for maximumVisible
     var result = fuzzy.filter(value, options).map(function(res) {
       return res.string;
     });
