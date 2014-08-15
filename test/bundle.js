@@ -35227,6 +35227,7 @@ var React = require('react/addons');
 var Typeahead = require('../src/typeahead');
 var TypeaheadOption = require('../src/typeahead/option');
 var TypeaheadSelector = require('../src/typeahead/selector');
+var Keyevent = require('../src/keyevent');
 var TestUtils = React.addons.TestUtils;
 
 function simulateTextInput(component, value) {
@@ -35256,12 +35257,14 @@ describe('Typeahead Component', function() {
   });
 
   context('sanity', function() {
-    it('should fuzzy search and render matching results', function() {
-      var component = TestUtils.renderIntoDocument(Typeahead({
+    beforeEach(function() {
+      this.component = TestUtils.renderIntoDocument(Typeahead({
         options: BEATLES,
       }));
+    });
 
-      // hash of input values to num of expected results
+    it('should fuzzy search and render matching results', function() {
+      // input value: num of expected results
       var testplan = {
         'o': 3,
         'pa': 1,
@@ -35271,10 +35274,34 @@ describe('Typeahead Component', function() {
       };
 
       _.each(testplan, function(expected, value) {
-        var results = simulateTextInput(component, value);
+        var results = simulateTextInput(this.component, value);
         assert.equal(results.length, expected, 'Text input: ' + value);
+      }, this);
+    });
+
+    context('keyboard controls', function() {
+      it('down arrow + return', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var secondItem = results[1].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+        assert.equal(node.value, secondItem); // Poor Ringo
+      });
+
+      it('up arrow + return', function() {
+        var results2 = simulateTextInput(this.component, 'o');
+        var firstItem = results2[0].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+        assert.equal(node.value, firstItem);
       });
     });
+
   });
 
   context('maxVisible', function() {
@@ -35290,4 +35317,4 @@ describe('Typeahead Component', function() {
 
 });
 
-},{"../src/typeahead":"/Users/sam/dev/forks/react-typeahead/src/typeahead/index.js","../src/typeahead/option":"/Users/sam/dev/forks/react-typeahead/src/typeahead/option.js","../src/typeahead/selector":"/Users/sam/dev/forks/react-typeahead/src/typeahead/selector.js","chai":"/Users/sam/dev/forks/react-typeahead/node_modules/chai/index.js","lodash":"/Users/sam/dev/forks/react-typeahead/node_modules/lodash/dist/lodash.js","react/addons":"/Users/sam/dev/forks/react-typeahead/node_modules/react/addons.js"}]},{},["/Users/sam/dev/forks/react-typeahead/test/main.js"]);
+},{"../src/keyevent":"/Users/sam/dev/forks/react-typeahead/src/keyevent.js","../src/typeahead":"/Users/sam/dev/forks/react-typeahead/src/typeahead/index.js","../src/typeahead/option":"/Users/sam/dev/forks/react-typeahead/src/typeahead/option.js","../src/typeahead/selector":"/Users/sam/dev/forks/react-typeahead/src/typeahead/selector.js","chai":"/Users/sam/dev/forks/react-typeahead/node_modules/chai/index.js","lodash":"/Users/sam/dev/forks/react-typeahead/node_modules/lodash/dist/lodash.js","react/addons":"/Users/sam/dev/forks/react-typeahead/node_modules/react/addons.js"}]},{},["/Users/sam/dev/forks/react-typeahead/test/main.js"]);
