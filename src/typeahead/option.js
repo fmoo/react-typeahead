@@ -35,8 +35,8 @@ var TypeaheadOption = React.createClass({
     var classList = React.addons.classSet(classes);
 
     return (
-      <li className={classList}>
-        <a href="#" className={this._getClasses()} onClick={this._onClick} ref="anchor">
+      <li className={classList} onClick={this._onClick}>
+        <a href="#" className={this._getClasses()} ref="anchor">
           { this.props.children }
         </a>
       </li>
