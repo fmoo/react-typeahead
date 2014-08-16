@@ -15,10 +15,12 @@ var Token = React.createClass({
   },
 
   render: function() {
-    return <div className="typeahead-token">
-      {this.props.children}
-      {this._makeCloseButton()}
-    </div>;
+    return this.transferPropsTo(
+      <div className="typeahead-token">
+        {this.props.children}
+        {this._makeCloseButton()}
+      </div>
+    );
   },
 
   _makeCloseButton: function() {

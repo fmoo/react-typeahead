@@ -15,6 +15,7 @@ var Typeahead = require('../typeahead');
 var TypeaheadTokenizer = React.createClass({
   propTypes: {
     options: React.PropTypes.array,
+    customClasses: React.PropTypes.object,
     defaultSelected: React.PropTypes.array,
     defaultValue: React.PropTypes.string
   },
@@ -29,6 +30,7 @@ var TypeaheadTokenizer = React.createClass({
     return {
       options: [],
       defaultSelected: [],
+      customClasses: {},
       defaultValue: ""
     };
   },
@@ -36,8 +38,16 @@ var TypeaheadTokenizer = React.createClass({
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
+    var tokenClasses = {}
+    tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
+    var classList = React.addons.classSet(tokenClasses);
     var result = this.state.selected.map(function(selected) {
-      return <Token key={ selected } onRemove={ this._removeTokenForValue }>{ selected }</Token>;
+      return (
+        <Token key={ selected } className={classList}
+          onRemove={ this._removeTokenForValue }>
+          { selected }
+        </Token>
+      )
     }, this);
     return result;
   },
@@ -92,13 +102,21 @@ var TypeaheadTokenizer = React.createClass({
   },
 
   render: function() {
-    return <div>
-      { this._renderTokens() }
-      <Typeahead ref="typeahead" options={this._getOptionsForTypeahead()}
-        defaultValue={this.props.defaultValue} 
-        onOptionSelected={this._addTokenForValue} 
-        onKeyDown={this._onKeyDown} />
-    </div>
+    var classes = {}
+    classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
+    var classList = React.addons.classSet(classes);
+    return (
+      <div>
+        { this._renderTokens() }
+        <Typeahead ref="typeahead"
+          className={classList}
+          customClasses={this.props.customClasses}
+          options={this._getOptionsForTypeahead()}
+          defaultValue={this.props.defaultValue}
+          onOptionSelected={this._addTokenForValue}
+          onKeyDown={this._onKeyDown} />
+      </div>
+    )
   }
 });
 

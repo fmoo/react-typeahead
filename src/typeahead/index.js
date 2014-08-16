@@ -2,7 +2,7 @@
  * @jsx React.DOM
  */
 
-var React = window.React || require('react');
+var React = window.React || require('react/addons');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
@@ -15,10 +15,7 @@ var fuzzy = require('fuzzy');
  */
 var Typeahead = React.createClass({
   propTypes: {
-    customLIClass: React.PropTypes.string,
-    customEntryClass: React.PropTypes.string,
-    customOptionClass: React.PropTypes.string,
-    customSelectorClass: React.PropTypes.string,
+    customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
@@ -29,6 +26,7 @@ var Typeahead = React.createClass({
   getDefaultProps: function() {
     return {
       options: [],
+      customClasses: {},
       defaultValue: "",
       onKeyDown: function(event) { return true; },
       onOptionSelected: function(option) { }
@@ -36,15 +34,9 @@ var Typeahead = React.createClass({
   },
 
   getInitialState: function() {
-    // We sort the options initially, so that shorter results match first
-    var sortedOptions = this.props.options.slice();
-    sortedOptions.sort(function(a, b) {
-      return a.length - b.length;
-    });
-
     return {
       // The set of all options... Does this need to be state?  I guess for lazy load...
-      options: sortedOptions,
+      options: this.props.options,
 
       // The currently visible set of options
       visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
@@ -93,9 +85,7 @@ var Typeahead = React.createClass({
       <TypeaheadSelector
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
-        customLIClass={this.props.customLIClass}
-        customSelectorClass={this.props.customSelectorClass}
-        customOptionClass={this.props.customOptionClass} />
+        customClasses={this.props.customClasses} />
    );
   },
 
@@ -144,11 +134,21 @@ var Typeahead = React.createClass({
   },
 
   render: function() {
-    return this.transferPropsTo(
-      <div className="typeahead">
-        <input ref="entry" type="text" defaultValue={this.state.entryValue}
-          className={this.props.customEntryClass}
-          onChange={ this._onTextEntryUpdated } onKeyDown={this._onKeyDown} />
+    var inputClasses = {}
+    inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
+    var inputClassList = React.addons.classSet(inputClasses)
+
+    var classes = {
+      typeahead: true
+    }
+    classes[this.props.className] = !!this.props.className;
+    var classList = React.addons.classSet(classes);
+
+    return (
+      <div className={classList}>
+        <input ref="entry" type="text"
+          className={inputClassList} defaultValue={this.state.entryValue}
+          onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown} />
         { this._renderIncrementalSearchResults() }
       </div>
     );

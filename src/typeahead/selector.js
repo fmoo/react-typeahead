@@ -2,7 +2,7 @@
  * @jsx React.DOM
  */
 
-var React = window.React || require('react');
+var React = window.React || require('react/addons');
 var TypeaheadOption = require('./option');
 
 /**
@@ -12,8 +12,7 @@ var TypeaheadOption = require('./option');
 var TypeaheadSelector = React.createClass({
   propTypes: {
     options: React.PropTypes.array,
-    customOptionClass: React.PropTypes.string,
-    customSelectorClass: React.PropTypes.string,
+    customClasses: React.PropTypes.object,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func
   },
@@ -21,6 +20,7 @@ var TypeaheadSelector = React.createClass({
   getDefaultProps: function() {
     return {
       selectionIndex: null,
+      customClasses: {},
       onOptionSelected: function(option) { }
     };
   },
@@ -33,13 +33,17 @@ var TypeaheadSelector = React.createClass({
   },
 
   render: function() {
-    var classList = "typeahead-selector " + this.props.customSelectorClass;
+    var classes = {
+      "typeahead-selector": true
+    };
+    classes[this.props.customClasses.results] = this.props.customClasses.results;
+    var classList = React.addons.classSet(classes);
+
     var results = this.props.options.map(function(result, i) {
       return (
         <TypeaheadOption ref={result} key={result}
           hover={this.state.selectionIndex === i}
-          customLIClass={this.props.customLIClass}
-          customClass={this.props.customOptionClass}
+          customClasses={this.props.customClasses}
           onClick={this._onClick.bind(this, result)}>
           { result }
         </TypeaheadOption>
