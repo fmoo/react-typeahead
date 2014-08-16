@@ -34,10 +34,11 @@
     }
 
 
+
     </style>
 
     <div id="main">
-      <h1>Topcoat + React.Typeahead</h1>
+      <h1>Topcoat + React.Tokenizer</h1>
       <div id="typeahead"></div>
     </div>
 
@@ -54,14 +55,14 @@
     }
 
     React.renderComponent(
-      <ReactTypeahead.Typeahead
-        defaultValue="src"
+      <ReactTypeahead.Tokenizer
         options={req.response.split('\n')}
-        className="topcoat-list"
         customClasses={{
+          typeahead: "topcoat-list",
           input: "topcoat-text-input",
           results: "topcoat-list__container",
-          listItem: "topcoat-list__item"
+          listItem: "topcoat-list__item",
+          token: "topcoat-button"
         }} />,
       document.getElementById("typeahead")
     );
@@ -74,4 +75,5 @@
 
   </body>
 </html>
+
 
