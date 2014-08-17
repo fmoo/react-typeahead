@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-mobile-dark.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="../node_modules/react/dist/react-with-addons.js"></script>
+    <script src="../node_modules/react/dist/JSXTransformer.js"></script>
+    <script src="../dist/react-typeahead.js"></script>
+  </head>
+  <body>
+    <style>
+
+    #main {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #F0F1F1;
+    }
+
+    a {
+      color: #288EDF;
+    }
+
+    .topcoat-text-input {
+      width: 100%;
+    }
+
+    li.hover {
+      background: #585858;
+    }
+
+
+
+    </style>
+
+    <div id="main">
+      <h1>Topcoat + React.Tokenizer</h1>
+      <div id="typeahead"></div>
+    </div>
+
+    <script type="text/jsx">
+/** @jsx React.DOM */
+
+(function(){
+  var req = new XMLHttpRequest();
+  req.open('GET', 'files.txt');
+
+  req.onload = function() {
+    if (req.status !== 200) {
+      throw new Error('nope');
+    }
+
+    React.renderComponent(
+      <ReactTypeahead.Tokenizer
+        options={req.response.split('\n')}
+        customClasses={{
+          typeahead: "topcoat-list",
+          input: "topcoat-text-input",
+          results: "topcoat-list__container",
+          listItem: "topcoat-list__item",
+          token: "topcoat-button"
+        }} />,
+      document.getElementById("typeahead")
+    );
+  };
+
+  req.send();
+})()
+
+    </script>
+
+  </body>
+</html>
+
+
