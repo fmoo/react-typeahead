@@ -35029,6 +35029,12 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     this.refs.sel.setSelectionIndex(null)
   },
 
+  _onTab: function(event) {
+    var option = this.refs.sel.state.selection ?
+      this.refs.sel.state.selection : this.state.visible[0];
+    this._onOptionSelected(option)
+  },
+
   eventMap: function(e) {
     var events = {};
 
@@ -35036,6 +35042,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     events[KeyEvent.DOM_VK_DOWN] = this.refs.sel.navDown;
     events[KeyEvent.DOM_VK_RETURN] = events[KeyEvent.DOM_VK_ENTER] = this._onEnter;
     events[KeyEvent.DOM_VK_ESCAPE] = this._onEscape;
+    events[KeyEvent.DOM_VK_TAB] = this._onTab;
 
     return events;
   },
@@ -35050,7 +35057,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     var handler = this.eventMap()[event.keyCode];
 
     if (handler) {
-      handler();
+      handler(event);
     } else {
       return this.props.onKeyDown(event);
     }
@@ -35330,7 +35337,7 @@ describe('Typeahead Component', function() {
     });
 
     describe('keyboard controls', function() {
-      it('down arrow + return', function() {
+      it('down arrow + return selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var secondItem = results[1].getDOMNode().innerText;
         var node = this.component.refs.entry.getDOMNode();
@@ -35340,7 +35347,7 @@ describe('Typeahead Component', function() {
         assert.equal(node.value, secondItem); // Poor Ringo
       });
 
-      it('up arrow + return', function() {
+      it('up arrow + return navigates and selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = results[0].getDOMNode().innerText;
         var node = this.component.refs.entry.getDOMNode();
@@ -35359,6 +35366,24 @@ describe('Typeahead Component', function() {
         assert.ok(firstItem.classList.contains('hover'));
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
         assert.notOk(firstItem.classList.contains('hover'));
+      });
+
+      it('tab to choose first item', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var itemText = results[0].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        assert.equal(node.value, itemText);
+      });
+
+      it('tab to selected current item', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var itemText = results[1].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        assert.equal(node.value, itemText);
       });
     });
 
