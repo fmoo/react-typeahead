@@ -20580,6 +20580,7 @@ KeyEvent.DOM_VK_BACK_SPACE = KeyEvent.DOM_VK_BACK_SPACE || 8;
 KeyEvent.DOM_VK_RETURN = KeyEvent.DOM_VK_RETURN || 13;
 KeyEvent.DOM_VK_ENTER = KeyEvent.DOM_VK_ENTER || 14;
 KeyEvent.DOM_VK_ESCAPE = KeyEvent.DOM_VK_ESCAPE || 27;
+KeyEvent.DOM_VK_TAB = KeyEvent.DOM_VK_TAB || 9;
 
 module.exports = KeyEvent;
 
@@ -20612,7 +20613,10 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
     defaultSelected: React.PropTypes.array,
-    defaultValue: React.PropTypes.string
+    defaultValue: React.PropTypes.string,
+    placeholder: React.PropTypes.string,
+    onTokenRemove: React.PropTypes.func,
+    onTokenAdd: React.PropTypes.func
   },
 
   getInitialState: function() {
@@ -20626,7 +20630,10 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
       options: [],
       defaultSelected: [],
       customClasses: {},
-      defaultValue: ""
+      defaultValue: "",
+      placeholder: "",
+      onTokenAdd: function() {},
+      onTokenRemove: function() {}
     };
   },
 
@@ -20684,6 +20691,7 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
 
     this.state.selected.splice(index, 1);
     this.setState({selected: this.state.selected});
+    this.props.onTokenRemove(this.state.selected);
     return false;
   },
 
@@ -20694,6 +20702,7 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
     this.state.selected.push(value);
     this.setState({selected: this.state.selected});
     this.refs.typeahead.setEntryText("");
+    this.props.onTokenAdd(this.state.selected);
   },
 
   render: function() {
@@ -20705,6 +20714,7 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
          this._renderTokens(), 
         Typeahead({ref: "typeahead", 
           className: classList, 
+          placeholder: this.props.placeholder, 
           customClasses: this.props.customClasses, 
           options: this._getOptionsForTypeahead(), 
           defaultValue: this.props.defaultValue, 
@@ -20780,6 +20790,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
+    placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
     onKeyDown: React.PropTypes.func
   },
@@ -20789,6 +20800,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
       options: [],
       customClasses: {},
       defaultValue: "",
+      placeholder: "",
       onKeyDown: function(event) { return true; },
       onOptionSelected: function(option) { }
     };
@@ -20868,6 +20880,35 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     return false;
   },
 
+  _onEnter: function(event) {
+    if (!this.refs.sel.state.selection) {
+      return this.props.onKeyDown(event);
+    }
+    this._onOptionSelected(this.refs.sel.state.selection);
+  },
+
+  _onEscape: function() {
+    this.refs.sel.setSelectionIndex(null)
+  },
+
+  _onTab: function(event) {
+    var option = this.refs.sel.state.selection ?
+      this.refs.sel.state.selection : this.state.visible[0];
+    this._onOptionSelected(option)
+  },
+
+  eventMap: function(e) {
+    var events = {};
+
+    events[KeyEvent.DOM_VK_UP] = this.refs.sel.navUp;
+    events[KeyEvent.DOM_VK_DOWN] = this.refs.sel.navDown;
+    events[KeyEvent.DOM_VK_RETURN] = events[KeyEvent.DOM_VK_ENTER] = this._onEnter;
+    events[KeyEvent.DOM_VK_ESCAPE] = this._onEscape;
+    events[KeyEvent.DOM_VK_TAB] = this._onTab;
+
+    return events;
+  },
+
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler
@@ -20875,18 +20916,10 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
       return this.props.onKeyDown(event);
     }
 
-    if (event.keyCode == KeyEvent.DOM_VK_UP) {
-      this.refs.sel.navUp();
-    } else if (event.keyCode == KeyEvent.DOM_VK_DOWN) {
-      this.refs.sel.navDown();
-    } else if (event.keyCode == KeyEvent.DOM_VK_RETURN ||
-               event.keyCode == KeyEvent.DOM_VK_ENTER) {
-      if (!this.refs.sel.state.selection) {
-        return this.props.onKeyDown(event);
-      }
-      this._onOptionSelected(this.refs.sel.state.selection);
-    } else if (event.keyCode == KeyEvent.DOM_VK_ESCAPE) {
-      this.refs.sel.setSelectionIndex(null);
+    var handler = this.eventMap()[event.keyCode];
+
+    if (handler) {
+      handler(event);
     } else {
       return this.props.onKeyDown(event);
     }
@@ -20908,6 +20941,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
     return (
       React.DOM.div({className: classList}, 
         React.DOM.input({ref: "entry", type: "text", 
+          placeholder: this.props.placeholder, 
           className: inputClassList, defaultValue: this.state.entryValue, 
           onChange: this._onTextEntryUpdated, onKeyDown: this._onKeyDown}), 
          this._renderIncrementalSearchResults() 
@@ -20956,8 +20990,8 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
     var classList = React.addons.classSet(classes);
 
     return (
-      React.DOM.li({className: classList}, 
-        React.DOM.a({href: "#", className: this._getClasses(), onClick: this._onClick, ref: "anchor"}, 
+      React.DOM.li({className: classList, onClick: this._onClick}, 
+        React.DOM.a({href: "#", className: this._getClasses(), ref: "anchor"}, 
            this.props.children
         )
       )

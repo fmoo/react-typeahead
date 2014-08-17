@@ -42,7 +42,7 @@ describe('Typeahead Component', function() {
     });
 
     describe('keyboard controls', function() {
-      it('down arrow + return', function() {
+      it('down arrow + return selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var secondItem = results[1].getDOMNode().innerText;
         var node = this.component.refs.entry.getDOMNode();
@@ -52,15 +52,43 @@ describe('Typeahead Component', function() {
         assert.equal(node.value, secondItem); // Poor Ringo
       });
 
-      it('up arrow + return', function() {
-        var results2 = simulateTextInput(this.component, 'o');
-        var firstItem = results2[0].getDOMNode().innerText;
+      it('up arrow + return navigates and selects an option', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode().innerText;
         var node = this.component.refs.entry.getDOMNode();
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
         assert.equal(node.value, firstItem);
+      });
+
+      it('escape clears selection', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode();
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        assert.ok(firstItem.classList.contains('hover'));
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
+        assert.notOk(firstItem.classList.contains('hover'));
+      });
+
+      it('tab to choose first item', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var itemText = results[0].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        assert.equal(node.value, itemText);
+      });
+
+      it('tab to selected current item', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var itemText = results[1].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        assert.equal(node.value, itemText);
       });
     });
 
