@@ -53,14 +53,24 @@ describe('Typeahead Component', function() {
       });
 
       it('up arrow + return', function() {
-        var results2 = simulateTextInput(this.component, 'o');
-        var firstItem = results2[0].getDOMNode().innerText;
+        var results = simulateTextInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode().innerText;
         var node = this.component.refs.entry.getDOMNode();
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
         assert.equal(node.value, firstItem);
+      });
+
+      it('escape clears selection', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode();
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        assert.ok(firstItem.classList.contains('hover'));
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
+        assert.notOk(firstItem.classList.contains('hover'));
       });
     });
 

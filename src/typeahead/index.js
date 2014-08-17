@@ -109,6 +109,28 @@ var Typeahead = React.createClass({
     return false;
   },
 
+  _onEnter: function(event) {
+    if (!this.refs.sel.state.selection) {
+      return this.props.onKeyDown(event);
+    }
+    this._onOptionSelected(this.refs.sel.state.selection);
+  },
+
+  _onEscape: function() {
+    this.refs.sel.setSelectionIndex(null)
+  },
+
+  eventMap: function(e) {
+    var events = {};
+
+    events[KeyEvent.DOM_VK_UP] = this.refs.sel.navUp;
+    events[KeyEvent.DOM_VK_DOWN] = this.refs.sel.navDown;
+    events[KeyEvent.DOM_VK_RETURN] = events[KeyEvent.DOM_VK_ENTER] = this._onEnter;
+    events[KeyEvent.DOM_VK_ESCAPE] = this._onEscape;
+
+    return events;
+  },
+
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler
@@ -116,18 +138,10 @@ var Typeahead = React.createClass({
       return this.props.onKeyDown(event);
     }
 
-    if (event.keyCode == KeyEvent.DOM_VK_UP) {
-      this.refs.sel.navUp();
-    } else if (event.keyCode == KeyEvent.DOM_VK_DOWN) {
-      this.refs.sel.navDown();
-    } else if (event.keyCode == KeyEvent.DOM_VK_RETURN ||
-               event.keyCode == KeyEvent.DOM_VK_ENTER) {
-      if (!this.refs.sel.state.selection) {
-        return this.props.onKeyDown(event);
-      }
-      this._onOptionSelected(this.refs.sel.state.selection);
-    } else if (event.keyCode == KeyEvent.DOM_VK_ESCAPE) {
-      this.refs.sel.setSelectionIndex(null);
+    var handler = this.eventMap()[event.keyCode];
+
+    if (handler) {
+      handler();
     } else {
       return this.props.onKeyDown(event);
     }
