@@ -38,9 +38,9 @@ React.renderComponent(Typeahead({
 
 ![](https://i.cloudup.com/CeLPJjWvFK.gif)
 
-[1]: http://fmoo.github.com/react-typeahead/blob/master/examples/typeahead-topcoat.html
-[2]: http://fmoo.github.com/react-typeahead/blob/master/examples/tokenizer-topcoat.html
-[3]: http://fmoo.github.com/react-typeahead/blob/master/examples/TypeaheadTokenizer-simple.html
+[1]: http://wookiehangover.github.com/react-typeahead/examples/typeahead-topcoat.html
+[2]: http://wookiehangover.github.com/react-typeahead/examples/tokenizer-topcoat.html
+[3]: http://wookiehangover.github.com/react-typeahead/examples/TypeaheadTokenizer-simple.html
 
 ## API
 
