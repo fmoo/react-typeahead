@@ -10,24 +10,24 @@ a typeahead that allows you to select multiple results.
 
 For a typeahead input:
 
-```
-  var Typeahead = require('react-typeahead').Typeahead;
-  React.renderComponent(Typeahead({
-    options: ['John', 'Paul', 'George', 'Ringo'],
-    maxVisible: 2
-  });
+```javascript
+var Typeahead = require('react-typeahead').Typeahead;
+React.renderComponent(Typeahead({
+  options: ['John', 'Paul', 'George', 'Ringo'],
+  maxVisible: 2
+});
 ```
 
 For a tokenizer typeahead input:
 
-```
-  var Tokenizer = require('react-typeahead').Tokenizer;
-  React.renderComponent(Typeahead({
-    options: ['John', 'Paul', 'George', 'Ringo'],
-    onTokenAdd: function(token) {
-      console.log('token added: ', token);
-    }
-  });
+```javascript
+var Tokenizer = require('react-typeahead').Tokenizer;
+React.renderComponent(Typeahead({
+  options: ['John', 'Paul', 'George', 'Ringo'],
+  onTokenAdd: function(token) {
+    console.log('token added: ', token);
+  }
+});
 ```
 
 ## Examples
@@ -87,13 +87,13 @@ Type: `Function`
 
 Event handler triggered whenever a user picks an option
 
+---
 
 ### Tokenizer(props)
 
 Type: React Component
 
-Typeahead component that handles allows for multiple options to be
-selected.
+Typeahead component that allows for multiple options to be selected.
 
 #### props.options
 
