@@ -18,6 +18,13 @@
     "email": "ruibalp@gmail.com",
     "url": "https://github.com/fmoo"
   },
+  "contributors": [
+    {
+      "name": "Sam Breed",
+      "email": "sam@quickleft.com",
+      "url": "http://wookiehangover.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/fmoo/react-typeahead.git"
