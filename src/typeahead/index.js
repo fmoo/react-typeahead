@@ -167,13 +167,13 @@ var Typeahead = React.createClass({
   },
 
   render: function() {
-    var inputClasses = {}
+    var inputClasses = {};
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
-    var inputClassList = React.addons.classSet(inputClasses)
+    var inputClassList = React.addons.classSet(inputClasses);
 
     var classes = {
       typeahead: true
-    }
+    };
     classes[this.props.className] = !!this.props.className;
     var classList = React.addons.classSet(classes);
 
