@@ -294,7 +294,7 @@ var TypeaheadTokenizer = React.createClass({displayName: 'TypeaheadTokenizer',
 
 module.exports = TypeaheadTokenizer;
 
-},{"../keyevent":2,"../typeahead":6,"./token":5,"react":9}],5:[function(require,module,exports){
+},{"../keyevent":2,"../typeahead":6,"./token":5,"react":"react"}],5:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -335,7 +335,7 @@ var Token = React.createClass({displayName: 'Token',
 
 module.exports = Token;
 
-},{"react":9}],6:[function(require,module,exports){
+},{"react":"react"}],6:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -691,7 +691,5 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
 
 module.exports = TypeaheadSelector;
 
-},{"./option":7,"react/addons":"react/addons"}],9:[function(require,module,exports){
-
-},{}]},{},[3])(3)
+},{"./option":7,"react/addons":"react/addons"}]},{},[3])(3)
 });
