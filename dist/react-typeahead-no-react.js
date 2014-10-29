@@ -519,7 +519,7 @@ var Typeahead = React.createClass({displayName: 'Typeahead',
 
 module.exports = Typeahead;
 
-},{"../keyevent":2,"./selector":8,"fuzzy":1,"react/addons":9}],7:[function(require,module,exports){
+},{"../keyevent":2,"./selector":8,"fuzzy":1,"react/addons":"react/addons"}],7:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -581,7 +581,7 @@ var TypeaheadOption = React.createClass({displayName: 'TypeaheadOption',
 
 module.exports = TypeaheadOption;
 
-},{"react/addons":9}],8:[function(require,module,exports){
+},{"react/addons":"react/addons"}],8:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -691,7 +691,7 @@ var TypeaheadSelector = React.createClass({displayName: 'TypeaheadSelector',
 
 module.exports = TypeaheadSelector;
 
-},{"./option":7,"react/addons":9}],9:[function(require,module,exports){
+},{"./option":7,"react/addons":"react/addons"}],9:[function(require,module,exports){
 
 },{}]},{},[3])(3)
 });
