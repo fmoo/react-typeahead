@@ -51,7 +51,7 @@
   "scripts": {
     "watch": "watchify test/main.js -o test/bundle.js -v",
     "build-test": "browserify test/main.js -o test/bundle.js",
-    "build": "browserify src/react-typeahead.js -s ReactTypeahead -u react -o dist/react-typeahead.js"
+    "build": "browserify src/react-typeahead.js -s ReactTypeahead -i react -x react -x 'react/addons' -o dist/react-typeahead.js"
   },
   "browserify": {
     "transform": [
