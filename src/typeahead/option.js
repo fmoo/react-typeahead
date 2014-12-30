@@ -17,7 +17,9 @@ var TypeaheadOption = React.createClass({
   getDefaultProps: function() {
     return {
       customClasses: {},
-      onClick: function() { return false; }
+      onClick: function(event) { 
+        event.preventDefault(); 
+      }
     };
   },
 
@@ -51,7 +53,7 @@ var TypeaheadOption = React.createClass({
     return React.addons.classSet(classes);
   },
 
-  _onClick: function(e) {
+  _onClick: function() {
     return this.props.onClick();
   }
 });
