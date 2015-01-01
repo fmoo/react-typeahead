@@ -12,7 +12,7 @@ For a typeahead input:
 
 ```javascript
 var Typeahead = require('react-typeahead').Typeahead;
-React.renderComponent(Typeahead({
+React.render(Typeahead({
   options: ['John', 'Paul', 'George', 'Ringo'],
   maxVisible: 2
 });
@@ -22,7 +22,7 @@ For a tokenizer typeahead input:
 
 ```javascript
 var Tokenizer = require('react-typeahead').Tokenizer;
-React.renderComponent(Typeahead({
+React.render(Typeahead({
   options: ['John', 'Paul', 'George', 'Ringo'],
   onTokenAdd: function(token) {
     console.log('token added: ', token);

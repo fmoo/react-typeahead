@@ -30,7 +30,7 @@ var Typeahead = React.createClass({
       customClasses: {},
       defaultValue: "",
       placeholder: "",
-      onKeyDown: function(event) { return true; },
+      onKeyDown: function(event) { return },
       onOptionSelected: function(option) { }
     };
   },
@@ -106,7 +106,6 @@ var Typeahead = React.createClass({
     this.setState({visible: this.getOptionsForValue(value, this.state.options),
                    selection: null,
                    entryValue: value});
-    return false;
   },
 
   _onEnter: function(event) {
@@ -126,7 +125,7 @@ var Typeahead = React.createClass({
     this._onOptionSelected(option)
   },
 
-  eventMap: function(e) {
+  eventMap: function(event) {
     var events = {};
 
     events[KeyEvent.DOM_VK_UP] = this.refs.sel.navUp;
@@ -153,7 +152,7 @@ var Typeahead = React.createClass({
       return this.props.onKeyDown(event);
     }
     // Don't propagate the keystroke back to the DOM/browser
-    return false;
+    event.preventDefault();
   },
 
   render: function() {

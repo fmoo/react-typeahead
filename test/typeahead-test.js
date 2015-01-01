@@ -20,9 +20,9 @@ describe('Typeahead Component', function() {
 
   describe('sanity', function() {
     beforeEach(function() {
-      this.component = TestUtils.renderIntoDocument(Typeahead({
-        options: BEATLES,
-      }));
+      this.component = TestUtils.renderIntoDocument(<Typeahead options={
+        BEATLES
+      } />);
     });
 
     it('should fuzzy search and render matching results', function() {
@@ -97,10 +97,10 @@ describe('Typeahead Component', function() {
   describe('props', function() {
     context('maxVisible', function() {
       it('limits the result set based on the maxVisible option', function() {
-        var component = TestUtils.renderIntoDocument(Typeahead({
-          options: BEATLES,
-          maxVisible: 1
-        }));
+        var component = TestUtils.renderIntoDocument(<Typeahead 
+          options={ BEATLES }
+          maxVisible={ 1 }
+        />);
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
       });
@@ -109,15 +109,17 @@ describe('Typeahead Component', function() {
     context('customClasses', function() {
 
       before(function() {
-        this.component = TestUtils.renderIntoDocument(Typeahead({
-          options: BEATLES,
-          customClasses: {
-            input: 'topcoat-text-input',
-            results: 'topcoat-list__container',
-            listItem: 'topcoat-list__item',
-            listAnchor: 'topcoat-list__link'
-          }
-        }));
+        var customClasses = {
+          input: 'topcoat-text-input',
+          results: 'topcoat-list__container',
+          listItem: 'topcoat-list__item',
+          listAnchor: 'topcoat-list__link'
+        };
+
+        this.component = TestUtils.renderIntoDocument(<Typeahead 
+          options={ BEATLES }
+          customClasses={ customClasses }
+        />);
 
         simulateTextInput(this.component, 'o');
       });
@@ -147,10 +149,10 @@ describe('Typeahead Component', function() {
 
     context('defaultValue', function() {
       it('should perform an initial search if a default value is provided', function() {
-        var component = TestUtils.renderIntoDocument(Typeahead({
-          options: BEATLES,
-          defaultValue: 'o'
-        }));
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          defaultValue={ 'o' }
+        />);
 
         var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
         assert.equal(results.length, 3);
@@ -159,12 +161,13 @@ describe('Typeahead Component', function() {
 
     context('onKeyDown', function() {
       it('should bind to key events on the input', function() {
-        var component = TestUtils.renderIntoDocument(Typeahead({
-          options: BEATLES,
-          onKeyDown: function(e) {
-            assert.equal(e.keyCode, 87);
-          },
-        }));
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          onKeyDown={ function(e) {
+              assert.equal(e.keyCode, 87);
+            }
+          }
+        />);
 
         var input = component.refs.entry.getDOMNode();
         TestUtils.Simulate.keyDown(input, { keyCode: 87 });
