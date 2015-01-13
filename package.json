@@ -1,6 +1,6 @@
 {
   "name": "react-typeahead",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -32,21 +32,21 @@
   },
   "dependencies": {
     "fuzzy": "^0.1.0",
-    "react": "^0.11.0"
+    "react": "^0.12.2"
   },
   "main": "src/react-typeahead.js",
   "devDependencies": {
-    "browserify": "^5.9.3",
+    "browserify": "^8.0.2",
     "chai": "^1.9.1",
     "es5-shim": "^4.0.1",
     "gulp": "^3.8.7",
     "gulp-mocha-phantomjs": "^0.4.0",
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
-    "react-tools": "^0.11.1",
-    "reactify": "^0.14.0",
+    "react-tools": "^0.12.2",
+    "reactify": "^0.17.1",
     "sinon": "^1.10.3",
-    "watchify": "^1.0.2"
+    "watchify": "^2.2.1"
   },
   "scripts": {
     "watch": "watchify test/main.js -o test/bundle.js -v",
