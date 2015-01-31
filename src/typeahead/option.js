@@ -30,9 +30,8 @@ var TypeaheadOption = React.createClass({
   },
 
   render: function() {
-    var classes = {
-      hover: this.props.hover
-    }
+    var classes = {};
+    classes[this.props.customClasses.hover || "hover"] = this.props.hover;
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
     var classList = React.addons.classSet(classes);
 
