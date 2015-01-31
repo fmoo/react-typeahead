@@ -34,11 +34,16 @@ var TypeaheadOption = React.createClass({
     classes[this.props.customClasses.hover || "hover"] = this.props.hover;
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
     var classList = React.addons.classSet(classes);
+      
+    var value = this.props.children;
+      
+    if(typeof(this.props.formatter) !== "undefined")
+        value = this.props.formatter(value);
 
     return (
       <li className={classList} onClick={this._onClick}>
         <a href="#" className={this._getClasses()} ref="anchor">
-          { this.props.children }
+          {value}
         </a>
       </li>
     );

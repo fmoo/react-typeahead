@@ -44,6 +44,7 @@ var TypeaheadSelector = React.createClass({
         <TypeaheadOption ref={result}   
           hover={this.state.selectionIndex === i}
           customClasses={this.props.customClasses}
+          formatter={this.props.formatter}
           onClick={this._onClick.bind(this, result)}>
           { result }
         </TypeaheadOption>
@@ -67,6 +68,7 @@ var TypeaheadSelector = React.createClass({
   },
 
   _onClick: function(result) {
+      console.log(result);
     this.props.onOptionSelected(result);
   },
 

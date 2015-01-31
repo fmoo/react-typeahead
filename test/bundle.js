@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -1316,7 +1316,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":2,"ieee754":3,"is-array":4}],2:[function(require,module,exports){
+},{"base64-js":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js","ieee754":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js","is-array":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js"}],"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\base64-js\\lib\\b64.js":[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1442,7 +1442,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],3:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\ieee754\\index.js":[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -1528,7 +1528,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\node_modules\\is-array\\index.js":[function(require,module,exports){
 
 /**
  * isArray
@@ -1563,7 +1563,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],5:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js":[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1622,10 +1622,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],6:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\index.js":[function(require,module,exports){
 module.exports = require('./lib/chai');
 
-},{"./lib/chai":7}],7:[function(require,module,exports){
+},{"./lib/chai":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai.js":[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -1714,7 +1714,7 @@ exports.use(should);
 var assert = require('./chai/interface/assert');
 exports.use(assert);
 
-},{"./chai/assertion":8,"./chai/config":9,"./chai/core/assertions":10,"./chai/interface/assert":11,"./chai/interface/expect":12,"./chai/interface/should":13,"./chai/utils":24,"assertion-error":33}],8:[function(require,module,exports){
+},{"./chai/assertion":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\assertion.js","./chai/config":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\config.js","./chai/core/assertions":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\core\\assertions.js","./chai/interface/assert":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\interface\\assert.js","./chai/interface/expect":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\interface\\expect.js","./chai/interface/should":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\interface\\should.js","./chai/utils":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\index.js","assertion-error":"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\assertion-error\\index.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\assertion.js":[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -1851,7 +1851,7 @@ module.exports = function (_chai, util) {
   });
 };
 
-},{"./config":9}],9:[function(require,module,exports){
+},{"./config":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\config.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\config.js":[function(require,module,exports){
 module.exports = {
 
   /**
@@ -1903,7 +1903,7 @@ module.exports = {
 
 };
 
-},{}],10:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\core\\assertions.js":[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -3264,7 +3264,7 @@ module.exports = function (chai, _) {
   });
 };
 
-},{}],11:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\interface\\assert.js":[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4322,7 +4322,7 @@ module.exports = function (chai, util) {
   ('Throw', 'throws');
 };
 
-},{}],12:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\interface\\expect.js":[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4336,7 +4336,7 @@ module.exports = function (chai, util) {
 };
 
 
-},{}],13:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\interface\\should.js":[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4416,7 +4416,7 @@ module.exports = function (chai, util) {
   chai.Should = loadShould;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\addChainableMethod.js":[function(require,module,exports){
 /*!
  * Chai - addChainingMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4529,7 +4529,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   });
 };
 
-},{"../config":9,"./flag":17,"./transferFlags":31}],15:[function(require,module,exports){
+},{"../config":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\config.js","./flag":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\flag.js","./transferFlags":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\transferFlags.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\addMethod.js":[function(require,module,exports){
 /*!
  * Chai - addMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4574,7 +4574,7 @@ module.exports = function (ctx, name, method) {
   };
 };
 
-},{"../config":9,"./flag":17}],16:[function(require,module,exports){
+},{"../config":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\config.js","./flag":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\flag.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\addProperty.js":[function(require,module,exports){
 /*!
  * Chai - addProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4616,7 +4616,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],17:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\flag.js":[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4650,7 +4650,7 @@ module.exports = function (obj, key, value) {
   }
 };
 
-},{}],18:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getActual.js":[function(require,module,exports){
 /*!
  * Chai - getActual utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4670,7 +4670,7 @@ module.exports = function (obj, args) {
   return args.length > 4 ? args[4] : obj._obj;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getEnumerableProperties.js":[function(require,module,exports){
 /*!
  * Chai - getEnumerableProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4697,7 +4697,7 @@ module.exports = function getEnumerableProperties(object) {
   return result;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getMessage.js":[function(require,module,exports){
 /*!
  * Chai - message composition utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4749,7 +4749,7 @@ module.exports = function (obj, args) {
   return flagMsg ? flagMsg + ': ' + msg : msg;
 };
 
-},{"./flag":17,"./getActual":18,"./inspect":25,"./objDisplay":26}],21:[function(require,module,exports){
+},{"./flag":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\flag.js","./getActual":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getActual.js","./inspect":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\inspect.js","./objDisplay":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\objDisplay.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getName.js":[function(require,module,exports){
 /*!
  * Chai - getName utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4771,7 +4771,7 @@ module.exports = function (func) {
   return match && match[1] ? match[1] : "";
 };
 
-},{}],22:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getPathValue.js":[function(require,module,exports){
 /*!
  * Chai - getPathValue utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4875,7 +4875,7 @@ function _getPathValue (parsed, obj) {
   return res;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getProperties.js":[function(require,module,exports){
 /*!
  * Chai - getProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4912,7 +4912,7 @@ module.exports = function getProperties(object) {
   return result;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\index.js":[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011 Jake Luer <jake@alogicalparadox.com>
@@ -5028,7 +5028,7 @@ exports.addChainableMethod = require('./addChainableMethod');
 exports.overwriteChainableMethod = require('./overwriteChainableMethod');
 
 
-},{"./addChainableMethod":14,"./addMethod":15,"./addProperty":16,"./flag":17,"./getActual":18,"./getMessage":20,"./getName":21,"./getPathValue":22,"./inspect":25,"./objDisplay":26,"./overwriteChainableMethod":27,"./overwriteMethod":28,"./overwriteProperty":29,"./test":30,"./transferFlags":31,"./type":32,"deep-eql":34}],25:[function(require,module,exports){
+},{"./addChainableMethod":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\addChainableMethod.js","./addMethod":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\addMethod.js","./addProperty":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\addProperty.js","./flag":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\flag.js","./getActual":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getActual.js","./getMessage":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getMessage.js","./getName":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getName.js","./getPathValue":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getPathValue.js","./inspect":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\inspect.js","./objDisplay":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\objDisplay.js","./overwriteChainableMethod":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\overwriteChainableMethod.js","./overwriteMethod":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\overwriteMethod.js","./overwriteProperty":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\overwriteProperty.js","./test":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\test.js","./transferFlags":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\transferFlags.js","./type":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\type.js","deep-eql":"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\index.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\inspect.js":[function(require,module,exports){
 // This is (almost) directly from Node.js utils
 // https://github.com/joyent/node/blob/f8c335d0caf47f16d31413f89aa28eda3878e3aa/lib/util.js
 
@@ -5363,7 +5363,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-},{"./getEnumerableProperties":19,"./getName":21,"./getProperties":23}],26:[function(require,module,exports){
+},{"./getEnumerableProperties":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getEnumerableProperties.js","./getName":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getName.js","./getProperties":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\getProperties.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\objDisplay.js":[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5414,7 +5414,7 @@ module.exports = function (obj) {
   }
 };
 
-},{"../config":9,"./inspect":25}],27:[function(require,module,exports){
+},{"../config":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\config.js","./inspect":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\inspect.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\overwriteChainableMethod.js":[function(require,module,exports){
 /*!
  * Chai - overwriteChainableMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5469,7 +5469,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   };
 };
 
-},{}],28:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\overwriteMethod.js":[function(require,module,exports){
 /*!
  * Chai - overwriteMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5522,7 +5522,7 @@ module.exports = function (ctx, name, method) {
   }
 };
 
-},{}],29:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\overwriteProperty.js":[function(require,module,exports){
 /*!
  * Chai - overwriteProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5578,7 +5578,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],30:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\test.js":[function(require,module,exports){
 /*!
  * Chai - test utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5606,7 +5606,7 @@ module.exports = function (obj, args) {
   return negate ? !expr : expr;
 };
 
-},{"./flag":17}],31:[function(require,module,exports){
+},{"./flag":"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\flag.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\transferFlags.js":[function(require,module,exports){
 /*!
  * Chai - transferFlags utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5652,7 +5652,7 @@ module.exports = function (assertion, object, includeAll) {
   }
 };
 
-},{}],32:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\lib\\chai\\utils\\type.js":[function(require,module,exports){
 /*!
  * Chai - type utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5699,7 +5699,7 @@ module.exports = function (obj) {
   return typeof obj;
 };
 
-},{}],33:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\assertion-error\\index.js":[function(require,module,exports){
 /*!
  * assertion-error
  * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
@@ -5811,10 +5811,10 @@ AssertionError.prototype.toJSON = function (stack) {
   return props;
 };
 
-},{}],34:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\index.js":[function(require,module,exports){
 module.exports = require('./lib/eql');
 
-},{"./lib/eql":35}],35:[function(require,module,exports){
+},{"./lib/eql":"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\lib\\eql.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\lib\\eql.js":[function(require,module,exports){
 /*!
  * deep-eql
  * Copyright(c) 2013 Jake Luer <jake@alogicalparadox.com>
@@ -6073,10 +6073,10 @@ function objectEqual(a, b, m) {
   return true;
 }
 
-},{"buffer":1,"type-detect":36}],36:[function(require,module,exports){
+},{"buffer":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\buffer\\index.js","type-detect":"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\node_modules\\type-detect\\index.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\node_modules\\type-detect\\index.js":[function(require,module,exports){
 module.exports = require('./lib/type');
 
-},{"./lib/type":37}],37:[function(require,module,exports){
+},{"./lib/type":"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\node_modules\\type-detect\\lib\\type.js"}],"C:\\dev\\react-typeahead\\node_modules\\chai\\node_modules\\deep-eql\\node_modules\\type-detect\\lib\\type.js":[function(require,module,exports){
 /*!
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
@@ -6220,7 +6220,7 @@ Library.prototype.test = function (obj, type) {
   }
 };
 
-},{}],38:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\es5-shim\\es5-shim.js":[function(require,module,exports){
 /*!
  * https://github.com/es-shims/es5-shim
  * @license es5-shim Copyright 2009-2014 by contributors, MIT License
@@ -7657,7 +7657,7 @@ if (parseInt(ws + '08') !== 8 || parseInt(ws + '0x16') !== 22) {
 
 }));
 
-},{}],39:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\fuzzy\\lib\\fuzzy.js":[function(require,module,exports){
 /*
  * Fuzzy
  * https://github.com/myork/fuzzy
@@ -7795,7 +7795,7 @@ fuzzy.filter = function(pattern, arr, opts) {
 }());
 
 
-},{}],40:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\lodash\\dist\\lodash.js":[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -14584,10 +14584,10 @@ fuzzy.filter = function(pattern, arr, opts) {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],41:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\addons.js":[function(require,module,exports){
 module.exports = require('./lib/ReactWithAddons');
 
-},{"./lib/ReactWithAddons":132}],42:[function(require,module,exports){
+},{"./lib/ReactWithAddons":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactWithAddons.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\AutoFocusMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14614,7 +14614,7 @@ var AutoFocusMixin = {
 
 module.exports = AutoFocusMixin;
 
-},{"./focusNode":166}],43:[function(require,module,exports){
+},{"./focusNode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\focusNode.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\BeforeInputEventPlugin.js":[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -14836,7 +14836,7 @@ var BeforeInputEventPlugin = {
 
 module.exports = BeforeInputEventPlugin;
 
-},{"./EventConstants":57,"./EventPropagators":62,"./ExecutionEnvironment":63,"./SyntheticInputEvent":142,"./keyOf":188}],44:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./SyntheticInputEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticInputEvent.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSCore.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -14948,7 +14948,7 @@ var CSSCore = {
 module.exports = CSSCore;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],45:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSProperty.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15067,7 +15067,7 @@ var CSSProperty = {
 
 module.exports = CSSProperty;
 
-},{}],46:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSPropertyOperations.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -15202,7 +15202,7 @@ var CSSPropertyOperations = {
 module.exports = CSSPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./CSSProperty":45,"./ExecutionEnvironment":63,"./camelizeStyleName":153,"./dangerousStyleValue":160,"./hyphenateStyleName":179,"./memoizeStringOnly":190,"./warning":201,"_process":5}],47:[function(require,module,exports){
+},{"./CSSProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSProperty.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./camelizeStyleName":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\camelizeStyleName.js","./dangerousStyleValue":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\dangerousStyleValue.js","./hyphenateStyleName":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\hyphenateStyleName.js","./memoizeStringOnly":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\memoizeStringOnly.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CallbackQueue.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -15302,7 +15302,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 module.exports = CallbackQueue;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./PooledClass":70,"./invariant":181,"_process":5}],48:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ChangeEventPlugin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15684,7 +15684,7 @@ var ChangeEventPlugin = {
 
 module.exports = ChangeEventPlugin;
 
-},{"./EventConstants":57,"./EventPluginHub":59,"./EventPropagators":62,"./ExecutionEnvironment":63,"./ReactUpdates":131,"./SyntheticEvent":140,"./isEventSupported":182,"./isTextInputElement":184,"./keyOf":188}],49:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPluginHub":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js","./isEventSupported":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isEventSupported.js","./isTextInputElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isTextInputElement.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ClientReactRootIndex.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15709,7 +15709,7 @@ var ClientReactRootIndex = {
 
 module.exports = ClientReactRootIndex;
 
-},{}],50:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CompositionEventPlugin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15968,7 +15968,7 @@ var CompositionEventPlugin = {
 
 module.exports = CompositionEventPlugin;
 
-},{"./EventConstants":57,"./EventPropagators":62,"./ExecutionEnvironment":63,"./ReactInputSelection":105,"./SyntheticCompositionEvent":138,"./getTextContentAccessor":176,"./keyOf":188}],51:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./ReactInputSelection":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInputSelection.js","./SyntheticCompositionEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticCompositionEvent.js","./getTextContentAccessor":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getTextContentAccessor.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMChildrenOperations.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16143,7 +16143,7 @@ var DOMChildrenOperations = {
 module.exports = DOMChildrenOperations;
 
 }).call(this,require('_process'))
-},{"./Danger":54,"./ReactMultiChildUpdateTypes":112,"./getTextContentAccessor":176,"./invariant":181,"_process":5}],52:[function(require,module,exports){
+},{"./Danger":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Danger.js","./ReactMultiChildUpdateTypes":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMultiChildUpdateTypes.js","./getTextContentAccessor":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getTextContentAccessor.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16442,7 +16442,7 @@ var DOMProperty = {
 module.exports = DOMProperty;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],53:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16639,7 +16639,7 @@ var DOMPropertyOperations = {
 module.exports = DOMPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":52,"./escapeTextForBrowser":164,"./memoizeStringOnly":190,"./warning":201,"_process":5}],54:[function(require,module,exports){
+},{"./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js","./escapeTextForBrowser":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\escapeTextForBrowser.js","./memoizeStringOnly":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\memoizeStringOnly.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Danger.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16825,7 +16825,7 @@ var Danger = {
 module.exports = Danger;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":63,"./createNodesFromMarkup":158,"./emptyFunction":162,"./getMarkupWrap":173,"./invariant":181,"_process":5}],55:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./createNodesFromMarkup":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\createNodesFromMarkup.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js","./getMarkupWrap":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getMarkupWrap.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DefaultEventPluginOrder.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16865,7 +16865,7 @@ var DefaultEventPluginOrder = [
 
 module.exports = DefaultEventPluginOrder;
 
-},{"./keyOf":188}],56:[function(require,module,exports){
+},{"./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EnterLeaveEventPlugin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17005,7 +17005,7 @@ var EnterLeaveEventPlugin = {
 
 module.exports = EnterLeaveEventPlugin;
 
-},{"./EventConstants":57,"./EventPropagators":62,"./ReactMount":110,"./SyntheticMouseEvent":144,"./keyOf":188}],57:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./SyntheticMouseEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticMouseEvent.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17077,7 +17077,7 @@ var EventConstants = {
 
 module.exports = EventConstants;
 
-},{"./keyMirror":187}],58:[function(require,module,exports){
+},{"./keyMirror":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventListener.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -17167,7 +17167,7 @@ var EventListener = {
 module.exports = EventListener;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":162,"_process":5}],59:[function(require,module,exports){
+},{"./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17443,7 +17443,7 @@ var EventPluginHub = {
 module.exports = EventPluginHub;
 
 }).call(this,require('_process'))
-},{"./EventPluginRegistry":60,"./EventPluginUtils":61,"./accumulateInto":150,"./forEachAccumulated":167,"./invariant":181,"_process":5}],60:[function(require,module,exports){
+},{"./EventPluginRegistry":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginRegistry.js","./EventPluginUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginUtils.js","./accumulateInto":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\accumulateInto.js","./forEachAccumulated":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\forEachAccumulated.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginRegistry.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17723,7 +17723,7 @@ var EventPluginRegistry = {
 module.exports = EventPluginRegistry;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],61:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginUtils.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17944,7 +17944,7 @@ var EventPluginUtils = {
 module.exports = EventPluginUtils;
 
 }).call(this,require('_process'))
-},{"./EventConstants":57,"./invariant":181,"_process":5}],62:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18086,7 +18086,7 @@ var EventPropagators = {
 module.exports = EventPropagators;
 
 }).call(this,require('_process'))
-},{"./EventConstants":57,"./EventPluginHub":59,"./accumulateInto":150,"./forEachAccumulated":167,"_process":5}],63:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPluginHub":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js","./accumulateInto":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\accumulateInto.js","./forEachAccumulated":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\forEachAccumulated.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18131,7 +18131,7 @@ var ExecutionEnvironment = {
 
 module.exports = ExecutionEnvironment;
 
-},{}],64:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\HTMLDOMPropertyConfig.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18323,7 +18323,7 @@ var HTMLDOMPropertyConfig = {
 
 module.exports = HTMLDOMPropertyConfig;
 
-},{"./DOMProperty":52,"./ExecutionEnvironment":63}],65:[function(require,module,exports){
+},{"./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LinkedStateMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18364,7 +18364,7 @@ var LinkedStateMixin = {
 
 module.exports = LinkedStateMixin;
 
-},{"./ReactLink":108,"./ReactStateSetters":125}],66:[function(require,module,exports){
+},{"./ReactLink":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLink.js","./ReactStateSetters":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactStateSetters.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LinkedValueUtils.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18520,7 +18520,7 @@ var LinkedValueUtils = {
 module.exports = LinkedValueUtils;
 
 }).call(this,require('_process'))
-},{"./ReactPropTypes":119,"./invariant":181,"_process":5}],67:[function(require,module,exports){
+},{"./ReactPropTypes":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypes.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LocalEventTrapMixin.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -18570,7 +18570,7 @@ var LocalEventTrapMixin = {
 module.exports = LocalEventTrapMixin;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserEventEmitter":73,"./accumulateInto":150,"./forEachAccumulated":167,"./invariant":181,"_process":5}],68:[function(require,module,exports){
+},{"./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js","./accumulateInto":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\accumulateInto.js","./forEachAccumulated":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\forEachAccumulated.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\MobileSafariClickEventPlugin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18628,7 +18628,7 @@ var MobileSafariClickEventPlugin = {
 
 module.exports = MobileSafariClickEventPlugin;
 
-},{"./EventConstants":57,"./emptyFunction":162}],69:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js":[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -18675,7 +18675,7 @@ function assign(target, sources) {
 
 module.exports = assign;
 
-},{}],70:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18791,7 +18791,7 @@ var PooledClass = {
 module.exports = PooledClass;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],71:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18979,7 +18979,7 @@ React.version = '0.12.2';
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./DOMPropertyOperations":53,"./EventPluginUtils":61,"./ExecutionEnvironment":63,"./Object.assign":69,"./ReactChildren":76,"./ReactComponent":77,"./ReactCompositeComponent":80,"./ReactContext":81,"./ReactCurrentOwner":82,"./ReactDOM":83,"./ReactDOMComponent":85,"./ReactDefaultInjection":95,"./ReactElement":98,"./ReactElementValidator":99,"./ReactInstanceHandles":106,"./ReactLegacyElement":107,"./ReactMount":110,"./ReactMultiChild":111,"./ReactPerf":115,"./ReactPropTypes":119,"./ReactServerRendering":123,"./ReactTextComponent":127,"./deprecated":161,"./onlyChild":192,"_process":5}],72:[function(require,module,exports){
+},{"./DOMPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js","./EventPluginUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginUtils.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactChildren":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactChildren.js","./ReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactContext":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactContext.js","./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactDOMComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMComponent.js","./ReactDefaultInjection":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultInjection.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactElementValidator":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElementValidator.js","./ReactInstanceHandles":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js","./ReactLegacyElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLegacyElement.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactMultiChild":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMultiChild.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./ReactPropTypes":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypes.js","./ReactServerRendering":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactServerRendering.js","./ReactTextComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTextComponent.js","./deprecated":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\deprecated.js","./onlyChild":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\onlyChild.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -19022,7 +19022,7 @@ var ReactBrowserComponentMixin = {
 module.exports = ReactBrowserComponentMixin;
 
 }).call(this,require('_process'))
-},{"./ReactEmptyComponent":100,"./ReactMount":110,"./invariant":181,"_process":5}],73:[function(require,module,exports){
+},{"./ReactEmptyComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEmptyComponent.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -19377,7 +19377,7 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
 
 module.exports = ReactBrowserEventEmitter;
 
-},{"./EventConstants":57,"./EventPluginHub":59,"./EventPluginRegistry":60,"./Object.assign":69,"./ReactEventEmitterMixin":102,"./ViewportMetrics":149,"./isEventSupported":182}],74:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPluginHub":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js","./EventPluginRegistry":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginRegistry.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactEventEmitterMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEventEmitterMixin.js","./ViewportMetrics":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ViewportMetrics.js","./isEventSupported":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isEventSupported.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCSSTransitionGroup.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -19444,7 +19444,7 @@ var ReactCSSTransitionGroup = React.createClass({
 
 module.exports = ReactCSSTransitionGroup;
 
-},{"./Object.assign":69,"./React":71,"./ReactCSSTransitionGroupChild":75,"./ReactTransitionGroup":130}],75:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js","./ReactCSSTransitionGroupChild":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCSSTransitionGroupChild.js","./ReactTransitionGroup":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionGroup.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCSSTransitionGroupChild.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -19579,7 +19579,7 @@ var ReactCSSTransitionGroupChild = React.createClass({
 module.exports = ReactCSSTransitionGroupChild;
 
 }).call(this,require('_process'))
-},{"./CSSCore":44,"./React":71,"./ReactTransitionEvents":129,"./onlyChild":192,"_process":5}],76:[function(require,module,exports){
+},{"./CSSCore":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSCore.js","./React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js","./ReactTransitionEvents":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionEvents.js","./onlyChild":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\onlyChild.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactChildren.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -19729,7 +19729,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 }).call(this,require('_process'))
-},{"./PooledClass":70,"./traverseAllChildren":199,"./warning":201,"_process":5}],77:[function(require,module,exports){
+},{"./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./traverseAllChildren":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\traverseAllChildren.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -20172,7 +20172,7 @@ var ReactComponent = {
 module.exports = ReactComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./ReactElement":98,"./ReactOwner":114,"./ReactUpdates":131,"./invariant":181,"./keyMirror":187,"_process":5}],78:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactOwner.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./keyMirror":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponentBrowserEnvironment.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -20294,7 +20294,7 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 }).call(this,require('_process'))
-},{"./ReactDOMIDOperations":87,"./ReactMarkupChecksum":109,"./ReactMount":110,"./ReactPerf":115,"./ReactReconcileTransaction":121,"./getReactRootElementInContainer":175,"./invariant":181,"./setInnerHTML":195,"_process":5}],79:[function(require,module,exports){
+},{"./ReactDOMIDOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMIDOperations.js","./ReactMarkupChecksum":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMarkupChecksum.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./ReactReconcileTransaction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactReconcileTransaction.js","./getReactRootElementInContainer":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getReactRootElementInContainer.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./setInnerHTML":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\setInnerHTML.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponentWithPureRenderMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -20343,7 +20343,7 @@ var ReactComponentWithPureRenderMixin = {
 
 module.exports = ReactComponentWithPureRenderMixin;
 
-},{"./shallowEqual":196}],80:[function(require,module,exports){
+},{"./shallowEqual":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shallowEqual.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -21783,7 +21783,7 @@ var ReactCompositeComponent = {
 module.exports = ReactCompositeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./ReactComponent":77,"./ReactContext":81,"./ReactCurrentOwner":82,"./ReactElement":98,"./ReactElementValidator":99,"./ReactEmptyComponent":100,"./ReactErrorUtils":101,"./ReactLegacyElement":107,"./ReactOwner":114,"./ReactPerf":115,"./ReactPropTransferer":116,"./ReactPropTypeLocationNames":117,"./ReactPropTypeLocations":118,"./ReactUpdates":131,"./instantiateReactComponent":180,"./invariant":181,"./keyMirror":187,"./keyOf":188,"./mapObject":189,"./monitorCodeUse":191,"./shouldUpdateReactComponent":197,"./warning":201,"_process":5}],81:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js","./ReactContext":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactContext.js","./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactElementValidator":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElementValidator.js","./ReactEmptyComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEmptyComponent.js","./ReactErrorUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactErrorUtils.js","./ReactLegacyElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLegacyElement.js","./ReactOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactOwner.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./ReactPropTransferer":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTransferer.js","./ReactPropTypeLocationNames":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypeLocationNames.js","./ReactPropTypeLocations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypeLocations.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./instantiateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\instantiateReactComponent.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./keyMirror":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js","./mapObject":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\mapObject.js","./monitorCodeUse":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\monitorCodeUse.js","./shouldUpdateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shouldUpdateReactComponent.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactContext.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -21845,7 +21845,7 @@ var ReactContext = {
 
 module.exports = ReactContext;
 
-},{"./Object.assign":69}],82:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -21879,7 +21879,7 @@ var ReactCurrentOwner = {
 
 module.exports = ReactCurrentOwner;
 
-},{}],83:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -22062,7 +22062,7 @@ var ReactDOM = mapObject({
 module.exports = ReactDOM;
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./ReactElementValidator":99,"./ReactLegacyElement":107,"./mapObject":189,"_process":5}],84:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactElementValidator":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElementValidator.js","./ReactLegacyElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLegacyElement.js","./mapObject":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\mapObject.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMButton.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22127,7 +22127,7 @@ var ReactDOMButton = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMButton;
 
-},{"./AutoFocusMixin":42,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./keyMirror":187}],85:[function(require,module,exports){
+},{"./AutoFocusMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\AutoFocusMixin.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./keyMirror":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -22614,7 +22614,7 @@ assign(
 module.exports = ReactDOMComponent;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":46,"./DOMProperty":52,"./DOMPropertyOperations":53,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactBrowserEventEmitter":73,"./ReactComponent":77,"./ReactMount":110,"./ReactMultiChild":111,"./ReactPerf":115,"./escapeTextForBrowser":164,"./invariant":181,"./isEventSupported":182,"./keyOf":188,"./monitorCodeUse":191,"_process":5}],86:[function(require,module,exports){
+},{"./CSSPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSPropertyOperations.js","./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js","./DOMPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js","./ReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactMultiChild":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMultiChild.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./escapeTextForBrowser":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\escapeTextForBrowser.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./isEventSupported":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isEventSupported.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js","./monitorCodeUse":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\monitorCodeUse.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMForm.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22664,7 +22664,7 @@ var ReactDOMForm = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMForm;
 
-},{"./EventConstants":57,"./LocalEventTrapMixin":67,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98}],87:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./LocalEventTrapMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LocalEventTrapMixin.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMIDOperations.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -22850,7 +22850,7 @@ var ReactDOMIDOperations = {
 module.exports = ReactDOMIDOperations;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":46,"./DOMChildrenOperations":51,"./DOMPropertyOperations":53,"./ReactMount":110,"./ReactPerf":115,"./invariant":181,"./setInnerHTML":195,"_process":5}],88:[function(require,module,exports){
+},{"./CSSPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSPropertyOperations.js","./DOMChildrenOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMChildrenOperations.js","./DOMPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./setInnerHTML":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\setInnerHTML.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMImg.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22898,7 +22898,7 @@ var ReactDOMImg = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMImg;
 
-},{"./EventConstants":57,"./LocalEventTrapMixin":67,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98}],89:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./LocalEventTrapMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LocalEventTrapMixin.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMInput.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -23076,7 +23076,7 @@ var ReactDOMInput = ReactCompositeComponent.createClass({
 module.exports = ReactDOMInput;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":42,"./DOMPropertyOperations":53,"./LinkedValueUtils":66,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./ReactMount":110,"./ReactUpdates":131,"./invariant":181,"_process":5}],90:[function(require,module,exports){
+},{"./AutoFocusMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\AutoFocusMixin.js","./DOMPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js","./LinkedValueUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LinkedValueUtils.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMOption.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -23129,7 +23129,7 @@ var ReactDOMOption = ReactCompositeComponent.createClass({
 module.exports = ReactDOMOption;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./warning":201,"_process":5}],91:[function(require,module,exports){
+},{"./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMSelect.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23313,7 +23313,7 @@ var ReactDOMSelect = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMSelect;
 
-},{"./AutoFocusMixin":42,"./LinkedValueUtils":66,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./ReactUpdates":131}],92:[function(require,module,exports){
+},{"./AutoFocusMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\AutoFocusMixin.js","./LinkedValueUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LinkedValueUtils.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMSelection.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23522,7 +23522,7 @@ var ReactDOMSelection = {
 
 module.exports = ReactDOMSelection;
 
-},{"./ExecutionEnvironment":63,"./getNodeForCharacterOffset":174,"./getTextContentAccessor":176}],93:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./getNodeForCharacterOffset":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getNodeForCharacterOffset.js","./getTextContentAccessor":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getTextContentAccessor.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMTextarea.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -23663,7 +23663,7 @@ var ReactDOMTextarea = ReactCompositeComponent.createClass({
 module.exports = ReactDOMTextarea;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":42,"./DOMPropertyOperations":53,"./LinkedValueUtils":66,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./ReactUpdates":131,"./invariant":181,"./warning":201,"_process":5}],94:[function(require,module,exports){
+},{"./AutoFocusMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\AutoFocusMixin.js","./DOMPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js","./LinkedValueUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LinkedValueUtils.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactDOM":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOM.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultBatchingStrategy.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23736,7 +23736,7 @@ var ReactDefaultBatchingStrategy = {
 
 module.exports = ReactDefaultBatchingStrategy;
 
-},{"./Object.assign":69,"./ReactUpdates":131,"./Transaction":148,"./emptyFunction":162}],95:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./Transaction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Transaction.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultInjection.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -23865,7 +23865,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./BeforeInputEventPlugin":43,"./ChangeEventPlugin":48,"./ClientReactRootIndex":49,"./CompositionEventPlugin":50,"./DefaultEventPluginOrder":55,"./EnterLeaveEventPlugin":56,"./ExecutionEnvironment":63,"./HTMLDOMPropertyConfig":64,"./MobileSafariClickEventPlugin":68,"./ReactBrowserComponentMixin":72,"./ReactComponentBrowserEnvironment":78,"./ReactDOMButton":84,"./ReactDOMComponent":85,"./ReactDOMForm":86,"./ReactDOMImg":88,"./ReactDOMInput":89,"./ReactDOMOption":90,"./ReactDOMSelect":91,"./ReactDOMTextarea":93,"./ReactDefaultBatchingStrategy":94,"./ReactDefaultPerf":96,"./ReactEventListener":103,"./ReactInjection":104,"./ReactInstanceHandles":106,"./ReactMount":110,"./SVGDOMPropertyConfig":133,"./SelectEventPlugin":134,"./ServerReactRootIndex":135,"./SimpleEventPlugin":136,"./createFullPageComponent":157,"_process":5}],96:[function(require,module,exports){
+},{"./BeforeInputEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\BeforeInputEventPlugin.js","./ChangeEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ChangeEventPlugin.js","./ClientReactRootIndex":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ClientReactRootIndex.js","./CompositionEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CompositionEventPlugin.js","./DefaultEventPluginOrder":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DefaultEventPluginOrder.js","./EnterLeaveEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EnterLeaveEventPlugin.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./HTMLDOMPropertyConfig":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\HTMLDOMPropertyConfig.js","./MobileSafariClickEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\MobileSafariClickEventPlugin.js","./ReactBrowserComponentMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserComponentMixin.js","./ReactComponentBrowserEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponentBrowserEnvironment.js","./ReactDOMButton":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMButton.js","./ReactDOMComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMComponent.js","./ReactDOMForm":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMForm.js","./ReactDOMImg":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMImg.js","./ReactDOMInput":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMInput.js","./ReactDOMOption":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMOption.js","./ReactDOMSelect":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMSelect.js","./ReactDOMTextarea":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMTextarea.js","./ReactDefaultBatchingStrategy":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultBatchingStrategy.js","./ReactDefaultPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultPerf.js","./ReactEventListener":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEventListener.js","./ReactInjection":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInjection.js","./ReactInstanceHandles":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./SVGDOMPropertyConfig":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SVGDOMPropertyConfig.js","./SelectEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SelectEventPlugin.js","./ServerReactRootIndex":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ServerReactRootIndex.js","./SimpleEventPlugin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SimpleEventPlugin.js","./createFullPageComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\createFullPageComponent.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultPerf.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -24125,7 +24125,7 @@ var ReactDefaultPerf = {
 
 module.exports = ReactDefaultPerf;
 
-},{"./DOMProperty":52,"./ReactDefaultPerfAnalysis":97,"./ReactMount":110,"./ReactPerf":115,"./performanceNow":194}],97:[function(require,module,exports){
+},{"./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js","./ReactDefaultPerfAnalysis":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultPerfAnalysis.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./performanceNow":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\performanceNow.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultPerfAnalysis.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -24331,7 +24331,7 @@ var ReactDefaultPerfAnalysis = {
 
 module.exports = ReactDefaultPerfAnalysis;
 
-},{"./Object.assign":69}],98:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -24577,7 +24577,7 @@ ReactElement.isValidElement = function(object) {
 module.exports = ReactElement;
 
 }).call(this,require('_process'))
-},{"./ReactContext":81,"./ReactCurrentOwner":82,"./warning":201,"_process":5}],99:[function(require,module,exports){
+},{"./ReactContext":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactContext.js","./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElementValidator.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -24859,7 +24859,7 @@ var ReactElementValidator = {
 module.exports = ReactElementValidator;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":82,"./ReactElement":98,"./ReactPropTypeLocations":118,"./monitorCodeUse":191,"./warning":201,"_process":5}],100:[function(require,module,exports){
+},{"./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactPropTypeLocations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypeLocations.js","./monitorCodeUse":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\monitorCodeUse.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEmptyComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -24936,7 +24936,7 @@ var ReactEmptyComponent = {
 module.exports = ReactEmptyComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./invariant":181,"_process":5}],101:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactErrorUtils.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -24968,7 +24968,7 @@ var ReactErrorUtils = {
 
 module.exports = ReactErrorUtils;
 
-},{}],102:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEventEmitterMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -25018,7 +25018,7 @@ var ReactEventEmitterMixin = {
 
 module.exports = ReactEventEmitterMixin;
 
-},{"./EventPluginHub":59}],103:[function(require,module,exports){
+},{"./EventPluginHub":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEventListener.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -25202,7 +25202,7 @@ var ReactEventListener = {
 
 module.exports = ReactEventListener;
 
-},{"./EventListener":58,"./ExecutionEnvironment":63,"./Object.assign":69,"./PooledClass":70,"./ReactInstanceHandles":106,"./ReactMount":110,"./ReactUpdates":131,"./getEventTarget":172,"./getUnboundedScrollPosition":177}],104:[function(require,module,exports){
+},{"./EventListener":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventListener.js","./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./ReactInstanceHandles":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./getEventTarget":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventTarget.js","./getUnboundedScrollPosition":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getUnboundedScrollPosition.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInjection.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -25242,7 +25242,7 @@ var ReactInjection = {
 
 module.exports = ReactInjection;
 
-},{"./DOMProperty":52,"./EventPluginHub":59,"./ReactBrowserEventEmitter":73,"./ReactComponent":77,"./ReactCompositeComponent":80,"./ReactEmptyComponent":100,"./ReactNativeComponent":113,"./ReactPerf":115,"./ReactRootIndex":122,"./ReactUpdates":131}],105:[function(require,module,exports){
+},{"./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js","./EventPluginHub":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js","./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js","./ReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js","./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactEmptyComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEmptyComponent.js","./ReactNativeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactNativeComponent.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./ReactRootIndex":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactRootIndex.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInputSelection.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -25378,7 +25378,7 @@ var ReactInputSelection = {
 
 module.exports = ReactInputSelection;
 
-},{"./ReactDOMSelection":92,"./containsNode":155,"./focusNode":166,"./getActiveElement":168}],106:[function(require,module,exports){
+},{"./ReactDOMSelection":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDOMSelection.js","./containsNode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\containsNode.js","./focusNode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\focusNode.js","./getActiveElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getActiveElement.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -25713,7 +25713,7 @@ var ReactInstanceHandles = {
 module.exports = ReactInstanceHandles;
 
 }).call(this,require('_process'))
-},{"./ReactRootIndex":122,"./invariant":181,"_process":5}],107:[function(require,module,exports){
+},{"./ReactRootIndex":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactRootIndex.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLegacyElement.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -25960,7 +25960,7 @@ ReactLegacyElementFactory._isLegacyCallWarningEnabled = true;
 module.exports = ReactLegacyElementFactory;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":82,"./invariant":181,"./monitorCodeUse":191,"./warning":201,"_process":5}],108:[function(require,module,exports){
+},{"./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./monitorCodeUse":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\monitorCodeUse.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLink.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26033,7 +26033,7 @@ ReactLink.PropTypes = {
 
 module.exports = ReactLink;
 
-},{"./React":71}],109:[function(require,module,exports){
+},{"./React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMarkupChecksum.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26081,7 +26081,7 @@ var ReactMarkupChecksum = {
 
 module.exports = ReactMarkupChecksum;
 
-},{"./adler32":151}],110:[function(require,module,exports){
+},{"./adler32":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\adler32.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -26779,7 +26779,7 @@ ReactMount.renderComponent = deprecated(
 module.exports = ReactMount;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":52,"./ReactBrowserEventEmitter":73,"./ReactCurrentOwner":82,"./ReactElement":98,"./ReactInstanceHandles":106,"./ReactLegacyElement":107,"./ReactPerf":115,"./containsNode":155,"./deprecated":161,"./getReactRootElementInContainer":175,"./instantiateReactComponent":180,"./invariant":181,"./shouldUpdateReactComponent":197,"./warning":201,"_process":5}],111:[function(require,module,exports){
+},{"./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js","./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js","./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactInstanceHandles":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js","./ReactLegacyElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLegacyElement.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./containsNode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\containsNode.js","./deprecated":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\deprecated.js","./getReactRootElementInContainer":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getReactRootElementInContainer.js","./instantiateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\instantiateReactComponent.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./shouldUpdateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shouldUpdateReactComponent.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMultiChild.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27207,7 +27207,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 
-},{"./ReactComponent":77,"./ReactMultiChildUpdateTypes":112,"./flattenChildren":165,"./instantiateReactComponent":180,"./shouldUpdateReactComponent":197}],112:[function(require,module,exports){
+},{"./ReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js","./ReactMultiChildUpdateTypes":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMultiChildUpdateTypes.js","./flattenChildren":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\flattenChildren.js","./instantiateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\instantiateReactComponent.js","./shouldUpdateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shouldUpdateReactComponent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMultiChildUpdateTypes.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27240,7 +27240,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 
 module.exports = ReactMultiChildUpdateTypes;
 
-},{"./keyMirror":187}],113:[function(require,module,exports){
+},{"./keyMirror":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactNativeComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -27313,7 +27313,7 @@ var ReactNativeComponent = {
 module.exports = ReactNativeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./invariant":181,"_process":5}],114:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactOwner.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -27469,7 +27469,7 @@ var ReactOwner = {
 module.exports = ReactOwner;
 
 }).call(this,require('_process'))
-},{"./emptyObject":163,"./invariant":181,"_process":5}],115:[function(require,module,exports){
+},{"./emptyObject":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyObject.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -27553,7 +27553,7 @@ function _noMeasure(objName, fnName, func) {
 module.exports = ReactPerf;
 
 }).call(this,require('_process'))
-},{"_process":5}],116:[function(require,module,exports){
+},{"_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTransferer.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -27720,7 +27720,7 @@ var ReactPropTransferer = {
 module.exports = ReactPropTransferer;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./emptyFunction":162,"./invariant":181,"./joinClasses":186,"./warning":201,"_process":5}],117:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./joinClasses":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\joinClasses.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypeLocationNames.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -27748,7 +27748,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactPropTypeLocationNames;
 
 }).call(this,require('_process'))
-},{"_process":5}],118:[function(require,module,exports){
+},{"_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypeLocations.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27772,7 +27772,7 @@ var ReactPropTypeLocations = keyMirror({
 
 module.exports = ReactPropTypeLocations;
 
-},{"./keyMirror":187}],119:[function(require,module,exports){
+},{"./keyMirror":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypes.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28126,7 +28126,7 @@ function getPreciseType(propValue) {
 
 module.exports = ReactPropTypes;
 
-},{"./ReactElement":98,"./ReactPropTypeLocationNames":117,"./deprecated":161,"./emptyFunction":162}],120:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactPropTypeLocationNames":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTypeLocationNames.js","./deprecated":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\deprecated.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPutListenerQueue.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28182,7 +28182,7 @@ PooledClass.addPoolingTo(ReactPutListenerQueue);
 
 module.exports = ReactPutListenerQueue;
 
-},{"./Object.assign":69,"./PooledClass":70,"./ReactBrowserEventEmitter":73}],121:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactReconcileTransaction.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28358,7 +28358,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 
-},{"./CallbackQueue":47,"./Object.assign":69,"./PooledClass":70,"./ReactBrowserEventEmitter":73,"./ReactInputSelection":105,"./ReactPutListenerQueue":120,"./Transaction":148}],122:[function(require,module,exports){
+},{"./CallbackQueue":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CallbackQueue.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js","./ReactInputSelection":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInputSelection.js","./ReactPutListenerQueue":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPutListenerQueue.js","./Transaction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Transaction.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactRootIndex.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28389,7 +28389,7 @@ var ReactRootIndex = {
 
 module.exports = ReactRootIndex;
 
-},{}],123:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactServerRendering.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -28469,7 +28469,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./ReactInstanceHandles":106,"./ReactMarkupChecksum":109,"./ReactServerRenderingTransaction":124,"./instantiateReactComponent":180,"./invariant":181,"_process":5}],124:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactInstanceHandles":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js","./ReactMarkupChecksum":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMarkupChecksum.js","./ReactServerRenderingTransaction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactServerRenderingTransaction.js","./instantiateReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\instantiateReactComponent.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactServerRenderingTransaction.js":[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -28582,7 +28582,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./CallbackQueue":47,"./Object.assign":69,"./PooledClass":70,"./ReactPutListenerQueue":120,"./Transaction":148,"./emptyFunction":162}],125:[function(require,module,exports){
+},{"./CallbackQueue":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CallbackQueue.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./ReactPutListenerQueue":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPutListenerQueue.js","./Transaction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Transaction.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactStateSetters.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28688,7 +28688,7 @@ ReactStateSetters.Mixin = {
 
 module.exports = ReactStateSetters;
 
-},{}],126:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTestUtils.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29100,7 +29100,7 @@ for (eventType in topLevelTypes) {
 
 module.exports = ReactTestUtils;
 
-},{"./EventConstants":57,"./EventPluginHub":59,"./EventPropagators":62,"./Object.assign":69,"./React":71,"./ReactBrowserEventEmitter":73,"./ReactElement":98,"./ReactMount":110,"./ReactTextComponent":127,"./ReactUpdates":131,"./SyntheticEvent":140}],127:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPluginHub":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginHub.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js","./ReactBrowserEventEmitter":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactBrowserEventEmitter.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactMount":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactMount.js","./ReactTextComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTextComponent.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTextComponent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29206,7 +29206,7 @@ ReactTextComponentFactory.type = ReactTextComponent;
 
 module.exports = ReactTextComponentFactory;
 
-},{"./DOMPropertyOperations":53,"./Object.assign":69,"./ReactComponent":77,"./ReactElement":98,"./escapeTextForBrowser":164}],128:[function(require,module,exports){
+},{"./DOMPropertyOperations":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMPropertyOperations.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./ReactComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponent.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./escapeTextForBrowser":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\escapeTextForBrowser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionChildMapping.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29307,7 +29307,7 @@ var ReactTransitionChildMapping = {
 
 module.exports = ReactTransitionChildMapping;
 
-},{"./ReactChildren":76}],129:[function(require,module,exports){
+},{"./ReactChildren":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactChildren.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionEvents.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29418,7 +29418,7 @@ var ReactTransitionEvents = {
 
 module.exports = ReactTransitionEvents;
 
-},{"./ExecutionEnvironment":63}],130:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionGroup.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29607,7 +29607,7 @@ var ReactTransitionGroup = React.createClass({
 
 module.exports = ReactTransitionGroup;
 
-},{"./Object.assign":69,"./React":71,"./ReactTransitionChildMapping":128,"./cloneWithProps":154,"./emptyFunction":162}],131:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js","./ReactTransitionChildMapping":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionChildMapping.js","./cloneWithProps":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\cloneWithProps.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -29897,7 +29897,7 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require('_process'))
-},{"./CallbackQueue":47,"./Object.assign":69,"./PooledClass":70,"./ReactCurrentOwner":82,"./ReactPerf":115,"./Transaction":148,"./invariant":181,"./warning":201,"_process":5}],132:[function(require,module,exports){
+},{"./CallbackQueue":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CallbackQueue.js","./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./ReactCurrentOwner":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCurrentOwner.js","./ReactPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPerf.js","./Transaction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Transaction.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactWithAddons.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -29951,7 +29951,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./LinkedStateMixin":65,"./React":71,"./ReactCSSTransitionGroup":74,"./ReactComponentWithPureRenderMixin":79,"./ReactDefaultPerf":96,"./ReactTestUtils":126,"./ReactTransitionGroup":130,"./ReactUpdates":131,"./cloneWithProps":154,"./cx":159,"./update":200,"_process":5}],133:[function(require,module,exports){
+},{"./LinkedStateMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\LinkedStateMixin.js","./React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js","./ReactCSSTransitionGroup":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCSSTransitionGroup.js","./ReactComponentWithPureRenderMixin":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactComponentWithPureRenderMixin.js","./ReactDefaultPerf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactDefaultPerf.js","./ReactTestUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTestUtils.js","./ReactTransitionGroup":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTransitionGroup.js","./ReactUpdates":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactUpdates.js","./cloneWithProps":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\cloneWithProps.js","./cx":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\cx.js","./update":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\update.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SVGDOMPropertyConfig.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30043,7 +30043,7 @@ var SVGDOMPropertyConfig = {
 
 module.exports = SVGDOMPropertyConfig;
 
-},{"./DOMProperty":52}],134:[function(require,module,exports){
+},{"./DOMProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\DOMProperty.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SelectEventPlugin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30238,7 +30238,7 @@ var SelectEventPlugin = {
 
 module.exports = SelectEventPlugin;
 
-},{"./EventConstants":57,"./EventPropagators":62,"./ReactInputSelection":105,"./SyntheticEvent":140,"./getActiveElement":168,"./isTextInputElement":184,"./keyOf":188,"./shallowEqual":196}],135:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./ReactInputSelection":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInputSelection.js","./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js","./getActiveElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getActiveElement.js","./isTextInputElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isTextInputElement.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js","./shallowEqual":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shallowEqual.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ServerReactRootIndex.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30269,7 +30269,7 @@ var ServerReactRootIndex = {
 
 module.exports = ServerReactRootIndex;
 
-},{}],136:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SimpleEventPlugin.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30697,7 +30697,7 @@ var SimpleEventPlugin = {
 module.exports = SimpleEventPlugin;
 
 }).call(this,require('_process'))
-},{"./EventConstants":57,"./EventPluginUtils":61,"./EventPropagators":62,"./SyntheticClipboardEvent":137,"./SyntheticDragEvent":139,"./SyntheticEvent":140,"./SyntheticFocusEvent":141,"./SyntheticKeyboardEvent":143,"./SyntheticMouseEvent":144,"./SyntheticTouchEvent":145,"./SyntheticUIEvent":146,"./SyntheticWheelEvent":147,"./getEventCharCode":169,"./invariant":181,"./keyOf":188,"./warning":201,"_process":5}],137:[function(require,module,exports){
+},{"./EventConstants":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventConstants.js","./EventPluginUtils":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPluginUtils.js","./EventPropagators":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\EventPropagators.js","./SyntheticClipboardEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticClipboardEvent.js","./SyntheticDragEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticDragEvent.js","./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js","./SyntheticFocusEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticFocusEvent.js","./SyntheticKeyboardEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticKeyboardEvent.js","./SyntheticMouseEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticMouseEvent.js","./SyntheticTouchEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticTouchEvent.js","./SyntheticUIEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticUIEvent.js","./SyntheticWheelEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticWheelEvent.js","./getEventCharCode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventCharCode.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticClipboardEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30743,7 +30743,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 module.exports = SyntheticClipboardEvent;
 
 
-},{"./SyntheticEvent":140}],138:[function(require,module,exports){
+},{"./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticCompositionEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30789,7 +30789,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticCompositionEvent;
 
 
-},{"./SyntheticEvent":140}],139:[function(require,module,exports){
+},{"./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticDragEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30828,7 +30828,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
 
-},{"./SyntheticMouseEvent":144}],140:[function(require,module,exports){
+},{"./SyntheticMouseEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticMouseEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30986,7 +30986,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.threeArgumentPooler);
 
 module.exports = SyntheticEvent;
 
-},{"./Object.assign":69,"./PooledClass":70,"./emptyFunction":162,"./getEventTarget":172}],141:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./PooledClass":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\PooledClass.js","./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js","./getEventTarget":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventTarget.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticFocusEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31025,7 +31025,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
 
-},{"./SyntheticUIEvent":146}],142:[function(require,module,exports){
+},{"./SyntheticUIEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticUIEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticInputEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -31072,7 +31072,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticInputEvent;
 
 
-},{"./SyntheticEvent":140}],143:[function(require,module,exports){
+},{"./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticKeyboardEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31159,7 +31159,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
 
-},{"./SyntheticUIEvent":146,"./getEventCharCode":169,"./getEventKey":170,"./getEventModifierState":171}],144:[function(require,module,exports){
+},{"./SyntheticUIEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticUIEvent.js","./getEventCharCode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventCharCode.js","./getEventKey":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventKey.js","./getEventModifierState":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventModifierState.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticMouseEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31242,7 +31242,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
 
-},{"./SyntheticUIEvent":146,"./ViewportMetrics":149,"./getEventModifierState":171}],145:[function(require,module,exports){
+},{"./SyntheticUIEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticUIEvent.js","./ViewportMetrics":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ViewportMetrics.js","./getEventModifierState":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventModifierState.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticTouchEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31290,7 +31290,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
 
-},{"./SyntheticUIEvent":146,"./getEventModifierState":171}],146:[function(require,module,exports){
+},{"./SyntheticUIEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticUIEvent.js","./getEventModifierState":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventModifierState.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticUIEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31352,7 +31352,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
 
-},{"./SyntheticEvent":140,"./getEventTarget":172}],147:[function(require,module,exports){
+},{"./SyntheticEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticEvent.js","./getEventTarget":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventTarget.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticWheelEvent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31413,7 +31413,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
 
-},{"./SyntheticMouseEvent":144}],148:[function(require,module,exports){
+},{"./SyntheticMouseEvent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\SyntheticMouseEvent.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Transaction.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -31654,7 +31654,7 @@ var Transaction = {
 module.exports = Transaction;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],149:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ViewportMetrics.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31686,7 +31686,7 @@ var ViewportMetrics = {
 
 module.exports = ViewportMetrics;
 
-},{"./getUnboundedScrollPosition":177}],150:[function(require,module,exports){
+},{"./getUnboundedScrollPosition":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getUnboundedScrollPosition.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\accumulateInto.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -31752,7 +31752,7 @@ function accumulateInto(current, next) {
 module.exports = accumulateInto;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],151:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\adler32.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31786,7 +31786,7 @@ function adler32(data) {
 
 module.exports = adler32;
 
-},{}],152:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\camelize.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31818,7 +31818,7 @@ function camelize(string) {
 
 module.exports = camelize;
 
-},{}],153:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\camelizeStyleName.js":[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -31860,7 +31860,7 @@ function camelizeStyleName(string) {
 
 module.exports = camelizeStyleName;
 
-},{"./camelize":152}],154:[function(require,module,exports){
+},{"./camelize":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\camelize.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\cloneWithProps.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -31919,7 +31919,7 @@ function cloneWithProps(child, props) {
 module.exports = cloneWithProps;
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./ReactPropTransferer":116,"./keyOf":188,"./warning":201,"_process":5}],155:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactPropTransferer":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactPropTransferer.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\containsNode.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31963,7 +31963,7 @@ function containsNode(outerNode, innerNode) {
 
 module.exports = containsNode;
 
-},{"./isTextNode":185}],156:[function(require,module,exports){
+},{"./isTextNode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isTextNode.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\createArrayFrom.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32049,7 +32049,7 @@ function createArrayFrom(obj) {
 
 module.exports = createArrayFrom;
 
-},{"./toArray":198}],157:[function(require,module,exports){
+},{"./toArray":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\toArray.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\createFullPageComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32110,7 +32110,7 @@ function createFullPageComponent(tag) {
 module.exports = createFullPageComponent;
 
 }).call(this,require('_process'))
-},{"./ReactCompositeComponent":80,"./ReactElement":98,"./invariant":181,"_process":5}],158:[function(require,module,exports){
+},{"./ReactCompositeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactCompositeComponent.js","./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\createNodesFromMarkup.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32200,7 +32200,7 @@ function createNodesFromMarkup(markup, handleScript) {
 module.exports = createNodesFromMarkup;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":63,"./createArrayFrom":156,"./getMarkupWrap":173,"./invariant":181,"_process":5}],159:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./createArrayFrom":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\createArrayFrom.js","./getMarkupWrap":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getMarkupWrap.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\cx.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32239,7 +32239,7 @@ function cx(classNames) {
 
 module.exports = cx;
 
-},{}],160:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\dangerousStyleValue.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32297,7 +32297,7 @@ function dangerousStyleValue(name, value) {
 
 module.exports = dangerousStyleValue;
 
-},{"./CSSProperty":45}],161:[function(require,module,exports){
+},{"./CSSProperty":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\CSSProperty.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\deprecated.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32348,7 +32348,7 @@ function deprecated(namespace, oldName, newName, ctx, fn) {
 module.exports = deprecated;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./warning":201,"_process":5}],162:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32382,7 +32382,7 @@ emptyFunction.thatReturnsArgument = function(arg) { return arg; };
 
 module.exports = emptyFunction;
 
-},{}],163:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyObject.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32406,7 +32406,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = emptyObject;
 
 }).call(this,require('_process'))
-},{"_process":5}],164:[function(require,module,exports){
+},{"_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\escapeTextForBrowser.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32447,7 +32447,7 @@ function escapeTextForBrowser(text) {
 
 module.exports = escapeTextForBrowser;
 
-},{}],165:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\flattenChildren.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32516,7 +32516,7 @@ function flattenChildren(children) {
 module.exports = flattenChildren;
 
 }).call(this,require('_process'))
-},{"./ReactTextComponent":127,"./traverseAllChildren":199,"./warning":201,"_process":5}],166:[function(require,module,exports){
+},{"./ReactTextComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactTextComponent.js","./traverseAllChildren":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\traverseAllChildren.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\focusNode.js":[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -32545,7 +32545,7 @@ function focusNode(node) {
 
 module.exports = focusNode;
 
-},{}],167:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\forEachAccumulated.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32576,7 +32576,7 @@ var forEachAccumulated = function(arr, cb, scope) {
 
 module.exports = forEachAccumulated;
 
-},{}],168:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getActiveElement.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32605,7 +32605,7 @@ function getActiveElement() /*?DOMElement*/ {
 
 module.exports = getActiveElement;
 
-},{}],169:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventCharCode.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32657,7 +32657,7 @@ function getEventCharCode(nativeEvent) {
 
 module.exports = getEventCharCode;
 
-},{}],170:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventKey.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32762,7 +32762,7 @@ function getEventKey(nativeEvent) {
 
 module.exports = getEventKey;
 
-},{"./getEventCharCode":169}],171:[function(require,module,exports){
+},{"./getEventCharCode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventCharCode.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventModifierState.js":[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -32809,7 +32809,7 @@ function getEventModifierState(nativeEvent) {
 
 module.exports = getEventModifierState;
 
-},{}],172:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getEventTarget.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32840,7 +32840,7 @@ function getEventTarget(nativeEvent) {
 
 module.exports = getEventTarget;
 
-},{}],173:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getMarkupWrap.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32957,7 +32957,7 @@ function getMarkupWrap(nodeName) {
 module.exports = getMarkupWrap;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":63,"./invariant":181,"_process":5}],174:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getNodeForCharacterOffset.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33032,7 +33032,7 @@ function getNodeForCharacterOffset(root, offset) {
 
 module.exports = getNodeForCharacterOffset;
 
-},{}],175:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getReactRootElementInContainer.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33067,7 +33067,7 @@ function getReactRootElementInContainer(container) {
 
 module.exports = getReactRootElementInContainer;
 
-},{}],176:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getTextContentAccessor.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33104,7 +33104,7 @@ function getTextContentAccessor() {
 
 module.exports = getTextContentAccessor;
 
-},{"./ExecutionEnvironment":63}],177:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\getUnboundedScrollPosition.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33144,7 +33144,7 @@ function getUnboundedScrollPosition(scrollable) {
 
 module.exports = getUnboundedScrollPosition;
 
-},{}],178:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\hyphenate.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33177,7 +33177,7 @@ function hyphenate(string) {
 
 module.exports = hyphenate;
 
-},{}],179:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\hyphenateStyleName.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33218,7 +33218,7 @@ function hyphenateStyleName(string) {
 
 module.exports = hyphenateStyleName;
 
-},{"./hyphenate":178}],180:[function(require,module,exports){
+},{"./hyphenate":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\hyphenate.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\instantiateReactComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -33332,7 +33332,7 @@ function instantiateReactComponent(element, parentCompositeType) {
 module.exports = instantiateReactComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./ReactEmptyComponent":100,"./ReactLegacyElement":107,"./ReactNativeComponent":113,"./warning":201,"_process":5}],181:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactEmptyComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactEmptyComponent.js","./ReactLegacyElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactLegacyElement.js","./ReactNativeComponent":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactNativeComponent.js","./warning":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -33389,7 +33389,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 }).call(this,require('_process'))
-},{"_process":5}],182:[function(require,module,exports){
+},{"_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isEventSupported.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33454,7 +33454,7 @@ function isEventSupported(eventNameSuffix, capture) {
 
 module.exports = isEventSupported;
 
-},{"./ExecutionEnvironment":63}],183:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isNode.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33482,7 +33482,7 @@ function isNode(object) {
 
 module.exports = isNode;
 
-},{}],184:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isTextInputElement.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33526,7 +33526,7 @@ function isTextInputElement(elem) {
 
 module.exports = isTextInputElement;
 
-},{}],185:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isTextNode.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33551,7 +33551,7 @@ function isTextNode(object) {
 
 module.exports = isTextNode;
 
-},{"./isNode":183}],186:[function(require,module,exports){
+},{"./isNode":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\isNode.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\joinClasses.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33592,7 +33592,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],187:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyMirror.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -33647,7 +33647,7 @@ var keyMirror = function(obj) {
 module.exports = keyMirror;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],188:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33683,7 +33683,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],189:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\mapObject.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33736,7 +33736,7 @@ function mapObject(object, callback, context) {
 
 module.exports = mapObject;
 
-},{}],190:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\memoizeStringOnly.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33770,7 +33770,7 @@ function memoizeStringOnly(callback) {
 
 module.exports = memoizeStringOnly;
 
-},{}],191:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\monitorCodeUse.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -33804,7 +33804,7 @@ function monitorCodeUse(eventName, data) {
 module.exports = monitorCodeUse;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],192:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\onlyChild.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -33844,7 +33844,7 @@ function onlyChild(children) {
 module.exports = onlyChild;
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./invariant":181,"_process":5}],193:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\performance.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33872,7 +33872,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = performance || {};
 
-},{"./ExecutionEnvironment":63}],194:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\performanceNow.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33900,7 +33900,7 @@ var performanceNow = performance.now.bind(performance);
 
 module.exports = performanceNow;
 
-},{"./performance":193}],195:[function(require,module,exports){
+},{"./performance":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\performance.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\setInnerHTML.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -33978,7 +33978,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = setInnerHTML;
 
-},{"./ExecutionEnvironment":63}],196:[function(require,module,exports){
+},{"./ExecutionEnvironment":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ExecutionEnvironment.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shallowEqual.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -34022,7 +34022,7 @@ function shallowEqual(objA, objB) {
 
 module.exports = shallowEqual;
 
-},{}],197:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\shouldUpdateReactComponent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -34060,7 +34060,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 
 module.exports = shouldUpdateReactComponent;
 
-},{}],198:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\toArray.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -34132,7 +34132,7 @@ function toArray(obj) {
 module.exports = toArray;
 
 }).call(this,require('_process'))
-},{"./invariant":181,"_process":5}],199:[function(require,module,exports){
+},{"./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\traverseAllChildren.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -34315,7 +34315,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require('_process'))
-},{"./ReactElement":98,"./ReactInstanceHandles":106,"./invariant":181,"_process":5}],200:[function(require,module,exports){
+},{"./ReactElement":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactElement.js","./ReactInstanceHandles":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\ReactInstanceHandles.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\update.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -34483,7 +34483,7 @@ function update(value, spec) {
 module.exports = update;
 
 }).call(this,require('_process'))
-},{"./Object.assign":69,"./invariant":181,"./keyOf":188,"_process":5}],201:[function(require,module,exports){
+},{"./Object.assign":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\Object.assign.js","./invariant":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\invariant.js","./keyOf":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\keyOf.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\warning.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -34528,10 +34528,10 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = warning;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":162,"_process":5}],202:[function(require,module,exports){
+},{"./emptyFunction":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\emptyFunction.js","_process":"C:\\dev\\react-typeahead\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"C:\\dev\\react-typeahead\\node_modules\\react\\react.js":[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":71}],203:[function(require,module,exports){
+},{"./lib/React":"C:\\dev\\react-typeahead\\node_modules\\react\\lib\\React.js"}],"C:\\dev\\react-typeahead\\src\\keyevent.js":[function(require,module,exports){
 /**
  * PolyFills make me sad
  */
@@ -34546,7 +34546,7 @@ KeyEvent.DOM_VK_TAB = KeyEvent.DOM_VK_TAB || 9;
 
 module.exports = KeyEvent;
 
-},{}],204:[function(require,module,exports){
+},{}],"C:\\dev\\react-typeahead\\src\\react-typeahead.js":[function(require,module,exports){
 var Typeahead = require('./typeahead');
 var Tokenizer = require('./tokenizer');
 
@@ -34555,7 +34555,7 @@ module.exports = {
   Tokenizer: Tokenizer
 };
 
-},{"./tokenizer":205,"./typeahead":207}],205:[function(require,module,exports){
+},{"./tokenizer":"C:\\dev\\react-typeahead\\src\\tokenizer\\index.js","./typeahead":"C:\\dev\\react-typeahead\\src\\typeahead\\index.js"}],"C:\\dev\\react-typeahead\\src\\tokenizer\\index.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34687,7 +34687,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 
 module.exports = TypeaheadTokenizer;
 
-},{"../keyevent":203,"../typeahead":207,"./token":206,"react":202}],206:[function(require,module,exports){
+},{"../keyevent":"C:\\dev\\react-typeahead\\src\\keyevent.js","../typeahead":"C:\\dev\\react-typeahead\\src\\typeahead\\index.js","./token":"C:\\dev\\react-typeahead\\src\\tokenizer\\token.js","react":"C:\\dev\\react-typeahead\\node_modules\\react\\react.js"}],"C:\\dev\\react-typeahead\\src\\tokenizer\\token.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34728,7 +34728,7 @@ var Token = React.createClass({displayName: "Token",
 
 module.exports = Token;
 
-},{"react":202}],207:[function(require,module,exports){
+},{"react":"C:\\dev\\react-typeahead\\node_modules\\react\\react.js"}],"C:\\dev\\react-typeahead\\src\\typeahead\\index.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34762,7 +34762,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) { },
+      formatter: undefined
     };
   },
 
@@ -34782,11 +34783,14 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     };
   },
 
-  getOptionsForValue: function(value, options) {
-    var result = fuzzy.filter(value, options).map(function(res) {
-      return res.string;
+  getOptionsForValue: function(value, options) {     
+   if(typeof(value) !== "string" && typeof(this.props.formatter) !== "undefined")
+       value = this.props.formatter(value);
+      
+    var result = fuzzy.filter(value, options, { extract: this.props.formatter }).map(function(res) {
+      return res.original;
     });
-
+      
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -34818,14 +34822,20 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       React.createElement(TypeaheadSelector, {
         ref: "sel", options:  this.state.visible, 
         onOptionSelected:  this._onOptionSelected, 
+        formatter: this.props.formatter, 
         customClasses: this.props.customClasses})
    );
   },
 
-  _onOptionSelected: function(option) {
+  _onOptionSelected: function(option) {     
+    var value = option;
+      
+    if(typeof(option) !== "string" && typeof(this.props.formatter) !== "undefined")
+       value = this.props.formatter(value);
+      
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
+    nEntry.value = value;
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
@@ -34911,7 +34921,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
 module.exports = Typeahead;
 
-},{"../keyevent":203,"./selector":209,"fuzzy":39,"react/addons":41}],208:[function(require,module,exports){
+},{"../keyevent":"C:\\dev\\react-typeahead\\src\\keyevent.js","./selector":"C:\\dev\\react-typeahead\\src\\typeahead\\selector.js","fuzzy":"C:\\dev\\react-typeahead\\node_modules\\fuzzy\\lib\\fuzzy.js","react/addons":"C:\\dev\\react-typeahead\\node_modules\\react\\addons.js"}],"C:\\dev\\react-typeahead\\src\\typeahead\\option.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34948,11 +34958,16 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     classes[this.props.customClasses.hover || "hover"] = this.props.hover;
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
     var classList = React.addons.classSet(classes);
+      
+    var value = this.props.children;
+      
+    if(typeof(this.props.formatter) !== "undefined")
+        value = this.props.formatter(value);
 
     return (
       React.createElement("li", {className: classList, onClick: this._onClick}, 
         React.createElement("a", {href: "#", className: this._getClasses(), ref: "anchor"}, 
-           this.props.children
+          value
         )
       )
     );
@@ -34974,7 +34989,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 
 module.exports = TypeaheadOption;
 
-},{"react/addons":41}],209:[function(require,module,exports){
+},{"react/addons":"C:\\dev\\react-typeahead\\node_modules\\react\\addons.js"}],"C:\\dev\\react-typeahead\\src\\typeahead\\selector.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -35021,6 +35036,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
         React.createElement(TypeaheadOption, {ref: result, 
           hover: this.state.selectionIndex === i, 
           customClasses: this.props.customClasses, 
+          formatter: this.props.formatter, 
           onClick: this._onClick.bind(this, result)}, 
           result 
         )
@@ -35044,6 +35060,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
   },
 
   _onClick: function(result) {
+      console.log(result);
     this.props.onOptionSelected(result);
   },
 
@@ -35083,7 +35100,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 
 module.exports = TypeaheadSelector;
 
-},{"./option":208,"react/addons":41}],210:[function(require,module,exports){
+},{"./option":"C:\\dev\\react-typeahead\\src\\typeahead\\option.js","react/addons":"C:\\dev\\react-typeahead\\node_modules\\react\\addons.js"}],"C:\\dev\\react-typeahead\\test\\main.js":[function(require,module,exports){
 // Phantomjs isn't es5 :(
 require('es5-shim');
 require('./react-typeahead-test');
@@ -35094,7 +35111,7 @@ if (window.mochaPhantomJS) {
   window.mocha.run();
 }
 
-},{"./react-typeahead-test":211,"./typeahead-test":212,"es5-shim":38}],211:[function(require,module,exports){
+},{"./react-typeahead-test":"C:\\dev\\react-typeahead\\test\\react-typeahead-test.js","./typeahead-test":"C:\\dev\\react-typeahead\\test\\typeahead-test.js","es5-shim":"C:\\dev\\react-typeahead\\node_modules\\es5-shim\\es5-shim.js"}],"C:\\dev\\react-typeahead\\test\\react-typeahead-test.js":[function(require,module,exports){
 var assert = require('chai').assert;
 var React = require('react/addons');
 var ReactTypeahead = require('../src/react-typeahead').Typeahead;
@@ -35114,7 +35131,7 @@ describe('Main entry point', function() {
 
 });
 
-},{"../src/react-typeahead":204,"chai":6,"react/addons":41}],212:[function(require,module,exports){
+},{"../src/react-typeahead":"C:\\dev\\react-typeahead\\src\\react-typeahead.js","chai":"C:\\dev\\react-typeahead\\node_modules\\chai\\index.js","react/addons":"C:\\dev\\react-typeahead\\node_modules\\react\\addons.js"}],"C:\\dev\\react-typeahead\\test\\typeahead-test.js":[function(require,module,exports){
 var _ = require('lodash');
 var assert = require('chai').assert;
 var React = require('react/addons');
@@ -35131,31 +35148,85 @@ function simulateTextInput(component, value) {
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
 }
 
-var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
+var BEATLES = ['John', 'Paul', 'George', 'Ringo'],
+    BEATLES_OBJECT = [
+        {
+            id: 1,
+            name: 'John'
+        },
+        {
+            id: 2,
+            name: 'Paul'
+        },
+        {
+            id: 3,
+            name: 'George'
+        },
+        {
+            id: 4,
+            name: 'Ringo'
+        }
+    ];
 
 describe('Typeahead Component', function() {
+    
+    describe('string options', function() {
+        beforeEach(function() {
+          this.component = TestUtils.renderIntoDocument(React.createElement(Typeahead, {options: 
+            BEATLES
+          }));
+        });
+            
+        it('should fuzzy search and render matching results', function() {
+          // input value: num of expected results
+          var testplan = {
+            'o': 3,
+            'pa': 1,
+            'Grg': 1,
+            'Ringo': 1,
+            'xxx': 0
+          };
 
+          _.each(testplan, function(expected, value) {
+            var results = simulateTextInput(this.component, value);
+            assert.equal(results.length, expected, 'Text input: ' + value);
+          }, this);
+        });
+    });
+
+    describe('object options', function() {
+        beforeEach(function() {
+          var formatter = function(item){
+              return item.name;
+          }
+            
+          this.component = TestUtils.renderIntoDocument(React.createElement(Typeahead, {options: 
+            BEATLES_OBJECT, 
+          formatter: formatter}));
+        });
+            
+        it('should fuzzy search and render matching results', function() {
+          // input value: num of expected results
+          var testplan = {
+            'o': 3,
+            'pa': 1,
+            'Grg': 1,
+            'Ringo': 1,
+            'xxx': 0
+          };
+
+          _.each(testplan, function(expected, value) {
+            var results = simulateTextInput(this.component, value);
+            assert.equal(results.length, expected, 'Text input: ' + value);
+          }, this);
+        });
+    });
+    
   describe('sanity', function() {
     beforeEach(function() {
       this.component = TestUtils.renderIntoDocument(React.createElement(Typeahead, {options: 
         BEATLES
       }));
-    });
-
-    it('should fuzzy search and render matching results', function() {
-      // input value: num of expected results
-      var testplan = {
-        'o': 3,
-        'pa': 1,
-        'Grg': 1,
-        'Ringo': 1,
-        'xxx': 0
-      };
-
-      _.each(testplan, function(expected, value) {
-        var results = simulateTextInput(this.component, value);
-        assert.equal(results.length, expected, 'Text input: ' + value);
-      }, this);
     });
 
     describe('keyboard controls', function() {
@@ -35309,4 +35380,4 @@ describe('Typeahead Component', function() {
 
 });
 
-},{"../src/keyevent":203,"../src/typeahead":207,"../src/typeahead/option":208,"../src/typeahead/selector":209,"chai":6,"lodash":40,"react/addons":41}]},{},[210]);
+},{"../src/keyevent":"C:\\dev\\react-typeahead\\src\\keyevent.js","../src/typeahead":"C:\\dev\\react-typeahead\\src\\typeahead\\index.js","../src/typeahead/option":"C:\\dev\\react-typeahead\\src\\typeahead\\option.js","../src/typeahead/selector":"C:\\dev\\react-typeahead\\src\\typeahead\\selector.js","chai":"C:\\dev\\react-typeahead\\node_modules\\chai\\index.js","lodash":"C:\\dev\\react-typeahead\\node_modules\\lodash\\dist\\lodash.js","react/addons":"C:\\dev\\react-typeahead\\node_modules\\react\\addons.js"}]},{},["C:\\dev\\react-typeahead\\test\\main.js"]);

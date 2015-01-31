@@ -14,31 +14,85 @@ function simulateTextInput(component, value) {
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
 }
 
-var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
+var BEATLES = ['John', 'Paul', 'George', 'Ringo'],
+    BEATLES_OBJECT = [
+        {
+            id: 1,
+            name: 'John'
+        },
+        {
+            id: 2,
+            name: 'Paul'
+        },
+        {
+            id: 3,
+            name: 'George'
+        },
+        {
+            id: 4,
+            name: 'Ringo'
+        }
+    ];
 
 describe('Typeahead Component', function() {
+    
+    describe('string options', function() {
+        beforeEach(function() {
+          this.component = TestUtils.renderIntoDocument(<Typeahead options={
+            BEATLES
+          } />);
+        });
+            
+        it('should fuzzy search and render matching results', function() {
+          // input value: num of expected results
+          var testplan = {
+            'o': 3,
+            'pa': 1,
+            'Grg': 1,
+            'Ringo': 1,
+            'xxx': 0
+          };
 
+          _.each(testplan, function(expected, value) {
+            var results = simulateTextInput(this.component, value);
+            assert.equal(results.length, expected, 'Text input: ' + value);
+          }, this);
+        });
+    });
+
+    describe('object options', function() {
+        beforeEach(function() {
+          var formatter = function(item){
+              return item.name;
+          }
+            
+          this.component = TestUtils.renderIntoDocument(<Typeahead options={
+            BEATLES_OBJECT
+          } formatter={formatter} />);
+        });
+            
+        it('should fuzzy search and render matching results', function() {
+          // input value: num of expected results
+          var testplan = {
+            'o': 3,
+            'pa': 1,
+            'Grg': 1,
+            'Ringo': 1,
+            'xxx': 0
+          };
+
+          _.each(testplan, function(expected, value) {
+            var results = simulateTextInput(this.component, value);
+            assert.equal(results.length, expected, 'Text input: ' + value);
+          }, this);
+        });
+    });
+    
   describe('sanity', function() {
     beforeEach(function() {
       this.component = TestUtils.renderIntoDocument(<Typeahead options={
         BEATLES
       } />);
-    });
-
-    it('should fuzzy search and render matching results', function() {
-      // input value: num of expected results
-      var testplan = {
-        'o': 3,
-        'pa': 1,
-        'Grg': 1,
-        'Ringo': 1,
-        'xxx': 0
-      };
-
-      _.each(testplan, function(expected, value) {
-        var results = simulateTextInput(this.component, value);
-        assert.equal(results.length, expected, 'Text input: ' + value);
-      }, this);
     });
 
     describe('keyboard controls', function() {
