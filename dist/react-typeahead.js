@@ -20574,7 +20574,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 
     return (
       React.createElement("li", {className: classList, onClick: this._onClick}, 
-        React.createElement("a", {href: "#", className: this._getClasses(), ref: "anchor"}, 
+        React.createElement("a", {href: "#", className: this._getClasses(), ref: "anchor", onclick: this._preventNavigation}, 
           value
         )
       )
@@ -20591,6 +20591,10 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 
   _onClick: function() {
     return this.props.onClick();
+  },
+      
+  _preventNavigation: function(e){
+      e.preventDefault();
   }
 });
 
