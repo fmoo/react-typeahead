@@ -14,31 +14,85 @@ function simulateTextInput(component, value) {
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
 }
 
-var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
+var BEATLES = ['John', 'Paul', 'George', 'Ringo'],
+    BEATLES_OBJECT = [
+        {
+            id: 1,
+            name: 'John'
+        },
+        {
+            id: 2,
+            name: 'Paul'
+        },
+        {
+            id: 3,
+            name: 'George'
+        },
+        {
+            id: 4,
+            name: 'Ringo'
+        }
+    ];
 
 describe('Typeahead Component', function() {
+    
+    describe('string options', function() {
+        beforeEach(function() {
+          this.component = TestUtils.renderIntoDocument(<Typeahead options={
+            BEATLES
+          } />);
+        });
+            
+        it('should fuzzy search and render matching results', function() {
+          // input value: num of expected results
+          var testplan = {
+            'o': 3,
+            'pa': 1,
+            'Grg': 1,
+            'Ringo': 1,
+            'xxx': 0
+          };
 
+          _.each(testplan, function(expected, value) {
+            var results = simulateTextInput(this.component, value);
+            assert.equal(results.length, expected, 'Text input: ' + value);
+          }, this);
+        });
+    });
+
+    describe('object options', function() {
+        beforeEach(function() {
+          var formatter = function(item){
+              return item.name;
+          }
+            
+          this.component = TestUtils.renderIntoDocument(<Typeahead options={
+            BEATLES_OBJECT
+          } formatter={formatter} />);
+        });
+            
+        it('should fuzzy search and render matching results', function() {
+          // input value: num of expected results
+          var testplan = {
+            'o': 3,
+            'pa': 1,
+            'Grg': 1,
+            'Ringo': 1,
+            'xxx': 0
+          };
+
+          _.each(testplan, function(expected, value) {
+            var results = simulateTextInput(this.component, value);
+            assert.equal(results.length, expected, 'Text input: ' + value);
+          }, this);
+        });
+    });
+    
   describe('sanity', function() {
     beforeEach(function() {
       this.component = TestUtils.renderIntoDocument(<Typeahead options={
         BEATLES
       } />);
-    });
-
-    it('should fuzzy search and render matching results', function() {
-      // input value: num of expected results
-      var testplan = {
-        'o': 3,
-        'pa': 1,
-        'Grg': 1,
-        'Ringo': 1,
-        'xxx': 0
-      };
-
-      _.each(testplan, function(expected, value) {
-        var results = simulateTextInput(this.component, value);
-        assert.equal(results.length, expected, 'Text input: ' + value);
-      }, this);
     });
 
     describe('keyboard controls', function() {
@@ -113,7 +167,8 @@ describe('Typeahead Component', function() {
           input: 'topcoat-text-input',
           results: 'topcoat-list__container',
           listItem: 'topcoat-list__item',
-          listAnchor: 'topcoat-list__link'
+          listAnchor: 'topcoat-list__link',
+          hover: 'topcoat-list__item-active'
         };
 
         this.component = TestUtils.renderIntoDocument(<Typeahead 
@@ -144,6 +199,18 @@ describe('Typeahead Component', function() {
         var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
         var listAnchor = typeaheadOptions[1].refs.anchor.getDOMNode();
         assert.isTrue(listAnchor.classList.contains('topcoat-list__link'));
+      });
+
+      it('adds a custom class to the list items when active', function() {
+        var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        var node = this.component.refs.entry.getDOMNode();
+        
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        
+        var listItem = typeaheadOptions[0]; 
+        var domListItem = listItem.getDOMNode();
+          
+        assert.isTrue(domListItem.classList.contains('topcoat-list__item-active'));
       });
     });
 

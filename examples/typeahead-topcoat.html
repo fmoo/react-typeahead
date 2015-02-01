@@ -33,7 +33,9 @@
       background: #585858;
     }
 
-
+    .custom-active{
+        background:#CCC;
+    }
     </style>
 
     <div id="main">
@@ -61,7 +63,8 @@
         customClasses={{
           input: "topcoat-text-input",
           results: "topcoat-list__container",
-          listItem: "topcoat-list__item"
+          listItem: "topcoat-list__item",
+          hover: 'custom-active'
         }} />,
       document.getElementById("typeahead")
     );

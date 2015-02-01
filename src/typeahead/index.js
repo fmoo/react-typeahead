@@ -31,7 +31,8 @@ var Typeahead = React.createClass({
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) { },
+      formatter: undefined
     };
   },
 
@@ -51,11 +52,14 @@ var Typeahead = React.createClass({
     };
   },
 
-  getOptionsForValue: function(value, options) {
-    var result = fuzzy.filter(value, options).map(function(res) {
-      return res.string;
+  getOptionsForValue: function(value, options) {     
+   if(typeof(value) !== "string" && typeof(this.props.formatter) !== "undefined")
+       value = this.props.formatter(value);
+      
+    var result = fuzzy.filter(value, options, { extract: this.props.formatter }).map(function(res) {
+      return res.original;
     });
-
+      
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -87,14 +91,20 @@ var Typeahead = React.createClass({
       <TypeaheadSelector
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
+        formatter={this.props.formatter}
         customClasses={this.props.customClasses} />
    );
   },
 
-  _onOptionSelected: function(option) {
+  _onOptionSelected: function(option) {     
+    var value = option;
+      
+    if(typeof(option) !== "string" && typeof(this.props.formatter) !== "undefined")
+       value = this.props.formatter(value);
+      
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
+    nEntry.value = value;
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
