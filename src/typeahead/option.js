@@ -42,7 +42,7 @@ var TypeaheadOption = React.createClass({
 
     return (
       <li className={classList} onClick={this._onClick}>
-        <a href="#" className={this._getClasses()} ref="anchor" onclick={this._preventNavigation}>
+        <a href="#" className={this._getClasses()} ref="anchor" onClick={this._preventNavigation}>
           {value}
         </a>
       </li>
@@ -57,7 +57,9 @@ var TypeaheadOption = React.createClass({
     return React.addons.classSet(classes);
   },
 
-  _onClick: function() {
+  _onClick: function(e) {
+    e.preventDefault();
+      
     return this.props.onClick();
   },
       
