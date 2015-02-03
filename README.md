@@ -66,7 +66,7 @@ Limit the number of options rendered in the results list.
 #### props.customClasses
 
 Type: `Object`
-Allowed Keys: `input`, `results`, `listItem`, `listAnchor`
+Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`
 
 An object containing custom class names for child elements. Useful for
 integrating with 3rd party UI kits.
