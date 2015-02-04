@@ -41,26 +41,65 @@ var BEATLES = BEATLES_MEMBERS.map(function(item) { return item.name });
 describe('Typeahead Component', function() {
 
   describe('sanity', function() {
-    beforeEach(function() {
-      this.component = TestUtils.renderIntoDocument(<Typeahead options={
-        BEATLES
-      } />);
+    describe('strings', function() {
+      beforeEach(function() {
+        this.component = TestUtils.renderIntoDocument(<Typeahead options={BEATLES} />);
+      });
+  
+      it('should fuzzy search and render matching results', function() {
+        // input value: num of expected results
+        var testplan = {
+          'o': 3,
+          'pa': 1,
+          'Grg': 1,
+          'Ringo': 1,
+          'xxx': 0
+        };
+  
+        _.each(testplan, function(expected, value) {
+          var results = simulateTextInput(this.component, value);
+          assert.equal(results.length, expected, 'Text input: ' + value);
+        }, this);
+      });
     });
-
-    it('should fuzzy search and render matching results', function() {
-      // input value: num of expected results
-      var testplan = {
-        'o': 3,
-        'pa': 1,
-        'Grg': 1,
-        'Ringo': 1,
-        'xxx': 0
+        
+    describe('objects', function(options) {
+      function createTypeahead(options) {
+        options = options || {};
+                    
+        var beatlesFormatter = function(item) {
+            return item.name;
+        };
+          
+        return TestUtils.renderIntoDocument(<Typeahead options={BEATLES_MEMBERS} formatter={beatlesFormatter} defaultValue={options.defaultValue} />);
       };
-
-      _.each(testplan, function(expected, value) {
-        var results = simulateTextInput(this.component, value);
-        assert.equal(results.length, expected, 'Text input: ' + value);
-      }, this);
+  
+      it('should fuzzy search and render matching results', function() {
+        this.component = createTypeahead();
+            
+        // input value: num of expected results
+        var testplan = {
+          'o': 3,
+          'pa': 1,
+          'Grg': 1,
+          'Ringo': 1,
+          'xxx': 0
+        };
+  
+        _.each(testplan, function(expected, value) {
+          var results = simulateTextInput(this.component, value);
+          assert.equal(results.length, expected, 'Text input: ' + value);
+        }, this);
+      });
+  
+      it('given defaultValue, should find the correct match', function() {
+        this.component = createTypeahead({ defaultValue: 'ringo' });
+            
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+        assert.equal(node.value, 'Ringo'); // Poor Ringo
+      });
     });
   });
     
