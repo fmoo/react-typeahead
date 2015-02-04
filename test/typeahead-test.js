@@ -14,7 +14,29 @@ function simulateTextInput(component, value) {
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
 }
 
-var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
+var BEATLES_MEMBERS = [
+    {
+        name: 'John',
+        isAlive: false
+    },
+    
+    {
+        name: 'Paul',
+        isAlive: true
+    },
+    
+    {
+        name: 'George',
+        isAlive: false
+    },
+    
+    {
+        name: 'Ringo',
+        isAlive: true
+    }
+];
+
+var BEATLES = BEATLES_MEMBERS.map(function(item) { return item.name });
 
 describe('Typeahead Component', function() {
 
@@ -40,58 +62,63 @@ describe('Typeahead Component', function() {
         assert.equal(results.length, expected, 'Text input: ' + value);
       }, this);
     });
-
-    describe('keyboard controls', function() {
-      it('down arrow + return selects an option', function() {
-        var results = simulateTextInput(this.component, 'o');
-        var secondItem = results[1].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
-        assert.equal(node.value, secondItem); // Poor Ringo
-      });
-
-      it('up arrow + return navigates and selects an option', function() {
-        var results = simulateTextInput(this.component, 'o');
-        var firstItem = results[0].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
-        assert.equal(node.value, firstItem);
-      });
-
-      it('escape clears selection', function() {
-        var results = simulateTextInput(this.component, 'o');
-        var firstItem = results[0].getDOMNode();
-        var node = this.component.refs.entry.getDOMNode();
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        assert.ok(firstItem.classList.contains('hover'));
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
-        assert.notOk(firstItem.classList.contains('hover'));
-      });
-
-      it('tab to choose first item', function() {
-        var results = simulateTextInput(this.component, 'o');
-        var itemText = results[0].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
-        assert.equal(node.value, itemText);
-      });
-
-      it('tab to selected current item', function() {
-        var results = simulateTextInput(this.component, 'o');
-        var itemText = results[1].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
-        assert.equal(node.value, itemText);
-      });
+  });
+    
+  describe('keyboard controls', function() {
+    beforeEach(function() {
+      this.component = TestUtils.renderIntoDocument(<Typeahead options={
+        BEATLES
+      } />);
     });
-
+        
+    it('down arrow + return selects an option', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var secondItem = results[1].getDOMNode().innerText;
+      var node = this.component.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+      assert.equal(node.value, secondItem); // Poor Ringo
+    })
+    
+    it('up arrow + return navigates and selects an option', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var firstItem = results[0].getDOMNode().innerText;
+      var node = this.component.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+      assert.equal(node.value, firstItem);
+    })
+    
+    it('escape clears selection', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var firstItem = results[0].getDOMNode();
+      var node = this.component.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      assert.ok(firstItem.classList.contains('hover'));
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
+      assert.notOk(firstItem.classList.contains('hover'));
+    })
+    
+    it('tab to choose first item', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var itemText = results[0].getDOMNode().innerText;
+      var node = this.component.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+      assert.equal(node.value, itemText);
+    })
+    
+    it('tab to selected current item', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var itemText = results[1].getDOMNode().innerText;
+      var node = this.component.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+      assert.equal(node.value, itemText);
+    });
   });
 
   describe('props', function() {
