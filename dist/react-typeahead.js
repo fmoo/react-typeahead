@@ -20565,7 +20565,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     var classList = React.addons.classSet(classes);
 
     return (
-      React.createElement("li", {className: classList, onClick: this._onClick}, 
+      React.createElement("li", {className: classList, onClick: this._onClick, key: this.props.children}, 
         React.createElement("a", {href: "#", className: this._getClasses(), ref: "anchor"}, 
            this.props.children
         )
@@ -20635,7 +20635,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
       var text = result.string;
         
       return (
-        React.createElement(TypeaheadOption, {ref: result, key: result, 
+        React.createElement(TypeaheadOption, {ref: result, 
           hover: this.state.selectionIndex === i, 
           customClasses: this.props.customClasses, 
           onClick: this._onClick.bind(this, result)}, 

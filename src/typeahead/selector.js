@@ -43,7 +43,7 @@ var TypeaheadSelector = React.createClass({
       var text = result.string;
         
       return (
-        <TypeaheadOption ref={result} key={result}
+        <TypeaheadOption ref={result}
           hover={this.state.selectionIndex === i}
           customClasses={this.props.customClasses}
           onClick={this._onClick.bind(this, result)}>
