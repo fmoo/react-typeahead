@@ -21,7 +21,8 @@ var Typeahead = React.createClass({
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func
+    onKeyDown: React.PropTypes.func,
+    formatter: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -52,13 +53,17 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
-    var result = fuzzy.filter(value, options).map(function(res) {
-      return res.string;
+    var formatter = this.props.formatter || null,
+        result = fuzzy.filter(value, options, { 
+        extract: function (item) {
+            return (formatter !== null) ? formatter(item) : item;
+        }
     });
-
+      
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
+      
     return result;
   },
 
@@ -94,10 +99,10 @@ var Typeahead = React.createClass({
   _onOptionSelected: function(option) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
-    this.setState({visible: this.getOptionsForValue(option, this.state.options),
-                   selection: option,
-                   entryValue: option});
+    nEntry.value = option.string;
+    this.setState({visible: this.getOptionsForValue(option.string, this.state.options),
+                   selection: option.original,
+                   entryValue: option.original});
     this.props.onOptionSelected(option);
   },
 

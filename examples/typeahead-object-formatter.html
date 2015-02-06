@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-mobile-dark.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="../node_modules/react/dist/react-with-addons.js"></script>
+    <script src="../node_modules/react/dist/JSXTransformer.js"></script>
+    <script src="../dist/react-typeahead.js"></script>
+  </head>
+  <body>
+    <style>
+
+    #main {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #F0F1F1;
+    }
+
+    a {
+      color: #288EDF;
+    }
+
+    .topcoat-text-input {
+      width: 100%;
+    }
+
+    li.hover {
+      background: #585858;
+    }
+
+    .custom-active{
+        background:#CCC;
+    }
+    </style>
+
+    <div id="main">
+      <h1>Topcoat + React.Typeahead</h1>
+      <div id="typeahead"></div>
+    </div>
+
+    <script type="text/jsx">
+/** @jsx React.DOM */
+
+    var items = [
+                  {
+                    "id": "54cd18a8d6585199ea277d52",
+                    "firstname": "Mercedes",
+                    "lastname": "Thornton"
+                  },
+                  {
+                    "id": "54cd18a8ef0a86467282eefc",
+                    "firstname": "Alexander",
+                    "lastname": "Carson"
+                  },
+                  {
+                    "id": "54cd18a8f07e74376c0eba83",
+                    "firstname": "Mathews",
+                    "lastname": "Grant"
+                  },
+                  {
+                    "id": "54cd18a856b09cd9962cc55c",
+                    "firstname": "Reilly",
+                    "lastname": "Suarez"
+                  },
+                  {
+                    "id": "54cd18a8e17d7834a0ce7ccb",
+                    "firstname": "Hines",
+                    "lastname": "Young"
+                  },
+                  {
+                    "id": "54cd18a8583eeb3b44e6a620",
+                    "firstname": "Aurora",
+                    "lastname": "Hale"
+                  }
+                ];
+
+    var formatObject = function(item){
+        return item.lastname + ", " + item.firstname;
+    };
+    
+    var onSelected = function(selectedItem){
+        console.log(selectedItem);
+    }
+
+    React.render(
+      <ReactTypeahead.Typeahead
+        defaultValue="src"
+        options={items}
+        formatter={formatObject}
+        className="topcoat-list"
+        onOptionSelected={onSelected}
+        customClasses={{
+          input: "topcoat-text-input",
+          results: "topcoat-list__container",
+          listItem: "topcoat-list__item",
+          hover: 'custom-active'
+        }} />,
+      document.getElementById("typeahead")
+    );
+
+    </script>
+
+  </body>
+</html>
