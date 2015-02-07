@@ -21,7 +21,18 @@ var Typeahead = React.createClass({
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func
+    onKeyDown: React.PropTypes.func,
+    filterOptions: React.PropTypes.shape({
+      // (element from options) => string
+      extract: React.PropTypes.func,
+      pre: React.PropTypes.string,
+      post: React.PropTypes.string,
+      caseSensitive: React.PropTypes.bool
+    }),
+    // original element must have a toString method
+    displayOriginal: React.PropTypes.bool,
+    // Clear value in input when selection an option
+    clearOnSelect: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -31,7 +42,12 @@ var Typeahead = React.createClass({
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) { },
+      filterOptions: {
+        extract: function(element) {
+          return element.toString();
+        }
+      }
     };
   },
 
@@ -51,10 +67,27 @@ var Typeahead = React.createClass({
     };
   },
 
-  getOptionsForValue: function(value, options) {
-    var result = fuzzy.filter(value, options).map(function(res) {
-      return res.string;
+  componentWillReceiveProps: function(nextProps) {
+    var entryValue = nextProps.defaultValue === this.props.defaultValue ?
+        this.state.entryValue : nextProps.defaultValue;
+    this.setState({
+      options: nextProps.options,
+      entryValue: entryValue,
+      visible: this.getOptionsForValue(entryValue, nextProps.options)
     });
+  },
+
+  getOptionsForValue: function(value, options) {
+    var displayFromOriginal = this.props.displayOriginal;
+    var result = fuzzy.filter(value, options, this.props.filterOptions)
+      .map(function(res) {
+        return {
+          display: displayFromOriginal ?
+            res.original.toString()
+            : res.string,
+          original: res.original
+        }
+      });
 
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
@@ -94,10 +127,11 @@ var Typeahead = React.createClass({
   _onOptionSelected: function(option) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
-    this.setState({visible: this.getOptionsForValue(option, this.state.options),
+    var value = this.props.clearOnSelect ? "" : option.display;
+    nEntry.value = value;
+    this.setState({visible: this.getOptionsForValue(value, this.state.options),
                    selection: option,
-                   entryValue: option});
+                   entryValue: value});
     this.props.onOptionSelected(option);
   },
 
