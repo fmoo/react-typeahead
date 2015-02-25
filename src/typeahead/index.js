@@ -91,14 +91,14 @@ var Typeahead = React.createClass({
    );
   },
 
-  _onOptionSelected: function(option) {
+  _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
     nEntry.value = option;
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
-    this.props.onOptionSelected(option);
+    return this.props.onOptionSelected(option, event);
   },
 
   _onTextEntryUpdated: function() {
