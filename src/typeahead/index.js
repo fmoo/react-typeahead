@@ -112,7 +112,7 @@ var Typeahead = React.createClass({
     if (!this.refs.sel.state.selection) {
       return this.props.onKeyDown(event);
     }
-    this._onOptionSelected(this.refs.sel.state.selection);
+    return this._onOptionSelected(this.refs.sel.state.selection, event);
   },
 
   _onEscape: function() {
@@ -122,7 +122,7 @@ var Typeahead = React.createClass({
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
       this.refs.sel.state.selection : this.state.visible[0];
-    this._onOptionSelected(option)
+    return this._onOptionSelected(option, event);
   },
 
   eventMap: function(event) {
