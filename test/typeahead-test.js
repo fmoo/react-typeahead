@@ -16,6 +16,43 @@ function simulateTextInput(component, value) {
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
+var getSearchString = function() {
+  return this.firstName + " " + this.lastName;
+};
+var getDisplayString = function() {
+  return this.firstName + " (" + this.birthYear + ")";
+};
+var BEATLES_COMPLEX = [
+  {
+    firstName: 'John',
+    lastName: 'Lennon',
+    birthYear: 1940,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
+  },
+  {
+    firstName: 'Paul',
+    lastName: 'McCartney',
+    birthYear: 1942,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
+  },
+  {
+    firstName: 'George',
+    lastName: 'Harrison',
+    birthYear: 1943,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
+  },
+  {
+    firstName: 'Ringo',
+    lastName: 'Starr',
+    birthYear: 1940,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
+  }
+];
+
 describe('Typeahead Component', function() {
 
   describe('sanity', function() {
@@ -97,12 +134,38 @@ describe('Typeahead Component', function() {
   describe('props', function() {
     context('maxVisible', function() {
       it('limits the result set based on the maxVisible option', function() {
-        var component = TestUtils.renderIntoDocument(<Typeahead 
+        var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
           maxVisible={ 1 }
         />);
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
+      });
+    });
+
+    context('options', function() {
+      it('renders simple options correctly', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().textContent, 'John');
+      });
+
+      it('renders custom options correctly', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
+      });
+
+      it('filters search string', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+        />);
+        var results = simulateTextInput(component, 'Lennon');
+        assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
       });
     });
 
@@ -116,7 +179,7 @@ describe('Typeahead Component', function() {
           listAnchor: 'topcoat-list__link'
         };
 
-        this.component = TestUtils.renderIntoDocument(<Typeahead 
+        this.component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
           customClasses={ customClasses }
         />);
