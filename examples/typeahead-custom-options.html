@@ -45,32 +45,41 @@
 /** @jsx React.DOM */
 
 var getSearchString = function() {
-  return this.name + ", " + this.city
+  return this.firstName + " " + this.lastName;
 };
 var getDisplayString = function() {
-  return this.name + " (" + this.size + ")";
+  return this.firstName + " (" + this.birthYear + ")";
 };
 var options = [
   {
-    name: "ABC",
-    city: "Berlin",
-    size: 500
+    firstName: 'John',
+    lastName: 'Lennon',
+    birthYear: 1940,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
   },
   {
-    name: "ABD",
-    city: "London",
-    size: 1000
+    firstName: 'Paul',
+    lastName: 'McCartney',
+    birthYear: 1942,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
   },
   {
-    name: "CCC",
-    city: "New York",
-    size: 2000
+    firstName: 'George',
+    lastName: 'Harrison',
+    birthYear: 1943,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
+  },
+  {
+    firstName: 'Ringo',
+    lastName: 'Starr',
+    birthYear: 1940,
+    getSearchString: getSearchString,
+    getDisplayString: getDisplayString
   }
-].map(function(option) {
-  option.getSearchString = getSearchString;
-  option.getDisplayString = getDisplayString;
-  return option;
-});
+];
 
 window.onload = function() {
   React.render(
