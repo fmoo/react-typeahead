@@ -51,9 +51,27 @@ var Typeahead = React.createClass({
     };
   },
 
+  _getSearchString: function(option) {
+    if (option.getSearchString) {
+      return option.getSearchString();
+    } else {
+      return option;
+    }
+  },
+
+  _getDisplayString: function(option) {
+    if (option.getDisplayString) {
+      return option.getDisplayString();
+    } else {
+      return option;
+    }
+  },
+
   getOptionsForValue: function(value, options) {
-    var result = fuzzy.filter(value, options).map(function(res) {
-      return res.string;
+    var optionStrings = options.map(this._getSearchString);
+    var valueString = this._getSearchString(value);
+    var result = fuzzy.filter(valueString, optionStrings).map(function(res) {
+      return options[res.index];
     });
 
     if (this.props.maxVisible) {
@@ -87,14 +105,15 @@ var Typeahead = React.createClass({
       <TypeaheadSelector
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
-        customClasses={this.props.customClasses} />
+        customClasses={this.props.customClasses}
+        getDisplayString={this._getDisplayString} />
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
+    nEntry.value = this._getDisplayString(option);
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
