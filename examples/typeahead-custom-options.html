@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-mobile-dark.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="../node_modules/react/dist/react-with-addons.js"></script>
+    <script src="../node_modules/react/dist/JSXTransformer.js"></script>
+    <script src="../dist/react-typeahead.js"></script>
+  </head>
+  <body>
+    <style>
+
+    #main {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #F0F1F1;
+    }
+
+    a {
+      color: #288EDF;
+    }
+
+    .topcoat-text-input {
+      width: 100%;
+    }
+
+    li.hover {
+      background: #585858;
+    }
+
+
+    </style>
+
+    <div id="main">
+      <h1>Topcoat + React.Typeahead (custom options)</h1>
+      <div id="typeahead"></div>
+    </div>
+
+    <script type="text/jsx">
+/** @jsx React.DOM */
+
+var getSearchString = function() {
+  return this.name + ", " + this.city
+};
+var getDisplayString = function() {
+  return this.name + " (" + this.size + ")";
+};
+var options = [
+  {
+    name: "ABC",
+    city: "Berlin",
+    size: 500
+  },
+  {
+    name: "ABD",
+    city: "London",
+    size: 1000
+  },
+  {
+    name: "CCC",
+    city: "New York",
+    size: 2000
+  }
+].map(function(option) {
+  option.getSearchString = getSearchString;
+  option.getDisplayString = getDisplayString;
+  return option;
+});
+
+window.onload = function() {
+  React.render(
+    <ReactTypeahead.Typeahead
+      defaultValue="a"
+      options={options}
+      className="topcoat-list"
+      customClasses={{
+        input: "topcoat-text-input",
+        results: "topcoat-list__container",
+        listItem: "topcoat-list__item"
+      }} />,
+    document.getElementById("typeahead")
+  );
+};
+
+    </script>
+
+  </body>
+</html>
+
