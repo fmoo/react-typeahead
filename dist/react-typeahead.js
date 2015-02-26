@@ -373,9 +373,6 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
   getInitialState: function() {
     return {
-      // The set of all options... Does this need to be state?  I guess for lazy load...
-      options: this.props.options,
-
       // The currently visible set of options
       visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
@@ -450,7 +447,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
     nEntry.value = this._getDisplayString(option);
-    this.setState({visible: this.getOptionsForValue(option, this.state.options),
+    this.setState({visible: this.getOptionsForValue(option, this.props.options),
                    selection: option,
                    entryValue: option});
     return this.props.onOptionSelected(option, event);
@@ -458,7 +455,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.getDOMNode().value;
-    this.setState({visible: this.getOptionsForValue(value, this.state.options),
+    this.setState({visible: this.getOptionsForValue(value, this.props.options),
                    selection: null,
                    entryValue: value});
   },
