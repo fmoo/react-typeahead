@@ -91,14 +91,14 @@ var Typeahead = React.createClass({
    );
   },
 
-  _onOptionSelected: function(option) {
+  _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
     nEntry.value = option;
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
-    this.props.onOptionSelected(option);
+    return this.props.onOptionSelected(option, event);
   },
 
   _onTextEntryUpdated: function() {
@@ -112,7 +112,7 @@ var Typeahead = React.createClass({
     if (!this.refs.sel.state.selection) {
       return this.props.onKeyDown(event);
     }
-    this._onOptionSelected(this.refs.sel.state.selection);
+    return this._onOptionSelected(this.refs.sel.state.selection, event);
   },
 
   _onEscape: function() {
@@ -122,7 +122,7 @@ var Typeahead = React.createClass({
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
       this.refs.sel.state.selection : this.state.visible[0];
-    this._onOptionSelected(option)
+    return this._onOptionSelected(option, event);
   },
 
   eventMap: function(event) {
