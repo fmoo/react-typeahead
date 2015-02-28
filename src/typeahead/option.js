@@ -54,6 +54,7 @@ var TypeaheadOption = React.createClass({
   },
 
   _onClick: function(event) {
+    event.preventDefault();
     return this.props.onClick(event);
   }
 });

@@ -1,7 +1,1625 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/index.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+
+var base64 = require('base64-js')
+var ieee754 = require('ieee754')
+var isArray = require('is-array')
+
+exports.Buffer = Buffer
+exports.SlowBuffer = SlowBuffer
+exports.INSPECT_MAX_BYTES = 50
+Buffer.poolSize = 8192 // not used by this implementation
+
+var kMaxLength = 0x3fffffff
+var rootParent = {}
+
+/**
+ * If `Buffer.TYPED_ARRAY_SUPPORT`:
+ *   === true    Use Uint8Array implementation (fastest)
+ *   === false   Use Object implementation (most compatible, even IE6)
+ *
+ * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+ * Opera 11.6+, iOS 4.2+.
+ *
+ * Note:
+ *
+ * - Implementation must support adding new properties to `Uint8Array` instances.
+ *   Firefox 4-29 lacked support, fixed in Firefox 30+.
+ *   See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+ *
+ *  - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+ *
+ *  - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+ *    incorrect length in some situations.
+ *
+ * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they will
+ * get the Object implementation, which is slower but will work correctly.
+ */
+Buffer.TYPED_ARRAY_SUPPORT = (function () {
+  try {
+    var buf = new ArrayBuffer(0)
+    var arr = new Uint8Array(buf)
+    arr.foo = function () { return 42 }
+    return arr.foo() === 42 && // typed array instances can be augmented
+        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+        new Uint8Array(1).subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
+  } catch (e) {
+    return false
+  }
+})()
+
+/**
+ * Class: Buffer
+ * =============
+ *
+ * The Buffer constructor returns instances of `Uint8Array` that are augmented
+ * with function properties for all the node `Buffer` API functions. We use
+ * `Uint8Array` so that square bracket notation works as expected -- it returns
+ * a single octet.
+ *
+ * By augmenting the instances, we can avoid modifying the `Uint8Array`
+ * prototype.
+ */
+function Buffer (subject, encoding, noZero) {
+  if (!(this instanceof Buffer))
+    return new Buffer(subject, encoding, noZero)
+
+  var type = typeof subject
+
+  // Find the length
+  var length
+  if (type === 'number') {
+    length = +subject
+  } else if (type === 'string') {
+    length = Buffer.byteLength(subject, encoding)
+  } else if (type === 'object' && subject !== null) { // assume object is array-like
+    if (subject.type === 'Buffer' && isArray(subject.data))
+      subject = subject.data
+    length = +subject.length
+  } else {
+    throw new TypeError('must start with number, buffer, array or string')
+  }
+
+  if (length > kMaxLength)
+    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+      'size: 0x' + kMaxLength.toString(16) + ' bytes')
+
+  if (length < 0)
+    length = 0
+  else
+    length >>>= 0 // Coerce to uint32.
+
+  var self = this
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Preferred: Return an augmented `Uint8Array` instance for best performance
+    /*eslint-disable consistent-this */
+    self = Buffer._augment(new Uint8Array(length))
+    /*eslint-enable consistent-this */
+  } else {
+    // Fallback: Return THIS instance of Buffer (created by `new`)
+    self.length = length
+    self._isBuffer = true
+  }
+
+  var i
+  if (Buffer.TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
+    // Speed optimization -- use set if we're copying from a typed array
+    self._set(subject)
+  } else if (isArrayish(subject)) {
+    // Treat array-ish objects as a byte array
+    if (Buffer.isBuffer(subject)) {
+      for (i = 0; i < length; i++)
+        self[i] = subject.readUInt8(i)
+    } else {
+      for (i = 0; i < length; i++)
+        self[i] = ((subject[i] % 256) + 256) % 256
+    }
+  } else if (type === 'string') {
+    self.write(subject, 0, encoding)
+  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT && !noZero) {
+    for (i = 0; i < length; i++) {
+      self[i] = 0
+    }
+  }
+
+  if (length > 0 && length <= Buffer.poolSize)
+    self.parent = rootParent
+
+  return self
+}
+
+function SlowBuffer (subject, encoding, noZero) {
+  if (!(this instanceof SlowBuffer))
+    return new SlowBuffer(subject, encoding, noZero)
+
+  var buf = new Buffer(subject, encoding, noZero)
+  delete buf.parent
+  return buf
+}
+
+Buffer.isBuffer = function (b) {
+  return !!(b != null && b._isBuffer)
+}
+
+Buffer.compare = function (a, b) {
+  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b))
+    throw new TypeError('Arguments must be Buffers')
+
+  if (a === b) return 0
+
+  var x = a.length
+  var y = b.length
+  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
+  if (i !== len) {
+    x = a[i]
+    y = b[i]
+  }
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
+}
+
+Buffer.isEncoding = function (encoding) {
+  switch (String(encoding).toLowerCase()) {
+    case 'hex':
+    case 'utf8':
+    case 'utf-8':
+    case 'ascii':
+    case 'binary':
+    case 'base64':
+    case 'raw':
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      return true
+    default:
+      return false
+  }
+}
+
+Buffer.concat = function (list, totalLength) {
+  if (!isArray(list)) throw new TypeError('Usage: Buffer.concat(list[, length])')
+
+  if (list.length === 0) {
+    return new Buffer(0)
+  } else if (list.length === 1) {
+    return list[0]
+  }
+
+  var i
+  if (totalLength === undefined) {
+    totalLength = 0
+    for (i = 0; i < list.length; i++) {
+      totalLength += list[i].length
+    }
+  }
+
+  var buf = new Buffer(totalLength)
+  var pos = 0
+  for (i = 0; i < list.length; i++) {
+    var item = list[i]
+    item.copy(buf, pos)
+    pos += item.length
+  }
+  return buf
+}
+
+Buffer.byteLength = function (str, encoding) {
+  var ret
+  str = str + ''
+  switch (encoding || 'utf8') {
+    case 'ascii':
+    case 'binary':
+    case 'raw':
+      ret = str.length
+      break
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      ret = str.length * 2
+      break
+    case 'hex':
+      ret = str.length >>> 1
+      break
+    case 'utf8':
+    case 'utf-8':
+      ret = utf8ToBytes(str).length
+      break
+    case 'base64':
+      ret = base64ToBytes(str).length
+      break
+    default:
+      ret = str.length
+  }
+  return ret
+}
+
+// pre-set for values that may exist in the future
+Buffer.prototype.length = undefined
+Buffer.prototype.parent = undefined
+
+// toString(encoding, start=0, end=buffer.length)
+Buffer.prototype.toString = function (encoding, start, end) {
+  var loweredCase = false
+
+  start = start >>> 0
+  end = end === undefined || end === Infinity ? this.length : end >>> 0
+
+  if (!encoding) encoding = 'utf8'
+  if (start < 0) start = 0
+  if (end > this.length) end = this.length
+  if (end <= start) return ''
+
+  while (true) {
+    switch (encoding) {
+      case 'hex':
+        return hexSlice(this, start, end)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Slice(this, start, end)
+
+      case 'ascii':
+        return asciiSlice(this, start, end)
+
+      case 'binary':
+        return binarySlice(this, start, end)
+
+      case 'base64':
+        return base64Slice(this, start, end)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return utf16leSlice(this, start, end)
+
+      default:
+        if (loweredCase)
+          throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = (encoding + '').toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+Buffer.prototype.equals = function (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return true
+  return Buffer.compare(this, b) === 0
+}
+
+Buffer.prototype.inspect = function () {
+  var str = ''
+  var max = exports.INSPECT_MAX_BYTES
+  if (this.length > 0) {
+    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
+    if (this.length > max)
+      str += ' ... '
+  }
+  return '<Buffer ' + str + '>'
+}
+
+Buffer.prototype.compare = function (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return 0
+  return Buffer.compare(this, b)
+}
+
+// `get` will be removed in Node 0.13+
+Buffer.prototype.get = function (offset) {
+  console.log('.get() is deprecated. Access using array indexes instead.')
+  return this.readUInt8(offset)
+}
+
+// `set` will be removed in Node 0.13+
+Buffer.prototype.set = function (v, offset) {
+  console.log('.set() is deprecated. Access using array indexes instead.')
+  return this.writeUInt8(v, offset)
+}
+
+function hexWrite (buf, string, offset, length) {
+  offset = Number(offset) || 0
+  var remaining = buf.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+
+  // must be an even number of digits
+  var strLen = string.length
+  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
+
+  if (length > strLen / 2) {
+    length = strLen / 2
+  }
+  for (var i = 0; i < length; i++) {
+    var byte = parseInt(string.substr(i * 2, 2), 16)
+    if (isNaN(byte)) throw new Error('Invalid hex string')
+    buf[offset + i] = byte
+  }
+  return i
+}
+
+function utf8Write (buf, string, offset, length) {
+  var charsWritten = blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
+  return charsWritten
+}
+
+function asciiWrite (buf, string, offset, length) {
+  var charsWritten = blitBuffer(asciiToBytes(string), buf, offset, length)
+  return charsWritten
+}
+
+function binaryWrite (buf, string, offset, length) {
+  return asciiWrite(buf, string, offset, length)
+}
+
+function base64Write (buf, string, offset, length) {
+  var charsWritten = blitBuffer(base64ToBytes(string), buf, offset, length)
+  return charsWritten
+}
+
+function utf16leWrite (buf, string, offset, length) {
+  var charsWritten = blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
+  return charsWritten
+}
+
+Buffer.prototype.write = function (string, offset, length, encoding) {
+  // Support both (string, offset, length, encoding)
+  // and the legacy (string, encoding, offset, length)
+  if (isFinite(offset)) {
+    if (!isFinite(length)) {
+      encoding = length
+      length = undefined
+    }
+  } else {  // legacy
+    var swap = encoding
+    encoding = offset
+    offset = length
+    length = swap
+  }
+
+  offset = Number(offset) || 0
+
+  if (length < 0 || offset < 0 || offset > this.length)
+    throw new RangeError('attempt to write outside buffer bounds')
+
+  var remaining = this.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+  encoding = String(encoding || 'utf8').toLowerCase()
+
+  var ret
+  switch (encoding) {
+    case 'hex':
+      ret = hexWrite(this, string, offset, length)
+      break
+    case 'utf8':
+    case 'utf-8':
+      ret = utf8Write(this, string, offset, length)
+      break
+    case 'ascii':
+      ret = asciiWrite(this, string, offset, length)
+      break
+    case 'binary':
+      ret = binaryWrite(this, string, offset, length)
+      break
+    case 'base64':
+      ret = base64Write(this, string, offset, length)
+      break
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      ret = utf16leWrite(this, string, offset, length)
+      break
+    default:
+      throw new TypeError('Unknown encoding: ' + encoding)
+  }
+  return ret
+}
+
+Buffer.prototype.toJSON = function () {
+  return {
+    type: 'Buffer',
+    data: Array.prototype.slice.call(this._arr || this, 0)
+  }
+}
+
+function base64Slice (buf, start, end) {
+  if (start === 0 && end === buf.length) {
+    return base64.fromByteArray(buf)
+  } else {
+    return base64.fromByteArray(buf.slice(start, end))
+  }
+}
+
+function utf8Slice (buf, start, end) {
+  var res = ''
+  var tmp = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    if (buf[i] <= 0x7F) {
+      res += decodeUtf8Char(tmp) + String.fromCharCode(buf[i])
+      tmp = ''
+    } else {
+      tmp += '%' + buf[i].toString(16)
+    }
+  }
+
+  return res + decodeUtf8Char(tmp)
+}
+
+function asciiSlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i] & 0x7F)
+  }
+  return ret
+}
+
+function binarySlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i])
+  }
+  return ret
+}
+
+function hexSlice (buf, start, end) {
+  var len = buf.length
+
+  if (!start || start < 0) start = 0
+  if (!end || end < 0 || end > len) end = len
+
+  var out = ''
+  for (var i = start; i < end; i++) {
+    out += toHex(buf[i])
+  }
+  return out
+}
+
+function utf16leSlice (buf, start, end) {
+  var bytes = buf.slice(start, end)
+  var res = ''
+  for (var i = 0; i < bytes.length; i += 2) {
+    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
+  }
+  return res
+}
+
+Buffer.prototype.slice = function (start, end) {
+  var len = this.length
+  start = ~~start
+  end = end === undefined ? len : ~~end
+
+  if (start < 0) {
+    start += len
+    if (start < 0)
+      start = 0
+  } else if (start > len) {
+    start = len
+  }
+
+  if (end < 0) {
+    end += len
+    if (end < 0)
+      end = 0
+  } else if (end > len) {
+    end = len
+  }
+
+  if (end < start)
+    end = start
+
+  var newBuf
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    newBuf = Buffer._augment(this.subarray(start, end))
+  } else {
+    var sliceLen = end - start
+    newBuf = new Buffer(sliceLen, undefined, true)
+    for (var i = 0; i < sliceLen; i++) {
+      newBuf[i] = this[i + start]
+    }
+  }
+
+  if (newBuf.length)
+    newBuf.parent = this.parent || this
+
+  return newBuf
+}
+
+/*
+ * Need to make sure that buffer isn't trying to write out of bounds.
+ */
+function checkOffset (offset, ext, length) {
+  if ((offset % 1) !== 0 || offset < 0)
+    throw new RangeError('offset is not uint')
+  if (offset + ext > length)
+    throw new RangeError('Trying to access beyond buffer length')
+}
+
+Buffer.prototype.readUIntLE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100))
+    val += this[offset + i] * mul
+
+  return val
+}
+
+Buffer.prototype.readUIntBE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset + --byteLength]
+  var mul = 1
+  while (byteLength > 0 && (mul *= 0x100))
+    val += this[offset + --byteLength] * mul
+
+  return val
+}
+
+Buffer.prototype.readUInt8 = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 1, this.length)
+  return this[offset]
+}
+
+Buffer.prototype.readUInt16LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  return this[offset] | (this[offset + 1] << 8)
+}
+
+Buffer.prototype.readUInt16BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  return (this[offset] << 8) | this[offset + 1]
+}
+
+Buffer.prototype.readUInt32LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return ((this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16)) +
+      (this[offset + 3] * 0x1000000)
+}
+
+Buffer.prototype.readUInt32BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return (this[offset] * 0x1000000) +
+      ((this[offset + 1] << 16) |
+      (this[offset + 2] << 8) |
+      this[offset + 3])
+}
+
+Buffer.prototype.readIntLE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100))
+    val += this[offset + i] * mul
+  mul *= 0x80
+
+  if (val >= mul)
+    val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readIntBE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var i = byteLength
+  var mul = 1
+  var val = this[offset + --i]
+  while (i > 0 && (mul *= 0x100))
+    val += this[offset + --i] * mul
+  mul *= 0x80
+
+  if (val >= mul)
+    val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readInt8 = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 1, this.length)
+  if (!(this[offset] & 0x80))
+    return (this[offset])
+  return ((0xff - this[offset] + 1) * -1)
+}
+
+Buffer.prototype.readInt16LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  var val = this[offset] | (this[offset + 1] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt16BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 2, this.length)
+  var val = this[offset + 1] | (this[offset] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt32LE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return (this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16) |
+      (this[offset + 3] << 24)
+}
+
+Buffer.prototype.readInt32BE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+
+  return (this[offset] << 24) |
+      (this[offset + 1] << 16) |
+      (this[offset + 2] << 8) |
+      (this[offset + 3])
+}
+
+Buffer.prototype.readFloatLE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, true, 23, 4)
+}
+
+Buffer.prototype.readFloatBE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, false, 23, 4)
+}
+
+Buffer.prototype.readDoubleLE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, true, 52, 8)
+}
+
+Buffer.prototype.readDoubleBE = function (offset, noAssert) {
+  if (!noAssert)
+    checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, false, 52, 8)
+}
+
+function checkInt (buf, value, offset, ext, max, min) {
+  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+}
+
+Buffer.prototype.writeUIntLE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var mul = 1
+  var i = 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100))
+    this[offset + i] = (value / mul) >>> 0 & 0xFF
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUIntBE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var i = byteLength - 1
+  var mul = 1
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100))
+    this[offset + i] = (value / mul) >>> 0 & 0xFF
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 1, 0xff, 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  this[offset] = value
+  return offset + 1
+}
+
+function objectWriteUInt16 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
+    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+      (littleEndian ? i : 1 - i) * 8
+  }
+}
+
+Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = value
+    this[offset + 1] = (value >>> 8)
+  } else objectWriteUInt16(this, value, offset, true)
+  return offset + 2
+}
+
+Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = value
+  } else objectWriteUInt16(this, value, offset, false)
+  return offset + 2
+}
+
+function objectWriteUInt32 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffffffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
+    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+  }
+}
+
+Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset + 3] = (value >>> 24)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 1] = (value >>> 8)
+    this[offset] = value
+  } else objectWriteUInt32(this, value, offset, true)
+  return offset + 4
+}
+
+Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = value
+  } else objectWriteUInt32(this, value, offset, false)
+  return offset + 4
+}
+
+Buffer.prototype.writeIntLE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    checkInt(this,
+             value,
+             offset,
+             byteLength,
+             Math.pow(2, 8 * byteLength - 1) - 1,
+             -Math.pow(2, 8 * byteLength - 1))
+  }
+
+  var i = 0
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100))
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeIntBE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    checkInt(this,
+             value,
+             offset,
+             byteLength,
+             Math.pow(2, 8 * byteLength - 1) - 1,
+             -Math.pow(2, 8 * byteLength - 1))
+  }
+
+  var i = byteLength - 1
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100))
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 1, 0x7f, -0x80)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  if (value < 0) value = 0xff + value + 1
+  this[offset] = value
+  return offset + 1
+}
+
+Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = value
+    this[offset + 1] = (value >>> 8)
+  } else objectWriteUInt16(this, value, offset, true)
+  return offset + 2
+}
+
+Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = value
+  } else objectWriteUInt16(this, value, offset, false)
+  return offset + 2
+}
+
+Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = value
+    this[offset + 1] = (value >>> 8)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 3] = (value >>> 24)
+  } else objectWriteUInt32(this, value, offset, true)
+  return offset + 4
+}
+
+Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (value < 0) value = 0xffffffff + value + 1
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = value
+  } else objectWriteUInt32(this, value, offset, false)
+  return offset + 4
+}
+
+function checkIEEE754 (buf, value, offset, ext, max, min) {
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (offset < 0) throw new RangeError('index out of range')
+}
+
+function writeFloat (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert)
+    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+  return offset + 4
+}
+
+Buffer.prototype.writeFloatLE = function (value, offset, noAssert) {
+  return writeFloat(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
+  return writeFloat(this, value, offset, false, noAssert)
+}
+
+function writeDouble (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert)
+    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+  return offset + 8
+}
+
+Buffer.prototype.writeDoubleLE = function (value, offset, noAssert) {
+  return writeDouble(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
+  return writeDouble(this, value, offset, false, noAssert)
+}
+
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+Buffer.prototype.copy = function (target, target_start, start, end) {
+  var self = this // source
+
+  if (!start) start = 0
+  if (!end && end !== 0) end = this.length
+  if (target_start >= target.length) target_start = target.length
+  if (!target_start) target_start = 0
+  if (end > 0 && end < start) end = start
+
+  // Copy 0 bytes; we're done
+  if (end === start) return 0
+  if (target.length === 0 || self.length === 0) return 0
+
+  // Fatal error conditions
+  if (target_start < 0)
+    throw new RangeError('targetStart out of bounds')
+  if (start < 0 || start >= self.length) throw new RangeError('sourceStart out of bounds')
+  if (end < 0) throw new RangeError('sourceEnd out of bounds')
+
+  // Are we oob?
+  if (end > this.length)
+    end = this.length
+  if (target.length - target_start < end - start)
+    end = target.length - target_start + start
+
+  var len = end - start
+
+  if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < len; i++) {
+      target[i + target_start] = this[i + start]
+    }
+  } else {
+    target._set(this.subarray(start, start + len), target_start)
+  }
+
+  return len
+}
+
+// fill(value, start=0, end=buffer.length)
+Buffer.prototype.fill = function (value, start, end) {
+  if (!value) value = 0
+  if (!start) start = 0
+  if (!end) end = this.length
+
+  if (end < start) throw new RangeError('end < start')
+
+  // Fill 0 bytes; we're done
+  if (end === start) return
+  if (this.length === 0) return
+
+  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
+  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
+
+  var i
+  if (typeof value === 'number') {
+    for (i = start; i < end; i++) {
+      this[i] = value
+    }
+  } else {
+    var bytes = utf8ToBytes(value.toString())
+    var len = bytes.length
+    for (i = start; i < end; i++) {
+      this[i] = bytes[i % len]
+    }
+  }
+
+  return this
+}
+
+/**
+ * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
+ * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
+ */
+Buffer.prototype.toArrayBuffer = function () {
+  if (typeof Uint8Array !== 'undefined') {
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      return (new Buffer(this)).buffer
+    } else {
+      var buf = new Uint8Array(this.length)
+      for (var i = 0, len = buf.length; i < len; i += 1) {
+        buf[i] = this[i]
+      }
+      return buf.buffer
+    }
+  } else {
+    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
+  }
+}
+
+// HELPER FUNCTIONS
+// ================
+
+var BP = Buffer.prototype
+
+/**
+ * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
+ */
+Buffer._augment = function (arr) {
+  arr.constructor = Buffer
+  arr._isBuffer = true
+
+  // save reference to original Uint8Array get/set methods before overwriting
+  arr._get = arr.get
+  arr._set = arr.set
+
+  // deprecated, will be removed in node 0.13+
+  arr.get = BP.get
+  arr.set = BP.set
+
+  arr.write = BP.write
+  arr.toString = BP.toString
+  arr.toLocaleString = BP.toString
+  arr.toJSON = BP.toJSON
+  arr.equals = BP.equals
+  arr.compare = BP.compare
+  arr.copy = BP.copy
+  arr.slice = BP.slice
+  arr.readUIntLE = BP.readUIntLE
+  arr.readUIntBE = BP.readUIntBE
+  arr.readUInt8 = BP.readUInt8
+  arr.readUInt16LE = BP.readUInt16LE
+  arr.readUInt16BE = BP.readUInt16BE
+  arr.readUInt32LE = BP.readUInt32LE
+  arr.readUInt32BE = BP.readUInt32BE
+  arr.readIntLE = BP.readIntLE
+  arr.readIntBE = BP.readIntBE
+  arr.readInt8 = BP.readInt8
+  arr.readInt16LE = BP.readInt16LE
+  arr.readInt16BE = BP.readInt16BE
+  arr.readInt32LE = BP.readInt32LE
+  arr.readInt32BE = BP.readInt32BE
+  arr.readFloatLE = BP.readFloatLE
+  arr.readFloatBE = BP.readFloatBE
+  arr.readDoubleLE = BP.readDoubleLE
+  arr.readDoubleBE = BP.readDoubleBE
+  arr.writeUInt8 = BP.writeUInt8
+  arr.writeUIntLE = BP.writeUIntLE
+  arr.writeUIntBE = BP.writeUIntBE
+  arr.writeUInt16LE = BP.writeUInt16LE
+  arr.writeUInt16BE = BP.writeUInt16BE
+  arr.writeUInt32LE = BP.writeUInt32LE
+  arr.writeUInt32BE = BP.writeUInt32BE
+  arr.writeIntLE = BP.writeIntLE
+  arr.writeIntBE = BP.writeIntBE
+  arr.writeInt8 = BP.writeInt8
+  arr.writeInt16LE = BP.writeInt16LE
+  arr.writeInt16BE = BP.writeInt16BE
+  arr.writeInt32LE = BP.writeInt32LE
+  arr.writeInt32BE = BP.writeInt32BE
+  arr.writeFloatLE = BP.writeFloatLE
+  arr.writeFloatBE = BP.writeFloatBE
+  arr.writeDoubleLE = BP.writeDoubleLE
+  arr.writeDoubleBE = BP.writeDoubleBE
+  arr.fill = BP.fill
+  arr.inspect = BP.inspect
+  arr.toArrayBuffer = BP.toArrayBuffer
+
+  return arr
+}
+
+var INVALID_BASE64_RE = /[^+\/0-9A-z\-]/g
+
+function base64clean (str) {
+  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+  // Node converts strings with length < 2 to ''
+  if (str.length < 2) return ''
+  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+  while (str.length % 4 !== 0) {
+    str = str + '='
+  }
+  return str
+}
+
+function stringtrim (str) {
+  if (str.trim) return str.trim()
+  return str.replace(/^\s+|\s+$/g, '')
+}
+
+function isArrayish (subject) {
+  return isArray(subject) || Buffer.isBuffer(subject) ||
+      subject && typeof subject === 'object' &&
+      typeof subject.length === 'number'
+}
+
+function toHex (n) {
+  if (n < 16) return '0' + n.toString(16)
+  return n.toString(16)
+}
+
+function utf8ToBytes (string, units) {
+  units = units || Infinity
+  var codePoint
+  var length = string.length
+  var leadSurrogate = null
+  var bytes = []
+  var i = 0
+
+  for (; i < length; i++) {
+    codePoint = string.charCodeAt(i)
+
+    // is surrogate component
+    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+      // last char was a lead
+      if (leadSurrogate) {
+        // 2 leads in a row
+        if (codePoint < 0xDC00) {
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          leadSurrogate = codePoint
+          continue
+        } else {
+          // valid surrogate pair
+          codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+          leadSurrogate = null
+        }
+      } else {
+        // no lead yet
+
+        if (codePoint > 0xDBFF) {
+          // unexpected trail
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        } else if (i + 1 === length) {
+          // unpaired lead
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        } else {
+          // valid lead
+          leadSurrogate = codePoint
+          continue
+        }
+      }
+    } else if (leadSurrogate) {
+      // valid bmp char, but last char was a lead
+      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+      leadSurrogate = null
+    }
+
+    // encode utf8
+    if (codePoint < 0x80) {
+      if ((units -= 1) < 0) break
+      bytes.push(codePoint)
+    } else if (codePoint < 0x800) {
+      if ((units -= 2) < 0) break
+      bytes.push(
+        codePoint >> 0x6 | 0xC0,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x10000) {
+      if ((units -= 3) < 0) break
+      bytes.push(
+        codePoint >> 0xC | 0xE0,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x200000) {
+      if ((units -= 4) < 0) break
+      bytes.push(
+        codePoint >> 0x12 | 0xF0,
+        codePoint >> 0xC & 0x3F | 0x80,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else {
+      throw new Error('Invalid code point')
+    }
+  }
+
+  return bytes
+}
+
+function asciiToBytes (str) {
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    // Node's code seems to be doing this and not & 0x7F..
+    byteArray.push(str.charCodeAt(i) & 0xFF)
+  }
+  return byteArray
+}
+
+function utf16leToBytes (str, units) {
+  var c, hi, lo
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    if ((units -= 2) < 0) break
+
+    c = str.charCodeAt(i)
+    hi = c >> 8
+    lo = c % 256
+    byteArray.push(lo)
+    byteArray.push(hi)
+  }
+
+  return byteArray
+}
+
+function base64ToBytes (str) {
+  return base64.toByteArray(base64clean(str))
+}
+
+function blitBuffer (src, dst, offset, length) {
+  for (var i = 0; i < length; i++) {
+    if ((i + offset >= dst.length) || (i >= src.length))
+      break
+    dst[i + offset] = src[i]
+  }
+  return i
+}
+
+function decodeUtf8Char (str) {
+  try {
+    return decodeURIComponent(str)
+  } catch (err) {
+    return String.fromCharCode(0xFFFD) // UTF 8 invalid char
+  }
+}
+
+},{"base64-js":2,"ieee754":3,"is-array":4}],2:[function(require,module,exports){
+var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+;(function (exports) {
+	'use strict';
+
+  var Arr = (typeof Uint8Array !== 'undefined')
+    ? Uint8Array
+    : Array
+
+	var PLUS   = '+'.charCodeAt(0)
+	var SLASH  = '/'.charCodeAt(0)
+	var NUMBER = '0'.charCodeAt(0)
+	var LOWER  = 'a'.charCodeAt(0)
+	var UPPER  = 'A'.charCodeAt(0)
+	var PLUS_URL_SAFE = '-'.charCodeAt(0)
+	var SLASH_URL_SAFE = '_'.charCodeAt(0)
+
+	function decode (elt) {
+		var code = elt.charCodeAt(0)
+		if (code === PLUS ||
+		    code === PLUS_URL_SAFE)
+			return 62 // '+'
+		if (code === SLASH ||
+		    code === SLASH_URL_SAFE)
+			return 63 // '/'
+		if (code < NUMBER)
+			return -1 //no match
+		if (code < NUMBER + 10)
+			return code - NUMBER + 26 + 26
+		if (code < UPPER + 26)
+			return code - UPPER
+		if (code < LOWER + 26)
+			return code - LOWER + 26
+	}
+
+	function b64ToByteArray (b64) {
+		var i, j, l, tmp, placeHolders, arr
+
+		if (b64.length % 4 > 0) {
+			throw new Error('Invalid string. Length must be a multiple of 4')
+		}
+
+		// the number of equal signs (place holders)
+		// if there are two placeholders, than the two characters before it
+		// represent one byte
+		// if there is only one, then the three characters before it represent 2 bytes
+		// this is just a cheap hack to not do indexOf twice
+		var len = b64.length
+		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
+
+		// base64 is 4/3 + up to two characters of the original data
+		arr = new Arr(b64.length * 3 / 4 - placeHolders)
+
+		// if there are placeholders, only get up to the last complete 4 chars
+		l = placeHolders > 0 ? b64.length - 4 : b64.length
+
+		var L = 0
+
+		function push (v) {
+			arr[L++] = v
+		}
+
+		for (i = 0, j = 0; i < l; i += 4, j += 3) {
+			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
+			push((tmp & 0xFF0000) >> 16)
+			push((tmp & 0xFF00) >> 8)
+			push(tmp & 0xFF)
+		}
+
+		if (placeHolders === 2) {
+			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
+			push(tmp & 0xFF)
+		} else if (placeHolders === 1) {
+			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
+			push((tmp >> 8) & 0xFF)
+			push(tmp & 0xFF)
+		}
+
+		return arr
+	}
+
+	function uint8ToBase64 (uint8) {
+		var i,
+			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
+			output = "",
+			temp, length
+
+		function encode (num) {
+			return lookup.charAt(num)
+		}
+
+		function tripletToBase64 (num) {
+			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+		}
+
+		// go through the array every three bytes, we'll deal with trailing stuff later
+		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+			output += tripletToBase64(temp)
+		}
+
+		// pad the end with zeros, but make sure to not forget the extra bytes
+		switch (extraBytes) {
+			case 1:
+				temp = uint8[uint8.length - 1]
+				output += encode(temp >> 2)
+				output += encode((temp << 4) & 0x3F)
+				output += '=='
+				break
+			case 2:
+				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+				output += encode(temp >> 10)
+				output += encode((temp >> 4) & 0x3F)
+				output += encode((temp << 2) & 0x3F)
+				output += '='
+				break
+		}
+
+		return output
+	}
+
+	exports.toByteArray = b64ToByteArray
+	exports.fromByteArray = uint8ToBase64
+}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
+
+},{}],3:[function(require,module,exports){
+exports.read = function(buffer, offset, isLE, mLen, nBytes) {
+  var e, m,
+      eLen = nBytes * 8 - mLen - 1,
+      eMax = (1 << eLen) - 1,
+      eBias = eMax >> 1,
+      nBits = -7,
+      i = isLE ? (nBytes - 1) : 0,
+      d = isLE ? -1 : 1,
+      s = buffer[offset + i];
+
+  i += d;
+
+  e = s & ((1 << (-nBits)) - 1);
+  s >>= (-nBits);
+  nBits += eLen;
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+  m = e & ((1 << (-nBits)) - 1);
+  e >>= (-nBits);
+  nBits += mLen;
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+  if (e === 0) {
+    e = 1 - eBias;
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity);
+  } else {
+    m = m + Math.pow(2, mLen);
+    e = e - eBias;
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
+};
+
+exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c,
+      eLen = nBytes * 8 - mLen - 1,
+      eMax = (1 << eLen) - 1,
+      eBias = eMax >> 1,
+      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
+      i = isLE ? 0 : (nBytes - 1),
+      d = isLE ? 1 : -1,
+      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+  value = Math.abs(value);
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0;
+    e = eMax;
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2);
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--;
+      c *= 2;
+    }
+    if (e + eBias >= 1) {
+      value += rt / c;
+    } else {
+      value += rt * Math.pow(2, 1 - eBias);
+    }
+    if (value * c >= 2) {
+      e++;
+      c /= 2;
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0;
+      e = eMax;
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen);
+      e = e + eBias;
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+      e = 0;
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
+
+  e = (e << mLen) | m;
+  eLen += mLen;
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
+
+  buffer[offset + i - d] |= s * 128;
+};
+
+},{}],4:[function(require,module,exports){
+
+/**
+ * isArray
+ */
+
+var isArray = Array.isArray;
+
+/**
+ * toString
+ */
+
+var str = Object.prototype.toString;
+
+/**
+ * Whether or not the given `val`
+ * is an array.
+ *
+ * example:
+ *
+ *        isArray([]);
+ *        // > true
+ *        isArray(arguments);
+ *        // > false
+ *        isArray('');
+ *        // > false
+ *
+ * @param {mixed} val
+ * @return {bool}
+ */
+
+module.exports = isArray || function (val) {
+  return !! val && '[object Array]' == str.call(val);
+};
+
+},{}],5:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
+    }
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],6:[function(require,module,exports){
 module.exports = require('./lib/chai');
 
-},{"./lib/chai":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai.js":[function(require,module,exports){
+},{"./lib/chai":7}],7:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -90,7 +1708,7 @@ exports.use(should);
 var assert = require('./chai/interface/assert');
 exports.use(assert);
 
-},{"./chai/assertion":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/assertion.js","./chai/config":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/config.js","./chai/core/assertions":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/core/assertions.js","./chai/interface/assert":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/interface/assert.js","./chai/interface/expect":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/interface/expect.js","./chai/interface/should":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/interface/should.js","./chai/utils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/index.js","assertion-error":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/assertion-error/index.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/assertion.js":[function(require,module,exports){
+},{"./chai/assertion":8,"./chai/config":9,"./chai/core/assertions":10,"./chai/interface/assert":11,"./chai/interface/expect":12,"./chai/interface/should":13,"./chai/utils":24,"assertion-error":33}],8:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -227,7 +1845,7 @@ module.exports = function (_chai, util) {
   });
 };
 
-},{"./config":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/config.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/config.js":[function(require,module,exports){
+},{"./config":9}],9:[function(require,module,exports){
 module.exports = {
 
   /**
@@ -279,7 +1897,7 @@ module.exports = {
 
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/core/assertions.js":[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -1640,7 +3258,7 @@ module.exports = function (chai, _) {
   });
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/interface/assert.js":[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2698,7 +4316,7 @@ module.exports = function (chai, util) {
   ('Throw', 'throws');
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/interface/expect.js":[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2712,7 +4330,7 @@ module.exports = function (chai, util) {
 };
 
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/interface/should.js":[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2792,7 +4410,7 @@ module.exports = function (chai, util) {
   chai.Should = loadShould;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/addChainableMethod.js":[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*!
  * Chai - addChainingMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2905,7 +4523,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   });
 };
 
-},{"../config":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/config.js","./flag":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/flag.js","./transferFlags":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/transferFlags.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/addMethod.js":[function(require,module,exports){
+},{"../config":9,"./flag":17,"./transferFlags":31}],15:[function(require,module,exports){
 /*!
  * Chai - addMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2950,7 +4568,7 @@ module.exports = function (ctx, name, method) {
   };
 };
 
-},{"../config":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/config.js","./flag":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/flag.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/addProperty.js":[function(require,module,exports){
+},{"../config":9,"./flag":17}],16:[function(require,module,exports){
 /*!
  * Chai - addProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2992,7 +4610,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/flag.js":[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3026,7 +4644,7 @@ module.exports = function (obj, key, value) {
   }
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getActual.js":[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*!
  * Chai - getActual utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3046,7 +4664,7 @@ module.exports = function (obj, args) {
   return args.length > 4 ? args[4] : obj._obj;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getEnumerableProperties.js":[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /*!
  * Chai - getEnumerableProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3073,7 +4691,7 @@ module.exports = function getEnumerableProperties(object) {
   return result;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getMessage.js":[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*!
  * Chai - message composition utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3125,7 +4743,7 @@ module.exports = function (obj, args) {
   return flagMsg ? flagMsg + ': ' + msg : msg;
 };
 
-},{"./flag":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/flag.js","./getActual":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getActual.js","./inspect":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/inspect.js","./objDisplay":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/objDisplay.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getName.js":[function(require,module,exports){
+},{"./flag":17,"./getActual":18,"./inspect":25,"./objDisplay":26}],21:[function(require,module,exports){
 /*!
  * Chai - getName utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3147,7 +4765,7 @@ module.exports = function (func) {
   return match && match[1] ? match[1] : "";
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getPathValue.js":[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*!
  * Chai - getPathValue utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3251,7 +4869,7 @@ function _getPathValue (parsed, obj) {
   return res;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getProperties.js":[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /*!
  * Chai - getProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3288,7 +4906,7 @@ module.exports = function getProperties(object) {
   return result;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/index.js":[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011 Jake Luer <jake@alogicalparadox.com>
@@ -3404,7 +5022,7 @@ exports.addChainableMethod = require('./addChainableMethod');
 exports.overwriteChainableMethod = require('./overwriteChainableMethod');
 
 
-},{"./addChainableMethod":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/addChainableMethod.js","./addMethod":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/addMethod.js","./addProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/addProperty.js","./flag":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/flag.js","./getActual":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getActual.js","./getMessage":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getMessage.js","./getName":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getName.js","./getPathValue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getPathValue.js","./inspect":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/inspect.js","./objDisplay":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/objDisplay.js","./overwriteChainableMethod":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/overwriteChainableMethod.js","./overwriteMethod":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/overwriteMethod.js","./overwriteProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/overwriteProperty.js","./test":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/test.js","./transferFlags":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/transferFlags.js","./type":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/type.js","deep-eql":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/index.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/inspect.js":[function(require,module,exports){
+},{"./addChainableMethod":14,"./addMethod":15,"./addProperty":16,"./flag":17,"./getActual":18,"./getMessage":20,"./getName":21,"./getPathValue":22,"./inspect":25,"./objDisplay":26,"./overwriteChainableMethod":27,"./overwriteMethod":28,"./overwriteProperty":29,"./test":30,"./transferFlags":31,"./type":32,"deep-eql":34}],25:[function(require,module,exports){
 // This is (almost) directly from Node.js utils
 // https://github.com/joyent/node/blob/f8c335d0caf47f16d31413f89aa28eda3878e3aa/lib/util.js
 
@@ -3739,7 +5357,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-},{"./getEnumerableProperties":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getEnumerableProperties.js","./getName":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getName.js","./getProperties":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/getProperties.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/objDisplay.js":[function(require,module,exports){
+},{"./getEnumerableProperties":19,"./getName":21,"./getProperties":23}],26:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3790,7 +5408,7 @@ module.exports = function (obj) {
   }
 };
 
-},{"../config":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/config.js","./inspect":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/inspect.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/overwriteChainableMethod.js":[function(require,module,exports){
+},{"../config":9,"./inspect":25}],27:[function(require,module,exports){
 /*!
  * Chai - overwriteChainableMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3845,7 +5463,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   };
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/overwriteMethod.js":[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*!
  * Chai - overwriteMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3898,7 +5516,7 @@ module.exports = function (ctx, name, method) {
   }
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/overwriteProperty.js":[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /*!
  * Chai - overwriteProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3954,7 +5572,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/test.js":[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * Chai - test utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3982,7 +5600,7 @@ module.exports = function (obj, args) {
   return negate ? !expr : expr;
 };
 
-},{"./flag":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/flag.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/transferFlags.js":[function(require,module,exports){
+},{"./flag":17}],31:[function(require,module,exports){
 /*!
  * Chai - transferFlags utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4028,7 +5646,7 @@ module.exports = function (assertion, object, includeAll) {
   }
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/lib/chai/utils/type.js":[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /*!
  * Chai - type utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -4075,7 +5693,7 @@ module.exports = function (obj) {
   return typeof obj;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/assertion-error/index.js":[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /*!
  * assertion-error
  * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
@@ -4187,10 +5805,10 @@ AssertionError.prototype.toJSON = function (stack) {
   return props;
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/index.js":[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports = require('./lib/eql');
 
-},{"./lib/eql":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/lib/eql.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/lib/eql.js":[function(require,module,exports){
+},{"./lib/eql":35}],35:[function(require,module,exports){
 /*!
  * deep-eql
  * Copyright(c) 2013 Jake Luer <jake@alogicalparadox.com>
@@ -4449,10 +6067,10 @@ function objectEqual(a, b, m) {
   return true;
 }
 
-},{"buffer":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","type-detect":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/node_modules/type-detect/index.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/node_modules/type-detect/index.js":[function(require,module,exports){
+},{"buffer":1,"type-detect":36}],36:[function(require,module,exports){
 module.exports = require('./lib/type');
 
-},{"./lib/type":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/node_modules/type-detect/lib/type.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/node_modules/deep-eql/node_modules/type-detect/lib/type.js":[function(require,module,exports){
+},{"./lib/type":37}],37:[function(require,module,exports){
 /*!
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
@@ -4596,7 +6214,7 @@ Library.prototype.test = function (obj, type) {
   }
 };
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/es5-shim/es5-shim.js":[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /*!
  * https://github.com/es-shims/es5-shim
  * @license es5-shim Copyright 2009-2014 by contributors, MIT License
@@ -4605,11 +6223,12 @@ Library.prototype.test = function (obj, type) {
 
 // vim: ts=4 sts=4 sw=4 expandtab
 
+// Add semicolon to prevent IIFE from being passed as argument to concatenated code.
+;
 
 // UMD (Universal Module Definition)
 // see https://github.com/umdjs/umd/blob/master/returnExports.js
-// Add semicolon to prevent IIFE from being passed as argument to concatenated code.
-;(function (root, factory) {
+(function (root, factory) {
     'use strict';
     /*global define, exports, module */
     if (typeof define === 'function' && define.amd) {
@@ -4651,18 +6270,15 @@ var call = FunctionPrototype.call;
 // Having a toString local variable name breaks in Opera so use to_string.
 var to_string = ObjectPrototype.toString;
 
-var isFunction = function (val) {
-    return to_string.call(val) === '[object Function]';
-};
-var isRegex = function (val) {
-    return to_string.call(val) === '[object RegExp]';
-};
-var isArray = function isArray(obj) {
+var isArray = Array.isArray || function isArray(obj) {
     return to_string.call(obj) === '[object Array]';
 };
-var isString = function isString(obj) {
-    return to_string.call(obj) === '[object String]';
-};
+
+var hasToStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol';
+var isCallable; /* inlined from https://npmjs.com/is-callable */ var fnToStr = Function.prototype.toString, tryFunctionObject = function tryFunctionObject(value) { try { fnToStr.call(value); return true; } catch (e) { return false; } }, fnClass = '[object Function]', genClass = '[object GeneratorFunction]'; isCallable = function isCallable(value) { if (typeof value !== 'function') { return false; } if (hasToStringTag) { return tryFunctionObject(value); } var strClass = to_string.call(value); return strClass === fnClass || strClass === genClass; };
+var isRegex; /* inlined from https://npmjs.com/is-regex */ var regexExec = RegExp.prototype.exec, tryRegexExec = function tryRegexExec(value) { try { regexExec.call(value); return true; } catch (e) { return false; } }, regexClass = '[object RegExp]'; isRegex = function isRegex(value) { if (typeof value !== 'object') { return false; } return hasToStringTag ? tryRegexExec(value) : to_string.call(value) === regexClass; };
+var isString; /* inlined from https://npmjs.com/is-string */ var strValue = String.prototype.valueOf, tryStringObject = function tryStringObject(value) { try { strValue.call(value); return true; } catch (e) { return false; } }, stringClass = '[object String]'; isString = function isString(value) { if (typeof value === 'string') { return true; } if (typeof value !== 'object') { return false; } return hasToStringTag ? tryStringObject(value) : to_string.call(value) === stringClass; };
+
 var isArguments = function isArguments(value) {
     var str = to_string.call(value);
     var isArgs = str === '[object Arguments]';
@@ -4672,66 +6288,56 @@ var isArguments = function isArguments(value) {
           typeof value === 'object' &&
           typeof value.length === 'number' &&
           value.length >= 0 &&
-          isFunction(value.callee);
+          isCallable(value.callee);
     }
     return isArgs;
 };
 
-var supportsDescriptors = Object.defineProperty && (function () {
-    try {
-        Object.defineProperty({}, 'x', {});
-        return true;
-    } catch (e) { /* this is ES3 */
-        return false;
-    }
-}());
+/* inlined from http://npmjs.com/define-properties */
+var defineProperties = (function (has) {
+  var supportsDescriptors = Object.defineProperty && (function () {
+      try {
+          Object.defineProperty({}, 'x', {});
+          return true;
+      } catch (e) { /* this is ES3 */
+          return false;
+      }
+  }());
 
-// Define configurable, writable and non-enumerable props
-// if they don't exist.
-var defineProperty;
-if (supportsDescriptors) {
-    defineProperty = function (object, name, method, forceAssign) {
-        if (!forceAssign && (name in object)) { return; }
-        Object.defineProperty(object, name, {
-            configurable: true,
-            enumerable: false,
-            writable: true,
-            value: method
-        });
-    };
-} else {
-    defineProperty = function (object, name, method, forceAssign) {
-        if (!forceAssign && (name in object)) { return; }
-        object[name] = method;
-    };
-}
-var defineProperties = function (object, map, forceAssign) {
-    for (var name in map) {
-        if (ObjectPrototype.hasOwnProperty.call(map, name)) {
-          defineProperty(object, name, map[name], forceAssign);
-        }
-    }
-};
+  // Define configurable, writable and non-enumerable props
+  // if they don't exist.
+  var defineProperty;
+  if (supportsDescriptors) {
+      defineProperty = function (object, name, method, forceAssign) {
+          if (!forceAssign && (name in object)) { return; }
+          Object.defineProperty(object, name, {
+              configurable: true,
+              enumerable: false,
+              writable: true,
+              value: method
+          });
+      };
+  } else {
+      defineProperty = function (object, name, method, forceAssign) {
+          if (!forceAssign && (name in object)) { return; }
+          object[name] = method;
+      };
+  }
+  return function defineProperties(object, map, forceAssign) {
+      for (var name in map) {
+          if (has.call(map, name)) {
+            defineProperty(object, name, map[name], forceAssign);
+          }
+      }
+  };
+}(ObjectPrototype.hasOwnProperty));
 
 //
 // Util
 // ======
 //
 
-// ES5 9.4
-// http://es5.github.com/#x9.4
-// http://jsperf.com/to-integer
-
-function toInteger(num) {
-    var n = +num;
-    if (n !== n) { // isNaN
-        n = 0;
-    } else if (n !== 0 && n !== (1 / 0) && n !== -(1 / 0)) {
-        n = (n > 0 || -1) * Math.floor(Math.abs(n));
-    }
-    return n;
-}
-
+/* replaceable with https://npmjs.com/package/es-abstract /helpers/isPrimitive */
 function isPrimitive(input) {
     var type = typeof input;
     return input === null ||
@@ -4741,31 +6347,47 @@ function isPrimitive(input) {
         type === 'string';
 }
 
-function toPrimitive(input) {
-    var val, valueOf, toStr;
-    if (isPrimitive(input)) {
-        return input;
-    }
-    valueOf = input.valueOf;
-    if (isFunction(valueOf)) {
-        val = valueOf.call(input);
-        if (isPrimitive(val)) {
-            return val;
-        }
-    }
-    toStr = input.toString;
-    if (isFunction(toStr)) {
-        val = toStr.call(input);
-        if (isPrimitive(val)) {
-            return val;
-        }
-    }
-    throw new TypeError();
-}
-
 var ES = {
+    // ES5 9.4
+    // http://es5.github.com/#x9.4
+    // http://jsperf.com/to-integer
+    /* replaceable with https://npmjs.com/package/es-abstract ES5.ToInteger */
+    ToInteger: function ToInteger(num) {
+        var n = +num;
+        if (n !== n) { // isNaN
+            n = 0;
+        } else if (n !== 0 && n !== (1 / 0) && n !== -(1 / 0)) {
+            n = (n > 0 || -1) * Math.floor(Math.abs(n));
+        }
+        return n;
+    },
+
+    /* replaceable with https://npmjs.com/package/es-abstract ES5.ToPrimitive */
+    ToPrimitive: function ToPrimitive(input) {
+        var val, valueOf, toStr;
+        if (isPrimitive(input)) {
+            return input;
+        }
+        valueOf = input.valueOf;
+        if (isCallable(valueOf)) {
+            val = valueOf.call(input);
+            if (isPrimitive(val)) {
+                return val;
+            }
+        }
+        toStr = input.toString;
+        if (isCallable(toStr)) {
+            val = toStr.call(input);
+            if (isPrimitive(val)) {
+                return val;
+            }
+        }
+        throw new TypeError();
+    },
+
     // ES5 9.9
     // http://es5.github.com/#x9.9
+    /* replaceable with https://npmjs.com/package/es-abstract ES5.ToObject */
     ToObject: function (o) {
         /*jshint eqnull: true */
         if (o == null) { // this matches both null and undefined
@@ -4773,6 +6395,8 @@ var ES = {
         }
         return Object(o);
     },
+
+    /* replaceable with https://npmjs.com/package/es-abstract ES5.ToUint32 */
     ToUint32: function ToUint32(x) {
         return x >>> 0;
     }
@@ -4793,7 +6417,7 @@ defineProperties(FunctionPrototype, {
         // 1. Let Target be the this value.
         var target = this;
         // 2. If IsCallable(Target) is false, throw a TypeError exception.
-        if (!isFunction(target)) {
+        if (!isCallable(target)) {
             throw new TypeError('Function.prototype.bind called on incompatible ' + target);
         }
         // 3. Let A be a new (possibly empty) internal list of all of the
@@ -4947,7 +6571,7 @@ defineProperties(ArrayPrototype, {
             return array_splice.apply(this, arguments);
         }
     }
-}, spliceNoopReturnsEmptyArray);
+}, !spliceNoopReturnsEmptyArray);
 
 var spliceWorksWithEmptyObject = (function () {
     var obj = {};
@@ -4958,13 +6582,13 @@ defineProperties(ArrayPrototype, {
     splice: function splice(start, deleteCount) {
         if (arguments.length === 0) { return []; }
         var args = arguments;
-        this.length = Math.max(toInteger(this.length), 0);
+        this.length = Math.max(ES.ToInteger(this.length), 0);
         if (arguments.length > 0 && typeof deleteCount !== 'number') {
             args = array_slice.call(arguments);
             if (args.length < 2) {
                 args.push(this.length - start);
             } else {
-                args[1] = toInteger(deleteCount);
+                args[1] = ES.ToInteger(deleteCount);
             }
         }
         return array_splice.apply(this, args);
@@ -5036,7 +6660,7 @@ defineProperties(ArrayPrototype, {
             length = self.length >>> 0;
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(); // TODO message
         }
 
@@ -5063,7 +6687,7 @@ defineProperties(ArrayPrototype, {
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(fun + ' is not a function');
         }
 
@@ -5089,7 +6713,7 @@ defineProperties(ArrayPrototype, {
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(fun + ' is not a function');
         }
 
@@ -5116,7 +6740,7 @@ defineProperties(ArrayPrototype, {
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(fun + ' is not a function');
         }
 
@@ -5140,7 +6764,7 @@ defineProperties(ArrayPrototype, {
             thisp = arguments[1];
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(fun + ' is not a function');
         }
 
@@ -5167,7 +6791,7 @@ defineProperties(ArrayPrototype, {
             length = self.length >>> 0;
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(fun + ' is not a function');
         }
 
@@ -5218,7 +6842,7 @@ defineProperties(ArrayPrototype, {
             length = self.length >>> 0;
 
         // If no callback function or if callback is not a callable function
-        if (!isFunction(fun)) {
+        if (!isCallable(fun)) {
             throw new TypeError(fun + ' is not a function');
         }
 
@@ -5273,7 +6897,7 @@ defineProperties(ArrayPrototype, {
 
         var i = 0;
         if (arguments.length > 1) {
-            i = toInteger(arguments[1]);
+            i = ES.ToInteger(arguments[1]);
         }
 
         // handle negative indices
@@ -5301,7 +6925,7 @@ defineProperties(ArrayPrototype, {
         }
         var i = length - 1;
         if (arguments.length > 1) {
-            i = Math.min(i, toInteger(arguments[1]));
+            i = Math.min(i, ES.ToInteger(arguments[1]));
         }
         // handle negative indices
         i = i >= 0 ? i : length - Math.abs(i);
@@ -5325,6 +6949,7 @@ defineProperties(ArrayPrototype, {
 // http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
 var hasDontEnumBug = !({'toString': null}).propertyIsEnumerable('toString'),
     hasProtoEnumBug = function () {}.propertyIsEnumerable('prototype'),
+    hasStringEnumBug = !owns('x', '0'),
     dontEnums = [
         'toString',
         'toLocaleString',
@@ -5338,7 +6963,7 @@ var hasDontEnumBug = !({'toString': null}).propertyIsEnumerable('toString'),
 
 defineProperties(Object, {
     keys: function keys(object) {
-        var isFn = isFunction(object),
+        var isFn = isCallable(object),
             isArgs = isArguments(object),
             isObject = object !== null && typeof object === 'object',
             isStr = isObject && isString(object);
@@ -5349,11 +6974,13 @@ defineProperties(Object, {
 
         var theKeys = [];
         var skipProto = hasProtoEnumBug && isFn;
-        if (isStr || isArgs) {
+        if ((isStr && hasStringEnumBug) || isArgs) {
             for (var i = 0; i < object.length; ++i) {
                 theKeys.push(String(i));
             }
-        } else {
+        }
+
+        if (!isArgs) {
             for (var name in object) {
                 if (!(skipProto && name === 'prototype') && owns(object, name)) {
                     theKeys.push(String(name));
@@ -5424,7 +7051,7 @@ defineProperties(Date.prototype, {
         result = [month + 1, this.getUTCDate(), this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()];
         year = (
             (year < 0 ? '-' : (year > 9999 ? '+' : '')) +
-            ('00000' + Math.abs(year)).slice(0 <= year && year <= 9999 ? -4 : -6)
+            ('00000' + Math.abs(year)).slice((0 <= year && year <= 9999) ? -4 : -6)
         );
 
         length = result.length;
@@ -5471,9 +7098,9 @@ if (!dateToJSONIsSupported) {
 
         // 1.  Let O be the result of calling ToObject, giving it the this
         // value as its argument.
-        // 2. Let tv be toPrimitive(O, hint Number).
+        // 2. Let tv be ES.ToPrimitive(O, hint Number).
         var o = Object(this),
-            tv = toPrimitive(o),
+            tv = ES.ToPrimitive(o),
             toISO;
         // 3. If tv is a Number and is not finite, return null.
         if (typeof tv === 'number' && !isFinite(tv)) {
@@ -5512,8 +7139,9 @@ if (!Date.parse || doesNotParseY2KNewYear || acceptsInvalidDates || !supportsExt
     // XXX global assignment won't work in embeddings that use
     // an alternate object for the context.
     /*global Date: true */
+    /*eslint-disable no-undef*/
     Date = (function (NativeDate) {
-
+    /*eslint-enable no-undef*/
         // Date.length === 7
         function Date(Y, M, D, h, m, s, ms) {
             var length = arguments.length;
@@ -5855,7 +7483,7 @@ if (
             }
 
             // If `separator` is not a regex, use native split
-            if (to_string.call(separator) !== '[object RegExp]') {
+            if (!isRegex(separator)) {
                 return string_split.call(this, separator, limit);
             }
 
@@ -5883,7 +7511,8 @@ if (
             limit = typeof limit === 'undefined' ?
                 -1 >>> 0 : // Math.pow(2, 32) - 1
                 ES.ToUint32(limit);
-            while (match = separator.exec(string)) {
+            match = separator.exec(string);
+            while (match) {
                 // `separator.lastIndex` is not reliable cross-browser
                 lastIndex = match.index + match[0].length;
                 if (lastIndex > lastLastIndex) {
@@ -5891,6 +7520,7 @@ if (
                     // Fix browsers whose `exec` methods don't consistently return `undefined` for
                     // nonparticipating capturing groups
                     if (!compliantExecNpcg && match.length > 1) {
+                        /*eslint-disable no-loop-func */
                         match[0].replace(separator2, function () {
                             for (var i = 1; i < arguments.length - 2; i++) {
                                 if (typeof arguments[i] === 'undefined') {
@@ -5898,6 +7528,7 @@ if (
                                 }
                             }
                         });
+                        /*eslint-enable no-loop-func */
                     }
                     if (match.length > 1 && match.index < string.length) {
                         array_push.apply(output, match.slice(1));
@@ -5911,6 +7542,7 @@ if (
                 if (separator.lastIndex === match.index) {
                     separator.lastIndex++; // Avoid an infinite loop
                 }
+                match = separator.exec(string);
             }
             if (lastLastIndex === string.length) {
                 if (lastLength || !separator.test('')) {
@@ -5947,7 +7579,7 @@ var replaceReportsGroupsCorrectly = (function () {
 
 if (!replaceReportsGroupsCorrectly) {
     StringPrototype.replace = function replace(searchValue, replaceValue) {
-        var isFn = isFunction(replaceValue);
+        var isFn = isCallable(replaceValue);
         var hasCapturingGroups = isRegex(searchValue) && (/\)[*?]/).test(searchValue.source);
         if (!isFn || !hasCapturingGroups) {
             return str_replace.call(this, searchValue, replaceValue);
@@ -6021,7 +7653,7 @@ if (parseInt(ws + '08') !== 8 || parseInt(ws + '0x16') !== 22) {
 
 }));
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/fuzzy/lib/fuzzy.js":[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /*
  * Fuzzy
  * https://github.com/myork/fuzzy
@@ -6159,7 +7791,7 @@ fuzzy.filter = function(pattern, arr, opts) {
 }());
 
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/lodash/dist/lodash.js":[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -12948,10 +14580,10 @@ fuzzy.filter = function(pattern, arr, opts) {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/addons.js":[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 module.exports = require('./lib/ReactWithAddons');
 
-},{"./lib/ReactWithAddons":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactWithAddons.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
+},{"./lib/ReactWithAddons":132}],42:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -12978,7 +14610,7 @@ var AutoFocusMixin = {
 
 module.exports = AutoFocusMixin;
 
-},{"./focusNode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/focusNode.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/BeforeInputEventPlugin.js":[function(require,module,exports){
+},{"./focusNode":166}],43:[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -13200,7 +14832,7 @@ var BeforeInputEventPlugin = {
 
 module.exports = BeforeInputEventPlugin;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./SyntheticInputEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticInputEvent.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSCore.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPropagators":62,"./ExecutionEnvironment":63,"./SyntheticInputEvent":142,"./keyOf":188}],44:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -13312,7 +14944,7 @@ var CSSCore = {
 module.exports = CSSCore;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSProperty.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],45:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -13431,7 +15063,7 @@ var CSSProperty = {
 
 module.exports = CSSProperty;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSPropertyOperations.js":[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -13566,7 +15198,7 @@ var CSSPropertyOperations = {
 module.exports = CSSPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./CSSProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSProperty.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./camelizeStyleName":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/camelizeStyleName.js","./dangerousStyleValue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/dangerousStyleValue.js","./hyphenateStyleName":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/hyphenateStyleName.js","./memoizeStringOnly":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/memoizeStringOnly.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CallbackQueue.js":[function(require,module,exports){
+},{"./CSSProperty":45,"./ExecutionEnvironment":63,"./camelizeStyleName":153,"./dangerousStyleValue":160,"./hyphenateStyleName":179,"./memoizeStringOnly":190,"./warning":201,"_process":5}],47:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -13666,7 +15298,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 module.exports = CallbackQueue;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ChangeEventPlugin.js":[function(require,module,exports){
+},{"./Object.assign":69,"./PooledClass":70,"./invariant":181,"_process":5}],48:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14048,7 +15680,7 @@ var ChangeEventPlugin = {
 
 module.exports = ChangeEventPlugin;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js","./isEventSupported":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isEventSupported.js","./isTextInputElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isTextInputElement.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ClientReactRootIndex.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPluginHub":59,"./EventPropagators":62,"./ExecutionEnvironment":63,"./ReactUpdates":131,"./SyntheticEvent":140,"./isEventSupported":182,"./isTextInputElement":184,"./keyOf":188}],49:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14073,7 +15705,7 @@ var ClientReactRootIndex = {
 
 module.exports = ClientReactRootIndex;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CompositionEventPlugin.js":[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14332,7 +15964,7 @@ var CompositionEventPlugin = {
 
 module.exports = CompositionEventPlugin;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./ReactInputSelection":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInputSelection.js","./SyntheticCompositionEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticCompositionEvent.js","./getTextContentAccessor":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getTextContentAccessor.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMChildrenOperations.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPropagators":62,"./ExecutionEnvironment":63,"./ReactInputSelection":105,"./SyntheticCompositionEvent":138,"./getTextContentAccessor":176,"./keyOf":188}],51:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -14507,7 +16139,7 @@ var DOMChildrenOperations = {
 module.exports = DOMChildrenOperations;
 
 }).call(this,require('_process'))
-},{"./Danger":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Danger.js","./ReactMultiChildUpdateTypes":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMultiChildUpdateTypes.js","./getTextContentAccessor":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getTextContentAccessor.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js":[function(require,module,exports){
+},{"./Danger":54,"./ReactMultiChildUpdateTypes":112,"./getTextContentAccessor":176,"./invariant":181,"_process":5}],52:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -14806,7 +16438,7 @@ var DOMProperty = {
 module.exports = DOMProperty;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],53:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -15003,7 +16635,7 @@ var DOMPropertyOperations = {
 module.exports = DOMPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js","./escapeTextForBrowser":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/escapeTextForBrowser.js","./memoizeStringOnly":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/memoizeStringOnly.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Danger.js":[function(require,module,exports){
+},{"./DOMProperty":52,"./escapeTextForBrowser":164,"./memoizeStringOnly":190,"./warning":201,"_process":5}],54:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -15189,7 +16821,7 @@ var Danger = {
 module.exports = Danger;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./createNodesFromMarkup":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/createNodesFromMarkup.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js","./getMarkupWrap":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getMarkupWrap.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DefaultEventPluginOrder.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63,"./createNodesFromMarkup":158,"./emptyFunction":162,"./getMarkupWrap":173,"./invariant":181,"_process":5}],55:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15229,7 +16861,7 @@ var DefaultEventPluginOrder = [
 
 module.exports = DefaultEventPluginOrder;
 
-},{"./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EnterLeaveEventPlugin.js":[function(require,module,exports){
+},{"./keyOf":188}],56:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15369,7 +17001,7 @@ var EnterLeaveEventPlugin = {
 
 module.exports = EnterLeaveEventPlugin;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./SyntheticMouseEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticMouseEvent.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPropagators":62,"./ReactMount":110,"./SyntheticMouseEvent":144,"./keyOf":188}],57:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15441,7 +17073,7 @@ var EventConstants = {
 
 module.exports = EventConstants;
 
-},{"./keyMirror":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventListener.js":[function(require,module,exports){
+},{"./keyMirror":187}],58:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15531,7 +17163,7 @@ var EventListener = {
 module.exports = EventListener;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js":[function(require,module,exports){
+},{"./emptyFunction":162,"_process":5}],59:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -15807,7 +17439,7 @@ var EventPluginHub = {
 module.exports = EventPluginHub;
 
 }).call(this,require('_process'))
-},{"./EventPluginRegistry":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginRegistry.js","./EventPluginUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginUtils.js","./accumulateInto":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/accumulateInto.js","./forEachAccumulated":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/forEachAccumulated.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginRegistry.js":[function(require,module,exports){
+},{"./EventPluginRegistry":60,"./EventPluginUtils":61,"./accumulateInto":150,"./forEachAccumulated":167,"./invariant":181,"_process":5}],60:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16087,7 +17719,7 @@ var EventPluginRegistry = {
 module.exports = EventPluginRegistry;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginUtils.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],61:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16308,7 +17940,7 @@ var EventPluginUtils = {
 module.exports = EventPluginUtils;
 
 }).call(this,require('_process'))
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js":[function(require,module,exports){
+},{"./EventConstants":57,"./invariant":181,"_process":5}],62:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16450,7 +18082,7 @@ var EventPropagators = {
 module.exports = EventPropagators;
 
 }).call(this,require('_process'))
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js","./accumulateInto":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/accumulateInto.js","./forEachAccumulated":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/forEachAccumulated.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPluginHub":59,"./accumulateInto":150,"./forEachAccumulated":167,"_process":5}],63:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16495,7 +18127,7 @@ var ExecutionEnvironment = {
 
 module.exports = ExecutionEnvironment;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/HTMLDOMPropertyConfig.js":[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16687,7 +18319,7 @@ var HTMLDOMPropertyConfig = {
 
 module.exports = HTMLDOMPropertyConfig;
 
-},{"./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LinkedStateMixin.js":[function(require,module,exports){
+},{"./DOMProperty":52,"./ExecutionEnvironment":63}],65:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16728,7 +18360,7 @@ var LinkedStateMixin = {
 
 module.exports = LinkedStateMixin;
 
-},{"./ReactLink":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLink.js","./ReactStateSetters":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactStateSetters.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LinkedValueUtils.js":[function(require,module,exports){
+},{"./ReactLink":108,"./ReactStateSetters":125}],66:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16884,7 +18516,7 @@ var LinkedValueUtils = {
 module.exports = LinkedValueUtils;
 
 }).call(this,require('_process'))
-},{"./ReactPropTypes":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypes.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LocalEventTrapMixin.js":[function(require,module,exports){
+},{"./ReactPropTypes":119,"./invariant":181,"_process":5}],67:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -16934,7 +18566,7 @@ var LocalEventTrapMixin = {
 module.exports = LocalEventTrapMixin;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js","./accumulateInto":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/accumulateInto.js","./forEachAccumulated":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/forEachAccumulated.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/MobileSafariClickEventPlugin.js":[function(require,module,exports){
+},{"./ReactBrowserEventEmitter":73,"./accumulateInto":150,"./forEachAccumulated":167,"./invariant":181,"_process":5}],68:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16992,7 +18624,7 @@ var MobileSafariClickEventPlugin = {
 
 module.exports = MobileSafariClickEventPlugin;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js":[function(require,module,exports){
+},{"./EventConstants":57,"./emptyFunction":162}],69:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -17039,7 +18671,7 @@ function assign(target, sources) {
 
 module.exports = assign;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js":[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17155,7 +18787,7 @@ var PooledClass = {
 module.exports = PooledClass;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],71:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17343,7 +18975,7 @@ React.version = '0.12.2';
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./DOMPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js","./EventPluginUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginUtils.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactChildren":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactChildren.js","./ReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactContext":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactContext.js","./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactDOMComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMComponent.js","./ReactDefaultInjection":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultInjection.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactElementValidator":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElementValidator.js","./ReactInstanceHandles":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js","./ReactLegacyElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLegacyElement.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactMultiChild":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMultiChild.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./ReactPropTypes":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypes.js","./ReactServerRendering":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactServerRendering.js","./ReactTextComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTextComponent.js","./deprecated":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/deprecated.js","./onlyChild":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/onlyChild.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js":[function(require,module,exports){
+},{"./DOMPropertyOperations":53,"./EventPluginUtils":61,"./ExecutionEnvironment":63,"./Object.assign":69,"./ReactChildren":76,"./ReactComponent":77,"./ReactCompositeComponent":80,"./ReactContext":81,"./ReactCurrentOwner":82,"./ReactDOM":83,"./ReactDOMComponent":85,"./ReactDefaultInjection":95,"./ReactElement":98,"./ReactElementValidator":99,"./ReactInstanceHandles":106,"./ReactLegacyElement":107,"./ReactMount":110,"./ReactMultiChild":111,"./ReactPerf":115,"./ReactPropTypes":119,"./ReactServerRendering":123,"./ReactTextComponent":127,"./deprecated":161,"./onlyChild":192,"_process":5}],72:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17386,7 +19018,7 @@ var ReactBrowserComponentMixin = {
 module.exports = ReactBrowserComponentMixin;
 
 }).call(this,require('_process'))
-},{"./ReactEmptyComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEmptyComponent.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js":[function(require,module,exports){
+},{"./ReactEmptyComponent":100,"./ReactMount":110,"./invariant":181,"_process":5}],73:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17741,7 +19373,7 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
 
 module.exports = ReactBrowserEventEmitter;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js","./EventPluginRegistry":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginRegistry.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactEventEmitterMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEventEmitterMixin.js","./ViewportMetrics":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ViewportMetrics.js","./isEventSupported":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isEventSupported.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCSSTransitionGroup.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPluginHub":59,"./EventPluginRegistry":60,"./Object.assign":69,"./ReactEventEmitterMixin":102,"./ViewportMetrics":149,"./isEventSupported":182}],74:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17808,7 +19440,7 @@ var ReactCSSTransitionGroup = React.createClass({
 
 module.exports = ReactCSSTransitionGroup;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js","./ReactCSSTransitionGroupChild":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCSSTransitionGroupChild.js","./ReactTransitionGroup":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionGroup.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCSSTransitionGroupChild.js":[function(require,module,exports){
+},{"./Object.assign":69,"./React":71,"./ReactCSSTransitionGroupChild":75,"./ReactTransitionGroup":130}],75:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17943,7 +19575,7 @@ var ReactCSSTransitionGroupChild = React.createClass({
 module.exports = ReactCSSTransitionGroupChild;
 
 }).call(this,require('_process'))
-},{"./CSSCore":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSCore.js","./React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js","./ReactTransitionEvents":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionEvents.js","./onlyChild":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/onlyChild.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactChildren.js":[function(require,module,exports){
+},{"./CSSCore":44,"./React":71,"./ReactTransitionEvents":129,"./onlyChild":192,"_process":5}],76:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18093,7 +19725,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 }).call(this,require('_process'))
-},{"./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./traverseAllChildren":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/traverseAllChildren.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js":[function(require,module,exports){
+},{"./PooledClass":70,"./traverseAllChildren":199,"./warning":201,"_process":5}],77:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18536,7 +20168,7 @@ var ReactComponent = {
 module.exports = ReactComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactOwner.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./keyMirror":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponentBrowserEnvironment.js":[function(require,module,exports){
+},{"./Object.assign":69,"./ReactElement":98,"./ReactOwner":114,"./ReactUpdates":131,"./invariant":181,"./keyMirror":187,"_process":5}],78:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18658,7 +20290,7 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 }).call(this,require('_process'))
-},{"./ReactDOMIDOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMIDOperations.js","./ReactMarkupChecksum":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMarkupChecksum.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./ReactReconcileTransaction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactReconcileTransaction.js","./getReactRootElementInContainer":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getReactRootElementInContainer.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./setInnerHTML":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/setInnerHTML.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponentWithPureRenderMixin.js":[function(require,module,exports){
+},{"./ReactDOMIDOperations":87,"./ReactMarkupChecksum":109,"./ReactMount":110,"./ReactPerf":115,"./ReactReconcileTransaction":121,"./getReactRootElementInContainer":175,"./invariant":181,"./setInnerHTML":195,"_process":5}],79:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18707,7 +20339,7 @@ var ReactComponentWithPureRenderMixin = {
 
 module.exports = ReactComponentWithPureRenderMixin;
 
-},{"./shallowEqual":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shallowEqual.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js":[function(require,module,exports){
+},{"./shallowEqual":196}],80:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -20147,7 +21779,7 @@ var ReactCompositeComponent = {
 module.exports = ReactCompositeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js","./ReactContext":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactContext.js","./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactElementValidator":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElementValidator.js","./ReactEmptyComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEmptyComponent.js","./ReactErrorUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactErrorUtils.js","./ReactLegacyElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLegacyElement.js","./ReactOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactOwner.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./ReactPropTransferer":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTransferer.js","./ReactPropTypeLocationNames":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypeLocationNames.js","./ReactPropTypeLocations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypeLocations.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./instantiateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/instantiateReactComponent.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./keyMirror":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js","./mapObject":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/mapObject.js","./monitorCodeUse":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/monitorCodeUse.js","./shouldUpdateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shouldUpdateReactComponent.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactContext.js":[function(require,module,exports){
+},{"./Object.assign":69,"./ReactComponent":77,"./ReactContext":81,"./ReactCurrentOwner":82,"./ReactElement":98,"./ReactElementValidator":99,"./ReactEmptyComponent":100,"./ReactErrorUtils":101,"./ReactLegacyElement":107,"./ReactOwner":114,"./ReactPerf":115,"./ReactPropTransferer":116,"./ReactPropTypeLocationNames":117,"./ReactPropTypeLocations":118,"./ReactUpdates":131,"./instantiateReactComponent":180,"./invariant":181,"./keyMirror":187,"./keyOf":188,"./mapObject":189,"./monitorCodeUse":191,"./shouldUpdateReactComponent":197,"./warning":201,"_process":5}],81:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -20209,7 +21841,7 @@ var ReactContext = {
 
 module.exports = ReactContext;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js":[function(require,module,exports){
+},{"./Object.assign":69}],82:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -20243,7 +21875,7 @@ var ReactCurrentOwner = {
 
 module.exports = ReactCurrentOwner;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js":[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -20426,7 +22058,7 @@ var ReactDOM = mapObject({
 module.exports = ReactDOM;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactElementValidator":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElementValidator.js","./ReactLegacyElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLegacyElement.js","./mapObject":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/mapObject.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMButton.js":[function(require,module,exports){
+},{"./ReactElement":98,"./ReactElementValidator":99,"./ReactLegacyElement":107,"./mapObject":189,"_process":5}],84:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -20491,7 +22123,7 @@ var ReactDOMButton = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMButton;
 
-},{"./AutoFocusMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/AutoFocusMixin.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./keyMirror":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMComponent.js":[function(require,module,exports){
+},{"./AutoFocusMixin":42,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./keyMirror":187}],85:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -20978,7 +22610,7 @@ assign(
 module.exports = ReactDOMComponent;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSPropertyOperations.js","./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js","./DOMPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactMultiChild":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMultiChild.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./escapeTextForBrowser":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/escapeTextForBrowser.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./isEventSupported":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isEventSupported.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js","./monitorCodeUse":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/monitorCodeUse.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMForm.js":[function(require,module,exports){
+},{"./CSSPropertyOperations":46,"./DOMProperty":52,"./DOMPropertyOperations":53,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactBrowserEventEmitter":73,"./ReactComponent":77,"./ReactMount":110,"./ReactMultiChild":111,"./ReactPerf":115,"./escapeTextForBrowser":164,"./invariant":181,"./isEventSupported":182,"./keyOf":188,"./monitorCodeUse":191,"_process":5}],86:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -21028,7 +22660,7 @@ var ReactDOMForm = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMForm;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./LocalEventTrapMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LocalEventTrapMixin.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMIDOperations.js":[function(require,module,exports){
+},{"./EventConstants":57,"./LocalEventTrapMixin":67,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98}],87:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -21214,7 +22846,7 @@ var ReactDOMIDOperations = {
 module.exports = ReactDOMIDOperations;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSPropertyOperations.js","./DOMChildrenOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMChildrenOperations.js","./DOMPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./setInnerHTML":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/setInnerHTML.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMImg.js":[function(require,module,exports){
+},{"./CSSPropertyOperations":46,"./DOMChildrenOperations":51,"./DOMPropertyOperations":53,"./ReactMount":110,"./ReactPerf":115,"./invariant":181,"./setInnerHTML":195,"_process":5}],88:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -21262,7 +22894,7 @@ var ReactDOMImg = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMImg;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./LocalEventTrapMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LocalEventTrapMixin.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMInput.js":[function(require,module,exports){
+},{"./EventConstants":57,"./LocalEventTrapMixin":67,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98}],89:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -21440,7 +23072,7 @@ var ReactDOMInput = ReactCompositeComponent.createClass({
 module.exports = ReactDOMInput;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/AutoFocusMixin.js","./DOMPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js","./LinkedValueUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LinkedValueUtils.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMOption.js":[function(require,module,exports){
+},{"./AutoFocusMixin":42,"./DOMPropertyOperations":53,"./LinkedValueUtils":66,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./ReactMount":110,"./ReactUpdates":131,"./invariant":181,"_process":5}],90:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -21493,7 +23125,7 @@ var ReactDOMOption = ReactCompositeComponent.createClass({
 module.exports = ReactDOMOption;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMSelect.js":[function(require,module,exports){
+},{"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./warning":201,"_process":5}],91:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -21677,7 +23309,7 @@ var ReactDOMSelect = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMSelect;
 
-},{"./AutoFocusMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/AutoFocusMixin.js","./LinkedValueUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LinkedValueUtils.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMSelection.js":[function(require,module,exports){
+},{"./AutoFocusMixin":42,"./LinkedValueUtils":66,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./ReactUpdates":131}],92:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -21886,7 +23518,7 @@ var ReactDOMSelection = {
 
 module.exports = ReactDOMSelection;
 
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./getNodeForCharacterOffset":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getNodeForCharacterOffset.js","./getTextContentAccessor":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getTextContentAccessor.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMTextarea.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63,"./getNodeForCharacterOffset":174,"./getTextContentAccessor":176}],93:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -22027,7 +23659,7 @@ var ReactDOMTextarea = ReactCompositeComponent.createClass({
 module.exports = ReactDOMTextarea;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/AutoFocusMixin.js","./DOMPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js","./LinkedValueUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LinkedValueUtils.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultBatchingStrategy.js":[function(require,module,exports){
+},{"./AutoFocusMixin":42,"./DOMPropertyOperations":53,"./LinkedValueUtils":66,"./Object.assign":69,"./ReactBrowserComponentMixin":72,"./ReactCompositeComponent":80,"./ReactDOM":83,"./ReactElement":98,"./ReactUpdates":131,"./invariant":181,"./warning":201,"_process":5}],94:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22100,7 +23732,7 @@ var ReactDefaultBatchingStrategy = {
 
 module.exports = ReactDefaultBatchingStrategy;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./Transaction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Transaction.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultInjection.js":[function(require,module,exports){
+},{"./Object.assign":69,"./ReactUpdates":131,"./Transaction":148,"./emptyFunction":162}],95:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -22229,7 +23861,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./BeforeInputEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/BeforeInputEventPlugin.js","./ChangeEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ChangeEventPlugin.js","./ClientReactRootIndex":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ClientReactRootIndex.js","./CompositionEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CompositionEventPlugin.js","./DefaultEventPluginOrder":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DefaultEventPluginOrder.js","./EnterLeaveEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EnterLeaveEventPlugin.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./HTMLDOMPropertyConfig":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/HTMLDOMPropertyConfig.js","./MobileSafariClickEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/MobileSafariClickEventPlugin.js","./ReactBrowserComponentMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactComponentBrowserEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponentBrowserEnvironment.js","./ReactDOMButton":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMButton.js","./ReactDOMComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMComponent.js","./ReactDOMForm":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMForm.js","./ReactDOMImg":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMImg.js","./ReactDOMInput":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMInput.js","./ReactDOMOption":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMOption.js","./ReactDOMSelect":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMSelect.js","./ReactDOMTextarea":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMTextarea.js","./ReactDefaultBatchingStrategy":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultBatchingStrategy.js","./ReactDefaultPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultPerf.js","./ReactEventListener":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEventListener.js","./ReactInjection":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInjection.js","./ReactInstanceHandles":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./SVGDOMPropertyConfig":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SVGDOMPropertyConfig.js","./SelectEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SelectEventPlugin.js","./ServerReactRootIndex":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ServerReactRootIndex.js","./SimpleEventPlugin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SimpleEventPlugin.js","./createFullPageComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/createFullPageComponent.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultPerf.js":[function(require,module,exports){
+},{"./BeforeInputEventPlugin":43,"./ChangeEventPlugin":48,"./ClientReactRootIndex":49,"./CompositionEventPlugin":50,"./DefaultEventPluginOrder":55,"./EnterLeaveEventPlugin":56,"./ExecutionEnvironment":63,"./HTMLDOMPropertyConfig":64,"./MobileSafariClickEventPlugin":68,"./ReactBrowserComponentMixin":72,"./ReactComponentBrowserEnvironment":78,"./ReactDOMButton":84,"./ReactDOMComponent":85,"./ReactDOMForm":86,"./ReactDOMImg":88,"./ReactDOMInput":89,"./ReactDOMOption":90,"./ReactDOMSelect":91,"./ReactDOMTextarea":93,"./ReactDefaultBatchingStrategy":94,"./ReactDefaultPerf":96,"./ReactEventListener":103,"./ReactInjection":104,"./ReactInstanceHandles":106,"./ReactMount":110,"./SVGDOMPropertyConfig":133,"./SelectEventPlugin":134,"./ServerReactRootIndex":135,"./SimpleEventPlugin":136,"./createFullPageComponent":157,"_process":5}],96:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22489,7 +24121,7 @@ var ReactDefaultPerf = {
 
 module.exports = ReactDefaultPerf;
 
-},{"./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js","./ReactDefaultPerfAnalysis":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultPerfAnalysis.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./performanceNow":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/performanceNow.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultPerfAnalysis.js":[function(require,module,exports){
+},{"./DOMProperty":52,"./ReactDefaultPerfAnalysis":97,"./ReactMount":110,"./ReactPerf":115,"./performanceNow":194}],97:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22695,7 +24327,7 @@ var ReactDefaultPerfAnalysis = {
 
 module.exports = ReactDefaultPerfAnalysis;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js":[function(require,module,exports){
+},{"./Object.assign":69}],98:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -22941,7 +24573,7 @@ ReactElement.isValidElement = function(object) {
 module.exports = ReactElement;
 
 }).call(this,require('_process'))
-},{"./ReactContext":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactContext.js","./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElementValidator.js":[function(require,module,exports){
+},{"./ReactContext":81,"./ReactCurrentOwner":82,"./warning":201,"_process":5}],99:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -23223,7 +24855,7 @@ var ReactElementValidator = {
 module.exports = ReactElementValidator;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactPropTypeLocations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypeLocations.js","./monitorCodeUse":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/monitorCodeUse.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEmptyComponent.js":[function(require,module,exports){
+},{"./ReactCurrentOwner":82,"./ReactElement":98,"./ReactPropTypeLocations":118,"./monitorCodeUse":191,"./warning":201,"_process":5}],100:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -23300,7 +24932,7 @@ var ReactEmptyComponent = {
 module.exports = ReactEmptyComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactErrorUtils.js":[function(require,module,exports){
+},{"./ReactElement":98,"./invariant":181,"_process":5}],101:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23332,7 +24964,7 @@ var ReactErrorUtils = {
 
 module.exports = ReactErrorUtils;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEventEmitterMixin.js":[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23382,7 +25014,7 @@ var ReactEventEmitterMixin = {
 
 module.exports = ReactEventEmitterMixin;
 
-},{"./EventPluginHub":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEventListener.js":[function(require,module,exports){
+},{"./EventPluginHub":59}],103:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23566,7 +25198,7 @@ var ReactEventListener = {
 
 module.exports = ReactEventListener;
 
-},{"./EventListener":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventListener.js","./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./ReactInstanceHandles":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./getEventTarget":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventTarget.js","./getUnboundedScrollPosition":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getUnboundedScrollPosition.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInjection.js":[function(require,module,exports){
+},{"./EventListener":58,"./ExecutionEnvironment":63,"./Object.assign":69,"./PooledClass":70,"./ReactInstanceHandles":106,"./ReactMount":110,"./ReactUpdates":131,"./getEventTarget":172,"./getUnboundedScrollPosition":177}],104:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23606,7 +25238,7 @@ var ReactInjection = {
 
 module.exports = ReactInjection;
 
-},{"./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js","./EventPluginHub":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js","./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js","./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactEmptyComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEmptyComponent.js","./ReactNativeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactNativeComponent.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./ReactRootIndex":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactRootIndex.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInputSelection.js":[function(require,module,exports){
+},{"./DOMProperty":52,"./EventPluginHub":59,"./ReactBrowserEventEmitter":73,"./ReactComponent":77,"./ReactCompositeComponent":80,"./ReactEmptyComponent":100,"./ReactNativeComponent":113,"./ReactPerf":115,"./ReactRootIndex":122,"./ReactUpdates":131}],105:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -23742,7 +25374,7 @@ var ReactInputSelection = {
 
 module.exports = ReactInputSelection;
 
-},{"./ReactDOMSelection":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDOMSelection.js","./containsNode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/containsNode.js","./focusNode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/focusNode.js","./getActiveElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getActiveElement.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js":[function(require,module,exports){
+},{"./ReactDOMSelection":92,"./containsNode":155,"./focusNode":166,"./getActiveElement":168}],106:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -24077,7 +25709,7 @@ var ReactInstanceHandles = {
 module.exports = ReactInstanceHandles;
 
 }).call(this,require('_process'))
-},{"./ReactRootIndex":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactRootIndex.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLegacyElement.js":[function(require,module,exports){
+},{"./ReactRootIndex":122,"./invariant":181,"_process":5}],107:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -24324,7 +25956,7 @@ ReactLegacyElementFactory._isLegacyCallWarningEnabled = true;
 module.exports = ReactLegacyElementFactory;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./monitorCodeUse":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/monitorCodeUse.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLink.js":[function(require,module,exports){
+},{"./ReactCurrentOwner":82,"./invariant":181,"./monitorCodeUse":191,"./warning":201,"_process":5}],108:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -24397,7 +26029,7 @@ ReactLink.PropTypes = {
 
 module.exports = ReactLink;
 
-},{"./React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMarkupChecksum.js":[function(require,module,exports){
+},{"./React":71}],109:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -24445,7 +26077,7 @@ var ReactMarkupChecksum = {
 
 module.exports = ReactMarkupChecksum;
 
-},{"./adler32":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/adler32.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js":[function(require,module,exports){
+},{"./adler32":151}],110:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -25143,7 +26775,7 @@ ReactMount.renderComponent = deprecated(
 module.exports = ReactMount;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js","./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js","./ReactLegacyElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLegacyElement.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./containsNode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/containsNode.js","./deprecated":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/deprecated.js","./getReactRootElementInContainer":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getReactRootElementInContainer.js","./instantiateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/instantiateReactComponent.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./shouldUpdateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shouldUpdateReactComponent.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMultiChild.js":[function(require,module,exports){
+},{"./DOMProperty":52,"./ReactBrowserEventEmitter":73,"./ReactCurrentOwner":82,"./ReactElement":98,"./ReactInstanceHandles":106,"./ReactLegacyElement":107,"./ReactPerf":115,"./containsNode":155,"./deprecated":161,"./getReactRootElementInContainer":175,"./instantiateReactComponent":180,"./invariant":181,"./shouldUpdateReactComponent":197,"./warning":201,"_process":5}],111:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -25571,7 +27203,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 
-},{"./ReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js","./ReactMultiChildUpdateTypes":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMultiChildUpdateTypes.js","./flattenChildren":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/flattenChildren.js","./instantiateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/instantiateReactComponent.js","./shouldUpdateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shouldUpdateReactComponent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMultiChildUpdateTypes.js":[function(require,module,exports){
+},{"./ReactComponent":77,"./ReactMultiChildUpdateTypes":112,"./flattenChildren":165,"./instantiateReactComponent":180,"./shouldUpdateReactComponent":197}],112:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -25604,7 +27236,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 
 module.exports = ReactMultiChildUpdateTypes;
 
-},{"./keyMirror":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactNativeComponent.js":[function(require,module,exports){
+},{"./keyMirror":187}],113:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -25677,7 +27309,7 @@ var ReactNativeComponent = {
 module.exports = ReactNativeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactOwner.js":[function(require,module,exports){
+},{"./Object.assign":69,"./invariant":181,"_process":5}],114:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -25833,7 +27465,7 @@ var ReactOwner = {
 module.exports = ReactOwner;
 
 }).call(this,require('_process'))
-},{"./emptyObject":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyObject.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js":[function(require,module,exports){
+},{"./emptyObject":163,"./invariant":181,"_process":5}],115:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -25917,7 +27549,7 @@ function _noMeasure(objName, fnName, func) {
 module.exports = ReactPerf;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTransferer.js":[function(require,module,exports){
+},{"_process":5}],116:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -26084,7 +27716,7 @@ var ReactPropTransferer = {
 module.exports = ReactPropTransferer;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./joinClasses":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/joinClasses.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypeLocationNames.js":[function(require,module,exports){
+},{"./Object.assign":69,"./emptyFunction":162,"./invariant":181,"./joinClasses":186,"./warning":201,"_process":5}],117:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -26112,7 +27744,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactPropTypeLocationNames;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypeLocations.js":[function(require,module,exports){
+},{"_process":5}],118:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26136,7 +27768,7 @@ var ReactPropTypeLocations = keyMirror({
 
 module.exports = ReactPropTypeLocations;
 
-},{"./keyMirror":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypes.js":[function(require,module,exports){
+},{"./keyMirror":187}],119:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26490,7 +28122,7 @@ function getPreciseType(propValue) {
 
 module.exports = ReactPropTypes;
 
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactPropTypeLocationNames":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTypeLocationNames.js","./deprecated":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/deprecated.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPutListenerQueue.js":[function(require,module,exports){
+},{"./ReactElement":98,"./ReactPropTypeLocationNames":117,"./deprecated":161,"./emptyFunction":162}],120:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26546,7 +28178,7 @@ PooledClass.addPoolingTo(ReactPutListenerQueue);
 
 module.exports = ReactPutListenerQueue;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactReconcileTransaction.js":[function(require,module,exports){
+},{"./Object.assign":69,"./PooledClass":70,"./ReactBrowserEventEmitter":73}],121:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26722,7 +28354,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 
-},{"./CallbackQueue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactInputSelection":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInputSelection.js","./ReactPutListenerQueue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPutListenerQueue.js","./Transaction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Transaction.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactRootIndex.js":[function(require,module,exports){
+},{"./CallbackQueue":47,"./Object.assign":69,"./PooledClass":70,"./ReactBrowserEventEmitter":73,"./ReactInputSelection":105,"./ReactPutListenerQueue":120,"./Transaction":148}],122:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -26753,7 +28385,7 @@ var ReactRootIndex = {
 
 module.exports = ReactRootIndex;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactServerRendering.js":[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -26833,7 +28465,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js","./ReactMarkupChecksum":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMarkupChecksum.js","./ReactServerRenderingTransaction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactServerRenderingTransaction.js","./instantiateReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/instantiateReactComponent.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactServerRenderingTransaction.js":[function(require,module,exports){
+},{"./ReactElement":98,"./ReactInstanceHandles":106,"./ReactMarkupChecksum":109,"./ReactServerRenderingTransaction":124,"./instantiateReactComponent":180,"./invariant":181,"_process":5}],124:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -26946,7 +28578,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./CallbackQueue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./ReactPutListenerQueue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPutListenerQueue.js","./Transaction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Transaction.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactStateSetters.js":[function(require,module,exports){
+},{"./CallbackQueue":47,"./Object.assign":69,"./PooledClass":70,"./ReactPutListenerQueue":120,"./Transaction":148,"./emptyFunction":162}],125:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27052,7 +28684,7 @@ ReactStateSetters.Mixin = {
 
 module.exports = ReactStateSetters;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTestUtils.js":[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27464,7 +29096,7 @@ for (eventType in topLevelTypes) {
 
 module.exports = ReactTestUtils;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginHub.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js","./ReactBrowserEventEmitter":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactMount":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactMount.js","./ReactTextComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTextComponent.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTextComponent.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPluginHub":59,"./EventPropagators":62,"./Object.assign":69,"./React":71,"./ReactBrowserEventEmitter":73,"./ReactElement":98,"./ReactMount":110,"./ReactTextComponent":127,"./ReactUpdates":131,"./SyntheticEvent":140}],127:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27570,7 +29202,7 @@ ReactTextComponentFactory.type = ReactTextComponent;
 
 module.exports = ReactTextComponentFactory;
 
-},{"./DOMPropertyOperations":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMPropertyOperations.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./ReactComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponent.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./escapeTextForBrowser":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/escapeTextForBrowser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionChildMapping.js":[function(require,module,exports){
+},{"./DOMPropertyOperations":53,"./Object.assign":69,"./ReactComponent":77,"./ReactElement":98,"./escapeTextForBrowser":164}],128:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27671,7 +29303,7 @@ var ReactTransitionChildMapping = {
 
 module.exports = ReactTransitionChildMapping;
 
-},{"./ReactChildren":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactChildren.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionEvents.js":[function(require,module,exports){
+},{"./ReactChildren":76}],129:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27782,7 +29414,7 @@ var ReactTransitionEvents = {
 
 module.exports = ReactTransitionEvents;
 
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionGroup.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63}],130:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -27971,7 +29603,7 @@ var ReactTransitionGroup = React.createClass({
 
 module.exports = ReactTransitionGroup;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js","./ReactTransitionChildMapping":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionChildMapping.js","./cloneWithProps":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/cloneWithProps.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js":[function(require,module,exports){
+},{"./Object.assign":69,"./React":71,"./ReactTransitionChildMapping":128,"./cloneWithProps":154,"./emptyFunction":162}],131:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -28261,7 +29893,7 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require('_process'))
-},{"./CallbackQueue":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./ReactCurrentOwner":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCurrentOwner.js","./ReactPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPerf.js","./Transaction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Transaction.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactWithAddons.js":[function(require,module,exports){
+},{"./CallbackQueue":47,"./Object.assign":69,"./PooledClass":70,"./ReactCurrentOwner":82,"./ReactPerf":115,"./Transaction":148,"./invariant":181,"./warning":201,"_process":5}],132:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -28315,7 +29947,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./LinkedStateMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/LinkedStateMixin.js","./React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js","./ReactCSSTransitionGroup":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCSSTransitionGroup.js","./ReactComponentWithPureRenderMixin":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactComponentWithPureRenderMixin.js","./ReactDefaultPerf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactDefaultPerf.js","./ReactTestUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTestUtils.js","./ReactTransitionGroup":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTransitionGroup.js","./ReactUpdates":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactUpdates.js","./cloneWithProps":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/cloneWithProps.js","./cx":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/cx.js","./update":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/update.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SVGDOMPropertyConfig.js":[function(require,module,exports){
+},{"./LinkedStateMixin":65,"./React":71,"./ReactCSSTransitionGroup":74,"./ReactComponentWithPureRenderMixin":79,"./ReactDefaultPerf":96,"./ReactTestUtils":126,"./ReactTransitionGroup":130,"./ReactUpdates":131,"./cloneWithProps":154,"./cx":159,"./update":200,"_process":5}],133:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28407,7 +30039,7 @@ var SVGDOMPropertyConfig = {
 
 module.exports = SVGDOMPropertyConfig;
 
-},{"./DOMProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/DOMProperty.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SelectEventPlugin.js":[function(require,module,exports){
+},{"./DOMProperty":52}],134:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28602,7 +30234,7 @@ var SelectEventPlugin = {
 
 module.exports = SelectEventPlugin;
 
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./ReactInputSelection":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInputSelection.js","./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js","./getActiveElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getActiveElement.js","./isTextInputElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isTextInputElement.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js","./shallowEqual":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shallowEqual.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ServerReactRootIndex.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPropagators":62,"./ReactInputSelection":105,"./SyntheticEvent":140,"./getActiveElement":168,"./isTextInputElement":184,"./keyOf":188,"./shallowEqual":196}],135:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -28633,7 +30265,7 @@ var ServerReactRootIndex = {
 
 module.exports = ServerReactRootIndex;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SimpleEventPlugin.js":[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -29061,7 +30693,7 @@ var SimpleEventPlugin = {
 module.exports = SimpleEventPlugin;
 
 }).call(this,require('_process'))
-},{"./EventConstants":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventConstants.js","./EventPluginUtils":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPluginUtils.js","./EventPropagators":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/EventPropagators.js","./SyntheticClipboardEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticClipboardEvent.js","./SyntheticDragEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticDragEvent.js","./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js","./SyntheticFocusEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticFocusEvent.js","./SyntheticKeyboardEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticKeyboardEvent.js","./SyntheticMouseEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticMouseEvent.js","./SyntheticTouchEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticTouchEvent.js","./SyntheticUIEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticUIEvent.js","./SyntheticWheelEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticWheelEvent.js","./getEventCharCode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventCharCode.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticClipboardEvent.js":[function(require,module,exports){
+},{"./EventConstants":57,"./EventPluginUtils":61,"./EventPropagators":62,"./SyntheticClipboardEvent":137,"./SyntheticDragEvent":139,"./SyntheticEvent":140,"./SyntheticFocusEvent":141,"./SyntheticKeyboardEvent":143,"./SyntheticMouseEvent":144,"./SyntheticTouchEvent":145,"./SyntheticUIEvent":146,"./SyntheticWheelEvent":147,"./getEventCharCode":169,"./invariant":181,"./keyOf":188,"./warning":201,"_process":5}],137:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29107,7 +30739,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 module.exports = SyntheticClipboardEvent;
 
 
-},{"./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticCompositionEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":140}],138:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29153,7 +30785,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticCompositionEvent;
 
 
-},{"./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticDragEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":140}],139:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29192,7 +30824,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
 
-},{"./SyntheticMouseEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticMouseEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js":[function(require,module,exports){
+},{"./SyntheticMouseEvent":144}],140:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29350,7 +30982,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.threeArgumentPooler);
 
 module.exports = SyntheticEvent;
 
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/PooledClass.js","./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js","./getEventTarget":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventTarget.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticFocusEvent.js":[function(require,module,exports){
+},{"./Object.assign":69,"./PooledClass":70,"./emptyFunction":162,"./getEventTarget":172}],141:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29389,7 +31021,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
 
-},{"./SyntheticUIEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticUIEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticInputEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":146}],142:[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -29436,7 +31068,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticInputEvent;
 
 
-},{"./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticKeyboardEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":140}],143:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29523,7 +31155,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
 
-},{"./SyntheticUIEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticUIEvent.js","./getEventCharCode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventCharCode.js","./getEventKey":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventKey.js","./getEventModifierState":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventModifierState.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticMouseEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":146,"./getEventCharCode":169,"./getEventKey":170,"./getEventModifierState":171}],144:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29606,7 +31238,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
 
-},{"./SyntheticUIEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticUIEvent.js","./ViewportMetrics":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ViewportMetrics.js","./getEventModifierState":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventModifierState.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticTouchEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":146,"./ViewportMetrics":149,"./getEventModifierState":171}],145:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29654,7 +31286,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
 
-},{"./SyntheticUIEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticUIEvent.js","./getEventModifierState":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventModifierState.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticUIEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":146,"./getEventModifierState":171}],146:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29716,7 +31348,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
 
-},{"./SyntheticEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticEvent.js","./getEventTarget":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventTarget.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticWheelEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":140,"./getEventTarget":172}],147:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -29777,7 +31409,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
 
-},{"./SyntheticMouseEvent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/SyntheticMouseEvent.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Transaction.js":[function(require,module,exports){
+},{"./SyntheticMouseEvent":144}],148:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30018,7 +31650,7 @@ var Transaction = {
 module.exports = Transaction;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ViewportMetrics.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],149:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30050,7 +31682,7 @@ var ViewportMetrics = {
 
 module.exports = ViewportMetrics;
 
-},{"./getUnboundedScrollPosition":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getUnboundedScrollPosition.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/accumulateInto.js":[function(require,module,exports){
+},{"./getUnboundedScrollPosition":177}],150:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -30116,7 +31748,7 @@ function accumulateInto(current, next) {
 module.exports = accumulateInto;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/adler32.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],151:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30150,7 +31782,7 @@ function adler32(data) {
 
 module.exports = adler32;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/camelize.js":[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30182,7 +31814,7 @@ function camelize(string) {
 
 module.exports = camelize;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/camelizeStyleName.js":[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -30224,7 +31856,7 @@ function camelizeStyleName(string) {
 
 module.exports = camelizeStyleName;
 
-},{"./camelize":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/camelize.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/cloneWithProps.js":[function(require,module,exports){
+},{"./camelize":152}],154:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30283,7 +31915,7 @@ function cloneWithProps(child, props) {
 module.exports = cloneWithProps;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactPropTransferer":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactPropTransferer.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/containsNode.js":[function(require,module,exports){
+},{"./ReactElement":98,"./ReactPropTransferer":116,"./keyOf":188,"./warning":201,"_process":5}],155:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30327,7 +31959,7 @@ function containsNode(outerNode, innerNode) {
 
 module.exports = containsNode;
 
-},{"./isTextNode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isTextNode.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/createArrayFrom.js":[function(require,module,exports){
+},{"./isTextNode":185}],156:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30413,7 +32045,7 @@ function createArrayFrom(obj) {
 
 module.exports = createArrayFrom;
 
-},{"./toArray":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/toArray.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/createFullPageComponent.js":[function(require,module,exports){
+},{"./toArray":198}],157:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30474,7 +32106,7 @@ function createFullPageComponent(tag) {
 module.exports = createFullPageComponent;
 
 }).call(this,require('_process'))
-},{"./ReactCompositeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactCompositeComponent.js","./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/createNodesFromMarkup.js":[function(require,module,exports){
+},{"./ReactCompositeComponent":80,"./ReactElement":98,"./invariant":181,"_process":5}],158:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30564,7 +32196,7 @@ function createNodesFromMarkup(markup, handleScript) {
 module.exports = createNodesFromMarkup;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./createArrayFrom":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/createArrayFrom.js","./getMarkupWrap":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getMarkupWrap.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/cx.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63,"./createArrayFrom":156,"./getMarkupWrap":173,"./invariant":181,"_process":5}],159:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30603,7 +32235,7 @@ function cx(classNames) {
 
 module.exports = cx;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/dangerousStyleValue.js":[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30661,7 +32293,7 @@ function dangerousStyleValue(name, value) {
 
 module.exports = dangerousStyleValue;
 
-},{"./CSSProperty":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/CSSProperty.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/deprecated.js":[function(require,module,exports){
+},{"./CSSProperty":45}],161:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30712,7 +32344,7 @@ function deprecated(namespace, oldName, newName, ctx, fn) {
 module.exports = deprecated;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js":[function(require,module,exports){
+},{"./Object.assign":69,"./warning":201,"_process":5}],162:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30746,7 +32378,7 @@ emptyFunction.thatReturnsArgument = function(arg) { return arg; };
 
 module.exports = emptyFunction;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyObject.js":[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30770,7 +32402,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = emptyObject;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/escapeTextForBrowser.js":[function(require,module,exports){
+},{"_process":5}],164:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30811,7 +32443,7 @@ function escapeTextForBrowser(text) {
 
 module.exports = escapeTextForBrowser;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/flattenChildren.js":[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30880,7 +32512,7 @@ function flattenChildren(children) {
 module.exports = flattenChildren;
 
 }).call(this,require('_process'))
-},{"./ReactTextComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactTextComponent.js","./traverseAllChildren":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/traverseAllChildren.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/focusNode.js":[function(require,module,exports){
+},{"./ReactTextComponent":127,"./traverseAllChildren":199,"./warning":201,"_process":5}],166:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -30909,7 +32541,7 @@ function focusNode(node) {
 
 module.exports = focusNode;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/forEachAccumulated.js":[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30940,7 +32572,7 @@ var forEachAccumulated = function(arr, cb, scope) {
 
 module.exports = forEachAccumulated;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getActiveElement.js":[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -30969,7 +32601,7 @@ function getActiveElement() /*?DOMElement*/ {
 
 module.exports = getActiveElement;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventCharCode.js":[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31021,7 +32653,7 @@ function getEventCharCode(nativeEvent) {
 
 module.exports = getEventCharCode;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventKey.js":[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31126,7 +32758,7 @@ function getEventKey(nativeEvent) {
 
 module.exports = getEventKey;
 
-},{"./getEventCharCode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventCharCode.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventModifierState.js":[function(require,module,exports){
+},{"./getEventCharCode":169}],171:[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -31173,7 +32805,7 @@ function getEventModifierState(nativeEvent) {
 
 module.exports = getEventModifierState;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getEventTarget.js":[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31204,7 +32836,7 @@ function getEventTarget(nativeEvent) {
 
 module.exports = getEventTarget;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getMarkupWrap.js":[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -31321,7 +32953,7 @@ function getMarkupWrap(nodeName) {
 module.exports = getMarkupWrap;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getNodeForCharacterOffset.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63,"./invariant":181,"_process":5}],174:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31396,7 +33028,7 @@ function getNodeForCharacterOffset(root, offset) {
 
 module.exports = getNodeForCharacterOffset;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getReactRootElementInContainer.js":[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31431,7 +33063,7 @@ function getReactRootElementInContainer(container) {
 
 module.exports = getReactRootElementInContainer;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getTextContentAccessor.js":[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31468,7 +33100,7 @@ function getTextContentAccessor() {
 
 module.exports = getTextContentAccessor;
 
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/getUnboundedScrollPosition.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63}],177:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31508,7 +33140,7 @@ function getUnboundedScrollPosition(scrollable) {
 
 module.exports = getUnboundedScrollPosition;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/hyphenate.js":[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31541,7 +33173,7 @@ function hyphenate(string) {
 
 module.exports = hyphenate;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/hyphenateStyleName.js":[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31582,7 +33214,7 @@ function hyphenateStyleName(string) {
 
 module.exports = hyphenateStyleName;
 
-},{"./hyphenate":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/hyphenate.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/instantiateReactComponent.js":[function(require,module,exports){
+},{"./hyphenate":178}],180:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -31696,7 +33328,7 @@ function instantiateReactComponent(element, parentCompositeType) {
 module.exports = instantiateReactComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactEmptyComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactEmptyComponent.js","./ReactLegacyElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactLegacyElement.js","./ReactNativeComponent":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactNativeComponent.js","./warning":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js":[function(require,module,exports){
+},{"./ReactElement":98,"./ReactEmptyComponent":100,"./ReactLegacyElement":107,"./ReactNativeComponent":113,"./warning":201,"_process":5}],181:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -31753,7 +33385,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isEventSupported.js":[function(require,module,exports){
+},{"_process":5}],182:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31818,7 +33450,7 @@ function isEventSupported(eventNameSuffix, capture) {
 
 module.exports = isEventSupported;
 
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isNode.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63}],183:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31846,7 +33478,7 @@ function isNode(object) {
 
 module.exports = isNode;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isTextInputElement.js":[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31890,7 +33522,7 @@ function isTextInputElement(elem) {
 
 module.exports = isTextInputElement;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isTextNode.js":[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31915,7 +33547,7 @@ function isTextNode(object) {
 
 module.exports = isTextNode;
 
-},{"./isNode":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/isNode.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/joinClasses.js":[function(require,module,exports){
+},{"./isNode":183}],186:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -31956,7 +33588,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyMirror.js":[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32011,7 +33643,7 @@ var keyMirror = function(obj) {
 module.exports = keyMirror;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],188:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32047,7 +33679,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/mapObject.js":[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32100,7 +33732,7 @@ function mapObject(object, callback, context) {
 
 module.exports = mapObject;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/memoizeStringOnly.js":[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32134,7 +33766,7 @@ function memoizeStringOnly(callback) {
 
 module.exports = memoizeStringOnly;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/monitorCodeUse.js":[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -32168,7 +33800,7 @@ function monitorCodeUse(eventName, data) {
 module.exports = monitorCodeUse;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/onlyChild.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],192:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32208,7 +33840,7 @@ function onlyChild(children) {
 module.exports = onlyChild;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/performance.js":[function(require,module,exports){
+},{"./ReactElement":98,"./invariant":181,"_process":5}],193:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32236,7 +33868,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = performance || {};
 
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/performanceNow.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63}],194:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32264,7 +33896,7 @@ var performanceNow = performance.now.bind(performance);
 
 module.exports = performanceNow;
 
-},{"./performance":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/performance.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/setInnerHTML.js":[function(require,module,exports){
+},{"./performance":193}],195:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32342,7 +33974,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = setInnerHTML;
 
-},{"./ExecutionEnvironment":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shallowEqual.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":63}],196:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32386,7 +34018,7 @@ function shallowEqual(objA, objB) {
 
 module.exports = shallowEqual;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/shouldUpdateReactComponent.js":[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32424,7 +34056,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 
 module.exports = shouldUpdateReactComponent;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/toArray.js":[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -32496,7 +34128,7 @@ function toArray(obj) {
 module.exports = toArray;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/traverseAllChildren.js":[function(require,module,exports){
+},{"./invariant":181,"_process":5}],199:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32679,7 +34311,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/ReactInstanceHandles.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/update.js":[function(require,module,exports){
+},{"./ReactElement":98,"./ReactInstanceHandles":106,"./invariant":181,"_process":5}],200:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -32847,7 +34479,7 @@ function update(value, spec) {
 module.exports = update;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/Object.assign.js","./invariant":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/invariant.js","./keyOf":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/keyOf.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/warning.js":[function(require,module,exports){
+},{"./Object.assign":69,"./invariant":181,"./keyOf":188,"_process":5}],201:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -32892,1661 +34524,10 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = warning;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/emptyFunction.js","_process":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/react.js":[function(require,module,exports){
+},{"./emptyFunction":162,"_process":5}],202:[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/lib/React.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-
-var base64 = require('base64-js')
-var ieee754 = require('ieee754')
-var isArray = require('is-array')
-
-exports.Buffer = Buffer
-exports.SlowBuffer = SlowBuffer
-exports.INSPECT_MAX_BYTES = 50
-Buffer.poolSize = 8192 // not used by this implementation
-
-var kMaxLength = 0x3fffffff
-var rootParent = {}
-
-/**
- * If `Buffer.TYPED_ARRAY_SUPPORT`:
- *   === true    Use Uint8Array implementation (fastest)
- *   === false   Use Object implementation (most compatible, even IE6)
- *
- * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
- * Opera 11.6+, iOS 4.2+.
- *
- * Note:
- *
- * - Implementation must support adding new properties to `Uint8Array` instances.
- *   Firefox 4-29 lacked support, fixed in Firefox 30+.
- *   See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
- *
- *  - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
- *
- *  - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
- *    incorrect length in some situations.
- *
- * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they will
- * get the Object implementation, which is slower but will work correctly.
- */
-Buffer.TYPED_ARRAY_SUPPORT = (function () {
-  try {
-    var buf = new ArrayBuffer(0)
-    var arr = new Uint8Array(buf)
-    arr.foo = function () { return 42 }
-    return 42 === arr.foo() && // typed array instances can be augmented
-        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
-        new Uint8Array(1).subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
-  } catch (e) {
-    return false
-  }
-})()
-
-/**
- * Class: Buffer
- * =============
- *
- * The Buffer constructor returns instances of `Uint8Array` that are augmented
- * with function properties for all the node `Buffer` API functions. We use
- * `Uint8Array` so that square bracket notation works as expected -- it returns
- * a single octet.
- *
- * By augmenting the instances, we can avoid modifying the `Uint8Array`
- * prototype.
- */
-function Buffer (subject, encoding, noZero) {
-  if (!(this instanceof Buffer))
-    return new Buffer(subject, encoding, noZero)
-
-  var type = typeof subject
-
-  // Find the length
-  var length
-  if (type === 'number')
-    length = subject > 0 ? subject >>> 0 : 0
-  else if (type === 'string') {
-    length = Buffer.byteLength(subject, encoding)
-  } else if (type === 'object' && subject !== null) { // assume object is array-like
-    if (subject.type === 'Buffer' && isArray(subject.data))
-      subject = subject.data
-    length = +subject.length > 0 ? Math.floor(+subject.length) : 0
-  } else
-    throw new TypeError('must start with number, buffer, array or string')
-
-  if (length > kMaxLength)
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-      'size: 0x' + kMaxLength.toString(16) + ' bytes')
-
-  var buf
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    // Preferred: Return an augmented `Uint8Array` instance for best performance
-    buf = Buffer._augment(new Uint8Array(length))
-  } else {
-    // Fallback: Return THIS instance of Buffer (created by `new`)
-    buf = this
-    buf.length = length
-    buf._isBuffer = true
-  }
-
-  var i
-  if (Buffer.TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
-    // Speed optimization -- use set if we're copying from a typed array
-    buf._set(subject)
-  } else if (isArrayish(subject)) {
-    // Treat array-ish objects as a byte array
-    if (Buffer.isBuffer(subject)) {
-      for (i = 0; i < length; i++)
-        buf[i] = subject.readUInt8(i)
-    } else {
-      for (i = 0; i < length; i++)
-        buf[i] = ((subject[i] % 256) + 256) % 256
-    }
-  } else if (type === 'string') {
-    buf.write(subject, 0, encoding)
-  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT && !noZero) {
-    for (i = 0; i < length; i++) {
-      buf[i] = 0
-    }
-  }
-
-  if (length > 0 && length <= Buffer.poolSize)
-    buf.parent = rootParent
-
-  return buf
-}
-
-function SlowBuffer(subject, encoding, noZero) {
-  if (!(this instanceof SlowBuffer))
-    return new SlowBuffer(subject, encoding, noZero)
-
-  var buf = new Buffer(subject, encoding, noZero)
-  delete buf.parent
-  return buf
-}
-
-Buffer.isBuffer = function (b) {
-  return !!(b != null && b._isBuffer)
-}
-
-Buffer.compare = function (a, b) {
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b))
-    throw new TypeError('Arguments must be Buffers')
-
-  var x = a.length
-  var y = b.length
-  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
-  if (i !== len) {
-    x = a[i]
-    y = b[i]
-  }
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
-
-Buffer.isEncoding = function (encoding) {
-  switch (String(encoding).toLowerCase()) {
-    case 'hex':
-    case 'utf8':
-    case 'utf-8':
-    case 'ascii':
-    case 'binary':
-    case 'base64':
-    case 'raw':
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      return true
-    default:
-      return false
-  }
-}
-
-Buffer.concat = function (list, totalLength) {
-  if (!isArray(list)) throw new TypeError('Usage: Buffer.concat(list[, length])')
-
-  if (list.length === 0) {
-    return new Buffer(0)
-  } else if (list.length === 1) {
-    return list[0]
-  }
-
-  var i
-  if (totalLength === undefined) {
-    totalLength = 0
-    for (i = 0; i < list.length; i++) {
-      totalLength += list[i].length
-    }
-  }
-
-  var buf = new Buffer(totalLength)
-  var pos = 0
-  for (i = 0; i < list.length; i++) {
-    var item = list[i]
-    item.copy(buf, pos)
-    pos += item.length
-  }
-  return buf
-}
-
-Buffer.byteLength = function (str, encoding) {
-  var ret
-  str = str + ''
-  switch (encoding || 'utf8') {
-    case 'ascii':
-    case 'binary':
-    case 'raw':
-      ret = str.length
-      break
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      ret = str.length * 2
-      break
-    case 'hex':
-      ret = str.length >>> 1
-      break
-    case 'utf8':
-    case 'utf-8':
-      ret = utf8ToBytes(str).length
-      break
-    case 'base64':
-      ret = base64ToBytes(str).length
-      break
-    default:
-      ret = str.length
-  }
-  return ret
-}
-
-// pre-set for values that may exist in the future
-Buffer.prototype.length = undefined
-Buffer.prototype.parent = undefined
-
-// toString(encoding, start=0, end=buffer.length)
-Buffer.prototype.toString = function (encoding, start, end) {
-  var loweredCase = false
-
-  start = start >>> 0
-  end = end === undefined || end === Infinity ? this.length : end >>> 0
-
-  if (!encoding) encoding = 'utf8'
-  if (start < 0) start = 0
-  if (end > this.length) end = this.length
-  if (end <= start) return ''
-
-  while (true) {
-    switch (encoding) {
-      case 'hex':
-        return hexSlice(this, start, end)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Slice(this, start, end)
-
-      case 'ascii':
-        return asciiSlice(this, start, end)
-
-      case 'binary':
-        return binarySlice(this, start, end)
-
-      case 'base64':
-        return base64Slice(this, start, end)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return utf16leSlice(this, start, end)
-
-      default:
-        if (loweredCase)
-          throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = (encoding + '').toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-
-Buffer.prototype.equals = function (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b) === 0
-}
-
-Buffer.prototype.inspect = function () {
-  var str = ''
-  var max = exports.INSPECT_MAX_BYTES
-  if (this.length > 0) {
-    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
-    if (this.length > max)
-      str += ' ... '
-  }
-  return '<Buffer ' + str + '>'
-}
-
-Buffer.prototype.compare = function (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b)
-}
-
-// `get` will be removed in Node 0.13+
-Buffer.prototype.get = function (offset) {
-  console.log('.get() is deprecated. Access using array indexes instead.')
-  return this.readUInt8(offset)
-}
-
-// `set` will be removed in Node 0.13+
-Buffer.prototype.set = function (v, offset) {
-  console.log('.set() is deprecated. Access using array indexes instead.')
-  return this.writeUInt8(v, offset)
-}
-
-function hexWrite (buf, string, offset, length) {
-  offset = Number(offset) || 0
-  var remaining = buf.length - offset
-  if (!length) {
-    length = remaining
-  } else {
-    length = Number(length)
-    if (length > remaining) {
-      length = remaining
-    }
-  }
-
-  // must be an even number of digits
-  var strLen = string.length
-  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
-
-  if (length > strLen / 2) {
-    length = strLen / 2
-  }
-  for (var i = 0; i < length; i++) {
-    var byte = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(byte)) throw new Error('Invalid hex string')
-    buf[offset + i] = byte
-  }
-  return i
-}
-
-function utf8Write (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
-  return charsWritten
-}
-
-function asciiWrite (buf, string, offset, length) {
-  var charsWritten = blitBuffer(asciiToBytes(string), buf, offset, length)
-  return charsWritten
-}
-
-function binaryWrite (buf, string, offset, length) {
-  return asciiWrite(buf, string, offset, length)
-}
-
-function base64Write (buf, string, offset, length) {
-  var charsWritten = blitBuffer(base64ToBytes(string), buf, offset, length)
-  return charsWritten
-}
-
-function utf16leWrite (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length, 2)
-  return charsWritten
-}
-
-Buffer.prototype.write = function (string, offset, length, encoding) {
-  // Support both (string, offset, length, encoding)
-  // and the legacy (string, encoding, offset, length)
-  if (isFinite(offset)) {
-    if (!isFinite(length)) {
-      encoding = length
-      length = undefined
-    }
-  } else {  // legacy
-    var swap = encoding
-    encoding = offset
-    offset = length
-    length = swap
-  }
-
-  offset = Number(offset) || 0
-
-  if (length < 0 || offset < 0 || offset > this.length)
-    throw new RangeError('attempt to write outside buffer bounds');
-
-  var remaining = this.length - offset
-  if (!length) {
-    length = remaining
-  } else {
-    length = Number(length)
-    if (length > remaining) {
-      length = remaining
-    }
-  }
-  encoding = String(encoding || 'utf8').toLowerCase()
-
-  var ret
-  switch (encoding) {
-    case 'hex':
-      ret = hexWrite(this, string, offset, length)
-      break
-    case 'utf8':
-    case 'utf-8':
-      ret = utf8Write(this, string, offset, length)
-      break
-    case 'ascii':
-      ret = asciiWrite(this, string, offset, length)
-      break
-    case 'binary':
-      ret = binaryWrite(this, string, offset, length)
-      break
-    case 'base64':
-      ret = base64Write(this, string, offset, length)
-      break
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      ret = utf16leWrite(this, string, offset, length)
-      break
-    default:
-      throw new TypeError('Unknown encoding: ' + encoding)
-  }
-  return ret
-}
-
-Buffer.prototype.toJSON = function () {
-  return {
-    type: 'Buffer',
-    data: Array.prototype.slice.call(this._arr || this, 0)
-  }
-}
-
-function base64Slice (buf, start, end) {
-  if (start === 0 && end === buf.length) {
-    return base64.fromByteArray(buf)
-  } else {
-    return base64.fromByteArray(buf.slice(start, end))
-  }
-}
-
-function utf8Slice (buf, start, end) {
-  var res = ''
-  var tmp = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; i++) {
-    if (buf[i] <= 0x7F) {
-      res += decodeUtf8Char(tmp) + String.fromCharCode(buf[i])
-      tmp = ''
-    } else {
-      tmp += '%' + buf[i].toString(16)
-    }
-  }
-
-  return res + decodeUtf8Char(tmp)
-}
-
-function asciiSlice (buf, start, end) {
-  var ret = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; i++) {
-    ret += String.fromCharCode(buf[i] & 0x7F)
-  }
-  return ret
-}
-
-function binarySlice (buf, start, end) {
-  var ret = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; i++) {
-    ret += String.fromCharCode(buf[i])
-  }
-  return ret
-}
-
-function hexSlice (buf, start, end) {
-  var len = buf.length
-
-  if (!start || start < 0) start = 0
-  if (!end || end < 0 || end > len) end = len
-
-  var out = ''
-  for (var i = start; i < end; i++) {
-    out += toHex(buf[i])
-  }
-  return out
-}
-
-function utf16leSlice (buf, start, end) {
-  var bytes = buf.slice(start, end)
-  var res = ''
-  for (var i = 0; i < bytes.length; i += 2) {
-    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
-  }
-  return res
-}
-
-Buffer.prototype.slice = function (start, end) {
-  var len = this.length
-  start = ~~start
-  end = end === undefined ? len : ~~end
-
-  if (start < 0) {
-    start += len;
-    if (start < 0)
-      start = 0
-  } else if (start > len) {
-    start = len
-  }
-
-  if (end < 0) {
-    end += len
-    if (end < 0)
-      end = 0
-  } else if (end > len) {
-    end = len
-  }
-
-  if (end < start)
-    end = start
-
-  var newBuf
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    newBuf = Buffer._augment(this.subarray(start, end))
-  } else {
-    var sliceLen = end - start
-    newBuf = new Buffer(sliceLen, undefined, true)
-    for (var i = 0; i < sliceLen; i++) {
-      newBuf[i] = this[i + start]
-    }
-  }
-
-  if (newBuf.length)
-    newBuf.parent = this.parent || this
-
-  return newBuf
-}
-
-/*
- * Need to make sure that buffer isn't trying to write out of bounds.
- */
-function checkOffset (offset, ext, length) {
-  if ((offset % 1) !== 0 || offset < 0)
-    throw new RangeError('offset is not uint')
-  if (offset + ext > length)
-    throw new RangeError('Trying to access beyond buffer length')
-}
-
-Buffer.prototype.readUIntLE = function (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
-
-  var val = this[offset]
-  var mul = 1
-  var i = 0
-  while (++i < byteLength && (mul *= 0x100))
-    val += this[offset + i] * mul
-
-  return val
-}
-
-Buffer.prototype.readUIntBE = function (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
-
-  var val = this[offset + --byteLength]
-  var mul = 1
-  while (byteLength > 0 && (mul *= 0x100))
-    val += this[offset + --byteLength] * mul;
-
-  return val
-}
-
-Buffer.prototype.readUInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
-  return this[offset]
-}
-
-Buffer.prototype.readUInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  return this[offset] | (this[offset + 1] << 8)
-}
-
-Buffer.prototype.readUInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  return (this[offset] << 8) | this[offset + 1]
-}
-
-Buffer.prototype.readUInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return ((this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16)) +
-      (this[offset + 3] * 0x1000000)
-}
-
-Buffer.prototype.readUInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset] * 0x1000000) +
-      ((this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      this[offset + 3])
-}
-
-Buffer.prototype.readIntLE = function (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
-
-  var val = this[offset]
-  var mul = 1
-  var i = 0
-  while (++i < byteLength && (mul *= 0x100))
-    val += this[offset + i] * mul
-  mul *= 0x80
-
-  if (val >= mul)
-    val -= Math.pow(2, 8 * byteLength)
-
-  return val
-}
-
-Buffer.prototype.readIntBE = function (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
-
-  var i = byteLength
-  var mul = 1
-  var val = this[offset + --i]
-  while (i > 0 && (mul *= 0x100))
-    val += this[offset + --i] * mul
-  mul *= 0x80
-
-  if (val >= mul)
-    val -= Math.pow(2, 8 * byteLength)
-
-  return val
-}
-
-Buffer.prototype.readInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
-  if (!(this[offset] & 0x80))
-    return (this[offset])
-  return ((0xff - this[offset] + 1) * -1)
-}
-
-Buffer.prototype.readInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  var val = this[offset] | (this[offset + 1] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  var val = this[offset + 1] | (this[offset] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16) |
-      (this[offset + 3] << 24)
-}
-
-Buffer.prototype.readInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset] << 24) |
-      (this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      (this[offset + 3])
-}
-
-Buffer.prototype.readFloatLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, true, 23, 4)
-}
-
-Buffer.prototype.readFloatBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, false, 23, 4)
-}
-
-Buffer.prototype.readDoubleLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, true, 52, 8)
-}
-
-Buffer.prototype.readDoubleBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, false, 52, 8)
-}
-
-function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new RangeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
-}
-
-Buffer.prototype.writeUIntLE = function (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
-
-  var mul = 1
-  var i = 0
-  this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100))
-    this[offset + i] = (value / mul) >>> 0 & 0xFF
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeUIntBE = function (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
-
-  var i = byteLength - 1
-  var mul = 1
-  this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100))
-    this[offset + i] = (value / mul) >>> 0 & 0xFF
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0xff, 0)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
-  this[offset] = value
-  return offset + 1
-}
-
-function objectWriteUInt16 (buf, value, offset, littleEndian) {
-  if (value < 0) value = 0xffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
-    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
-      (littleEndian ? i : 1 - i) * 8
-  }
-}
-
-Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
-  return offset + 2
-}
-
-Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 8)
-    this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
-  return offset + 2
-}
-
-function objectWriteUInt32 (buf, value, offset, littleEndian) {
-  if (value < 0) value = 0xffffffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
-    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
-  }
-}
-
-Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset + 3] = (value >>> 24)
-    this[offset + 2] = (value >>> 16)
-    this[offset + 1] = (value >>> 8)
-    this[offset] = value
-  } else objectWriteUInt32(this, value, offset, true)
-  return offset + 4
-}
-
-Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 24)
-    this[offset + 1] = (value >>> 16)
-    this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
-  return offset + 4
-}
-
-Buffer.prototype.writeIntLE = function (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    checkInt(this,
-             value,
-             offset,
-             byteLength,
-             Math.pow(2, 8 * byteLength - 1) - 1,
-             -Math.pow(2, 8 * byteLength - 1))
-  }
-
-  var i = 0
-  var mul = 1
-  var sub = value < 0 ? 1 : 0
-  this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100))
-    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeIntBE = function (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    checkInt(this,
-             value,
-             offset,
-             byteLength,
-             Math.pow(2, 8 * byteLength - 1) - 1,
-             -Math.pow(2, 8 * byteLength - 1))
-  }
-
-  var i = byteLength - 1
-  var mul = 1
-  var sub = value < 0 ? 1 : 0
-  this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100))
-    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0x7f, -0x80)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
-  if (value < 0) value = 0xff + value + 1
-  this[offset] = value
-  return offset + 1
-}
-
-Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 8)
-    this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-    this[offset + 2] = (value >>> 16)
-    this[offset + 3] = (value >>> 24)
-  } else objectWriteUInt32(this, value, offset, true)
-  return offset + 4
-}
-
-Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (value < 0) value = 0xffffffff + value + 1
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 24)
-    this[offset + 1] = (value >>> 16)
-    this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
-  return offset + 4
-}
-
-function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (value > max || value < min) throw new RangeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
-  if (offset < 0) throw new RangeError('index out of range')
-}
-
-function writeFloat (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
-    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
-  ieee754.write(buf, value, offset, littleEndian, 23, 4)
-  return offset + 4
-}
-
-Buffer.prototype.writeFloatLE = function (value, offset, noAssert) {
-  return writeFloat(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
-  return writeFloat(this, value, offset, false, noAssert)
-}
-
-function writeDouble (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
-    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
-  ieee754.write(buf, value, offset, littleEndian, 52, 8)
-  return offset + 8
-}
-
-Buffer.prototype.writeDoubleLE = function (value, offset, noAssert) {
-  return writeDouble(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
-  return writeDouble(this, value, offset, false, noAssert)
-}
-
-// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
-Buffer.prototype.copy = function (target, target_start, start, end) {
-  var source = this
-
-  if (!start) start = 0
-  if (!end && end !== 0) end = this.length
-  if (target_start >= target.length) target_start = target.length
-  if (!target_start) target_start = 0
-  if (end > 0 && end < start) end = start
-
-  // Copy 0 bytes; we're done
-  if (end === start) return 0
-  if (target.length === 0 || source.length === 0) return 0
-
-  // Fatal error conditions
-  if (target_start < 0)
-    throw new RangeError('targetStart out of bounds')
-  if (start < 0 || start >= source.length) throw new RangeError('sourceStart out of bounds')
-  if (end < 0) throw new RangeError('sourceEnd out of bounds')
-
-  // Are we oob?
-  if (end > this.length)
-    end = this.length
-  if (target.length - target_start < end - start)
-    end = target.length - target_start + start
-
-  var len = end - start
-
-  if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
-    for (var i = 0; i < len; i++) {
-      target[i + target_start] = this[i + start]
-    }
-  } else {
-    target._set(this.subarray(start, start + len), target_start)
-  }
-
-  return len
-}
-
-// fill(value, start=0, end=buffer.length)
-Buffer.prototype.fill = function (value, start, end) {
-  if (!value) value = 0
-  if (!start) start = 0
-  if (!end) end = this.length
-
-  if (end < start) throw new RangeError('end < start')
-
-  // Fill 0 bytes; we're done
-  if (end === start) return
-  if (this.length === 0) return
-
-  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
-
-  var i
-  if (typeof value === 'number') {
-    for (i = start; i < end; i++) {
-      this[i] = value
-    }
-  } else {
-    var bytes = utf8ToBytes(value.toString())
-    var len = bytes.length
-    for (i = start; i < end; i++) {
-      this[i] = bytes[i % len]
-    }
-  }
-
-  return this
-}
-
-/**
- * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
- * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
- */
-Buffer.prototype.toArrayBuffer = function () {
-  if (typeof Uint8Array !== 'undefined') {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      return (new Buffer(this)).buffer
-    } else {
-      var buf = new Uint8Array(this.length)
-      for (var i = 0, len = buf.length; i < len; i += 1) {
-        buf[i] = this[i]
-      }
-      return buf.buffer
-    }
-  } else {
-    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
-  }
-}
-
-// HELPER FUNCTIONS
-// ================
-
-var BP = Buffer.prototype
-
-/**
- * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
- */
-Buffer._augment = function (arr) {
-  arr.constructor = Buffer
-  arr._isBuffer = true
-
-  // save reference to original Uint8Array get/set methods before overwriting
-  arr._get = arr.get
-  arr._set = arr.set
-
-  // deprecated, will be removed in node 0.13+
-  arr.get = BP.get
-  arr.set = BP.set
-
-  arr.write = BP.write
-  arr.toString = BP.toString
-  arr.toLocaleString = BP.toString
-  arr.toJSON = BP.toJSON
-  arr.equals = BP.equals
-  arr.compare = BP.compare
-  arr.copy = BP.copy
-  arr.slice = BP.slice
-  arr.readUIntLE = BP.readUIntLE
-  arr.readUIntBE = BP.readUIntBE
-  arr.readUInt8 = BP.readUInt8
-  arr.readUInt16LE = BP.readUInt16LE
-  arr.readUInt16BE = BP.readUInt16BE
-  arr.readUInt32LE = BP.readUInt32LE
-  arr.readUInt32BE = BP.readUInt32BE
-  arr.readIntLE = BP.readIntLE
-  arr.readIntBE = BP.readIntBE
-  arr.readInt8 = BP.readInt8
-  arr.readInt16LE = BP.readInt16LE
-  arr.readInt16BE = BP.readInt16BE
-  arr.readInt32LE = BP.readInt32LE
-  arr.readInt32BE = BP.readInt32BE
-  arr.readFloatLE = BP.readFloatLE
-  arr.readFloatBE = BP.readFloatBE
-  arr.readDoubleLE = BP.readDoubleLE
-  arr.readDoubleBE = BP.readDoubleBE
-  arr.writeUInt8 = BP.writeUInt8
-  arr.writeUIntLE = BP.writeUIntLE
-  arr.writeUIntBE = BP.writeUIntBE
-  arr.writeUInt16LE = BP.writeUInt16LE
-  arr.writeUInt16BE = BP.writeUInt16BE
-  arr.writeUInt32LE = BP.writeUInt32LE
-  arr.writeUInt32BE = BP.writeUInt32BE
-  arr.writeIntLE = BP.writeIntLE
-  arr.writeIntBE = BP.writeIntBE
-  arr.writeInt8 = BP.writeInt8
-  arr.writeInt16LE = BP.writeInt16LE
-  arr.writeInt16BE = BP.writeInt16BE
-  arr.writeInt32LE = BP.writeInt32LE
-  arr.writeInt32BE = BP.writeInt32BE
-  arr.writeFloatLE = BP.writeFloatLE
-  arr.writeFloatBE = BP.writeFloatBE
-  arr.writeDoubleLE = BP.writeDoubleLE
-  arr.writeDoubleBE = BP.writeDoubleBE
-  arr.fill = BP.fill
-  arr.inspect = BP.inspect
-  arr.toArrayBuffer = BP.toArrayBuffer
-
-  return arr
-}
-
-var INVALID_BASE64_RE = /[^+\/0-9A-z\-]/g
-
-function base64clean (str) {
-  // Node strips out invalid characters like \n and \t from the string, base64-js does not
-  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
-  // replace url-safe space and slash
-  str = str.replace(/-/g, '+').replace(/_/g, '/')
-  // Node converts strings with length < 2 to ''
-  if (str.length < 2) return ''
-  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
-  while (str.length % 4 !== 0) {
-    str = str + '='
-  }
-  return str
-}
-
-function stringtrim (str) {
-  if (str.trim) return str.trim()
-  return str.replace(/^\s+|\s+$/g, '')
-}
-
-function isArrayish (subject) {
-  return isArray(subject) || Buffer.isBuffer(subject) ||
-      subject && typeof subject === 'object' &&
-      typeof subject.length === 'number'
-}
-
-function toHex (n) {
-  if (n < 16) return '0' + n.toString(16)
-  return n.toString(16)
-}
-
-function utf8ToBytes(string, units) {
-  var codePoint, length = string.length
-  var leadSurrogate = null
-  units = units || Infinity
-  var bytes = []
-  var i = 0
-
-  for (; i<length; i++) {
-    codePoint = string.charCodeAt(i)
-
-    // is surrogate component
-    if (codePoint > 0xD7FF && codePoint < 0xE000) {
-
-      // last char was a lead
-      if (leadSurrogate) {
-
-        // 2 leads in a row
-        if (codePoint < 0xDC00) {
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          leadSurrogate = codePoint
-          continue
-        }
-
-        // valid surrogate pair
-        else {
-          codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
-          leadSurrogate = null
-        }
-      }
-
-      // no lead yet
-      else {
-
-        // unexpected trail
-        if (codePoint > 0xDBFF) {
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          continue
-        }
-
-        // unpaired lead
-        else if (i + 1 === length) {
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          continue
-        }
-
-        // valid lead
-        else {
-          leadSurrogate = codePoint
-          continue
-        }
-      }
-    }
-
-    // valid bmp char, but last char was a lead
-    else if (leadSurrogate) {
-      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-      leadSurrogate = null
-    }
-
-    // encode utf8
-    if (codePoint < 0x80) {
-      if ((units -= 1) < 0) break
-      bytes.push(codePoint)
-    }
-    else if (codePoint < 0x800) {
-      if ((units -= 2) < 0) break
-      bytes.push(
-        codePoint >> 0x6 | 0xC0,
-        codePoint & 0x3F | 0x80
-      );
-    }
-    else if (codePoint < 0x10000) {
-      if ((units -= 3) < 0) break
-      bytes.push(
-        codePoint >> 0xC | 0xE0,
-        codePoint >> 0x6 & 0x3F | 0x80,
-        codePoint & 0x3F | 0x80
-      );
-    }
-    else if (codePoint < 0x200000) {
-      if ((units -= 4) < 0) break
-      bytes.push(
-        codePoint >> 0x12 | 0xF0,
-        codePoint >> 0xC & 0x3F | 0x80,
-        codePoint >> 0x6 & 0x3F | 0x80,
-        codePoint & 0x3F | 0x80
-      );
-    }
-    else {
-      throw new Error('Invalid code point')
-    }
-  }
-
-  return bytes
-}
-
-function asciiToBytes (str) {
-  var byteArray = []
-  for (var i = 0; i < str.length; i++) {
-    // Node's code seems to be doing this and not & 0x7F..
-    byteArray.push(str.charCodeAt(i) & 0xFF)
-  }
-  return byteArray
-}
-
-function utf16leToBytes (str, units) {
-  var c, hi, lo
-  var byteArray = []
-  for (var i = 0; i < str.length; i++) {
-
-    if ((units -= 2) < 0) break
-
-    c = str.charCodeAt(i)
-    hi = c >> 8
-    lo = c % 256
-    byteArray.push(lo)
-    byteArray.push(hi)
-  }
-
-  return byteArray
-}
-
-function base64ToBytes (str) {
-  return base64.toByteArray(base64clean(str))
-}
-
-function blitBuffer (src, dst, offset, length, unitSize) {
-  if (unitSize) length -= length % unitSize;
-  for (var i = 0; i < length; i++) {
-    if ((i + offset >= dst.length) || (i >= src.length))
-      break
-    dst[i + offset] = src[i]
-  }
-  return i
-}
-
-function decodeUtf8Char (str) {
-  try {
-    return decodeURIComponent(str)
-  } catch (err) {
-    return String.fromCharCode(0xFFFD) // UTF 8 invalid char
-  }
-}
-
-},{"base64-js":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js","ieee754":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js","is-array":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js"}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js":[function(require,module,exports){
-var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-;(function (exports) {
-	'use strict';
-
-  var Arr = (typeof Uint8Array !== 'undefined')
-    ? Uint8Array
-    : Array
-
-	var PLUS   = '+'.charCodeAt(0)
-	var SLASH  = '/'.charCodeAt(0)
-	var NUMBER = '0'.charCodeAt(0)
-	var LOWER  = 'a'.charCodeAt(0)
-	var UPPER  = 'A'.charCodeAt(0)
-
-	function decode (elt) {
-		var code = elt.charCodeAt(0)
-		if (code === PLUS)
-			return 62 // '+'
-		if (code === SLASH)
-			return 63 // '/'
-		if (code < NUMBER)
-			return -1 //no match
-		if (code < NUMBER + 10)
-			return code - NUMBER + 26 + 26
-		if (code < UPPER + 26)
-			return code - UPPER
-		if (code < LOWER + 26)
-			return code - LOWER + 26
-	}
-
-	function b64ToByteArray (b64) {
-		var i, j, l, tmp, placeHolders, arr
-
-		if (b64.length % 4 > 0) {
-			throw new Error('Invalid string. Length must be a multiple of 4')
-		}
-
-		// the number of equal signs (place holders)
-		// if there are two placeholders, than the two characters before it
-		// represent one byte
-		// if there is only one, then the three characters before it represent 2 bytes
-		// this is just a cheap hack to not do indexOf twice
-		var len = b64.length
-		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
-
-		// base64 is 4/3 + up to two characters of the original data
-		arr = new Arr(b64.length * 3 / 4 - placeHolders)
-
-		// if there are placeholders, only get up to the last complete 4 chars
-		l = placeHolders > 0 ? b64.length - 4 : b64.length
-
-		var L = 0
-
-		function push (v) {
-			arr[L++] = v
-		}
-
-		for (i = 0, j = 0; i < l; i += 4, j += 3) {
-			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
-			push((tmp & 0xFF0000) >> 16)
-			push((tmp & 0xFF00) >> 8)
-			push(tmp & 0xFF)
-		}
-
-		if (placeHolders === 2) {
-			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
-			push(tmp & 0xFF)
-		} else if (placeHolders === 1) {
-			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
-			push((tmp >> 8) & 0xFF)
-			push(tmp & 0xFF)
-		}
-
-		return arr
-	}
-
-	function uint8ToBase64 (uint8) {
-		var i,
-			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
-			output = "",
-			temp, length
-
-		function encode (num) {
-			return lookup.charAt(num)
-		}
-
-		function tripletToBase64 (num) {
-			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
-		}
-
-		// go through the array every three bytes, we'll deal with trailing stuff later
-		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-			output += tripletToBase64(temp)
-		}
-
-		// pad the end with zeros, but make sure to not forget the extra bytes
-		switch (extraBytes) {
-			case 1:
-				temp = uint8[uint8.length - 1]
-				output += encode(temp >> 2)
-				output += encode((temp << 4) & 0x3F)
-				output += '=='
-				break
-			case 2:
-				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
-				output += encode(temp >> 10)
-				output += encode((temp >> 4) & 0x3F)
-				output += encode((temp << 2) & 0x3F)
-				output += '='
-				break
-		}
-
-		return output
-	}
-
-	exports.toByteArray = b64ToByteArray
-	exports.fromByteArray = uint8ToBase64
-}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
-
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js":[function(require,module,exports){
-exports.read = function(buffer, offset, isLE, mLen, nBytes) {
-  var e, m,
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      nBits = -7,
-      i = isLE ? (nBytes - 1) : 0,
-      d = isLE ? -1 : 1,
-      s = buffer[offset + i];
-
-  i += d;
-
-  e = s & ((1 << (-nBits)) - 1);
-  s >>= (-nBits);
-  nBits += eLen;
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-  m = e & ((1 << (-nBits)) - 1);
-  e >>= (-nBits);
-  nBits += mLen;
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-  if (e === 0) {
-    e = 1 - eBias;
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity);
-  } else {
-    m = m + Math.pow(2, mLen);
-    e = e - eBias;
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-};
-
-exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c,
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
-      i = isLE ? 0 : (nBytes - 1),
-      d = isLE ? 1 : -1,
-      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
-
-  value = Math.abs(value);
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0;
-    e = eMax;
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2);
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--;
-      c *= 2;
-    }
-    if (e + eBias >= 1) {
-      value += rt / c;
-    } else {
-      value += rt * Math.pow(2, 1 - eBias);
-    }
-    if (value * c >= 2) {
-      e++;
-      c /= 2;
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0;
-      e = eMax;
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen);
-      e = e + eBias;
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-      e = 0;
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
-
-  e = (e << mLen) | m;
-  eLen += mLen;
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
-
-  buffer[offset + i - d] |= s * 128;
-};
-
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js":[function(require,module,exports){
-
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
-};
-
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canMutationObserver = typeof window !== 'undefined'
-    && window.MutationObserver;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    var queue = [];
-
-    if (canMutationObserver) {
-        var hiddenDiv = document.createElement("div");
-        var observer = new MutationObserver(function () {
-            var queueList = queue.slice();
-            queue.length = 0;
-            queueList.forEach(function (fn) {
-                fn();
-            });
-        });
-
-        observer.observe(hiddenDiv, { attributes: true });
-
-        return function nextTick(fn) {
-            if (!queue.length) {
-                hiddenDiv.setAttribute('yes', 'no');
-            }
-            queue.push(fn);
-        };
-    }
-
-    if (canPost) {
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/src/keyevent.js":[function(require,module,exports){
+},{"./lib/React":71}],203:[function(require,module,exports){
 /**
  * PolyFills make me sad
  */
@@ -34561,7 +34542,7 @@ KeyEvent.DOM_VK_TAB = KeyEvent.DOM_VK_TAB || 9;
 
 module.exports = KeyEvent;
 
-},{}],"/Users/djohnson/Documents/programming/react-typeahead/src/react-typeahead.js":[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 var Typeahead = require('./typeahead');
 var Tokenizer = require('./tokenizer');
 
@@ -34570,7 +34551,7 @@ module.exports = {
   Tokenizer: Tokenizer
 };
 
-},{"./tokenizer":"/Users/djohnson/Documents/programming/react-typeahead/src/tokenizer/index.js","./typeahead":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/index.js"}],"/Users/djohnson/Documents/programming/react-typeahead/src/tokenizer/index.js":[function(require,module,exports){
+},{"./tokenizer":205,"./typeahead":207}],205:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34702,7 +34683,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 
 module.exports = TypeaheadTokenizer;
 
-},{"../keyevent":"/Users/djohnson/Documents/programming/react-typeahead/src/keyevent.js","../typeahead":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/index.js","./token":"/Users/djohnson/Documents/programming/react-typeahead/src/tokenizer/token.js","react":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/react.js"}],"/Users/djohnson/Documents/programming/react-typeahead/src/tokenizer/token.js":[function(require,module,exports){
+},{"../keyevent":203,"../typeahead":207,"./token":206,"react":202}],206:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34743,7 +34724,7 @@ var Token = React.createClass({displayName: "Token",
 
 module.exports = Token;
 
-},{"react":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/react.js"}],"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/index.js":[function(require,module,exports){
+},{"react":202}],207:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34837,14 +34818,14 @@ var Typeahead = React.createClass({displayName: "Typeahead",
    );
   },
 
-  _onOptionSelected: function(option) {
+  _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
     nEntry.value = option;
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
-    this.props.onOptionSelected(option);
+    return this.props.onOptionSelected(option, event);
   },
 
   _onTextEntryUpdated: function() {
@@ -34858,7 +34839,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     if (!this.refs.sel.state.selection) {
       return this.props.onKeyDown(event);
     }
-    this._onOptionSelected(this.refs.sel.state.selection);
+    return this._onOptionSelected(this.refs.sel.state.selection, event);
   },
 
   _onEscape: function() {
@@ -34868,7 +34849,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
       this.refs.sel.state.selection : this.state.visible[0];
-    this._onOptionSelected(option)
+    return this._onOptionSelected(option, event);
   },
 
   eventMap: function(event) {
@@ -34926,7 +34907,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
 module.exports = Typeahead;
 
-},{"../keyevent":"/Users/djohnson/Documents/programming/react-typeahead/src/keyevent.js","./selector":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/selector.js","fuzzy":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/fuzzy/lib/fuzzy.js","react/addons":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/addons.js"}],"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/option.js":[function(require,module,exports){
+},{"../keyevent":203,"./selector":209,"fuzzy":39,"react/addons":41}],208:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -34946,8 +34927,8 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
   getDefaultProps: function() {
     return {
       customClasses: {},
-      onClick: function(event) { 
-        event.preventDefault(); 
+      onClick: function(event) {
+        event.preventDefault();
       }
     };
   },
@@ -34982,15 +34963,16 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     return React.addons.classSet(classes);
   },
 
-  _onClick: function() {
-    return this.props.onClick();
+  _onClick: function(event) {
+    event.preventDefault();
+    return this.props.onClick(event);
   }
 });
 
 
 module.exports = TypeaheadOption;
 
-},{"react/addons":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/addons.js"}],"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/selector.js":[function(require,module,exports){
+},{"react/addons":41}],209:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -35059,13 +35041,13 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     return this.props.options[index];
   },
 
-  _onClick: function(result) {
-    this.props.onOptionSelected(result);
+  _onClick: function(result, event) {
+    return this.props.onOptionSelected(result, event);
   },
 
   _nav: function(delta) {
     if (!this.props.options) {
-      return; 
+      return;
     }
     var newIndex;
     if (this.state.selectionIndex === null) {
@@ -35099,7 +35081,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 
 module.exports = TypeaheadSelector;
 
-},{"./option":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/option.js","react/addons":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/addons.js"}],"/Users/djohnson/Documents/programming/react-typeahead/test/main.js":[function(require,module,exports){
+},{"./option":208,"react/addons":41}],210:[function(require,module,exports){
 // Phantomjs isn't es5 :(
 require('es5-shim');
 require('./react-typeahead-test');
@@ -35110,7 +35092,7 @@ if (window.mochaPhantomJS) {
   window.mocha.run();
 }
 
-},{"./react-typeahead-test":"/Users/djohnson/Documents/programming/react-typeahead/test/react-typeahead-test.js","./typeahead-test":"/Users/djohnson/Documents/programming/react-typeahead/test/typeahead-test.js","es5-shim":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/es5-shim/es5-shim.js"}],"/Users/djohnson/Documents/programming/react-typeahead/test/react-typeahead-test.js":[function(require,module,exports){
+},{"./react-typeahead-test":211,"./typeahead-test":212,"es5-shim":38}],211:[function(require,module,exports){
 var assert = require('chai').assert;
 var React = require('react/addons');
 var ReactTypeahead = require('../src/react-typeahead').Typeahead;
@@ -35130,7 +35112,7 @@ describe('Main entry point', function() {
 
 });
 
-},{"../src/react-typeahead":"/Users/djohnson/Documents/programming/react-typeahead/src/react-typeahead.js","chai":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/index.js","react/addons":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/addons.js"}],"/Users/djohnson/Documents/programming/react-typeahead/test/typeahead-test.js":[function(require,module,exports){
+},{"../src/react-typeahead":204,"chai":6,"react/addons":41}],212:[function(require,module,exports){
 var _ = require('lodash');
 var assert = require('chai').assert;
 var React = require('react/addons');
@@ -35312,4 +35294,4 @@ describe('Typeahead Component', function() {
 
 });
 
-},{"../src/keyevent":"/Users/djohnson/Documents/programming/react-typeahead/src/keyevent.js","../src/typeahead":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/index.js","../src/typeahead/option":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/option.js","../src/typeahead/selector":"/Users/djohnson/Documents/programming/react-typeahead/src/typeahead/selector.js","chai":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/chai/index.js","lodash":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/lodash/dist/lodash.js","react/addons":"/Users/djohnson/Documents/programming/react-typeahead/node_modules/react/addons.js"}]},{},["/Users/djohnson/Documents/programming/react-typeahead/test/main.js"]);
+},{"../src/keyevent":203,"../src/typeahead":207,"../src/typeahead/option":208,"../src/typeahead/selector":209,"chai":6,"lodash":40,"react/addons":41}]},{},[210]);

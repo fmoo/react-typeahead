@@ -427,14 +427,14 @@ var Typeahead = React.createClass({displayName: "Typeahead",
    );
   },
 
-  _onOptionSelected: function(option) {
+  _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
     nEntry.value = option;
     this.setState({visible: this.getOptionsForValue(option, this.state.options),
                    selection: option,
                    entryValue: option});
-    this.props.onOptionSelected(option);
+    return this.props.onOptionSelected(option, event);
   },
 
   _onTextEntryUpdated: function() {
@@ -448,7 +448,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     if (!this.refs.sel.state.selection) {
       return this.props.onKeyDown(event);
     }
-    this._onOptionSelected(this.refs.sel.state.selection);
+    return this._onOptionSelected(this.refs.sel.state.selection, event);
   },
 
   _onEscape: function() {
@@ -458,7 +458,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
       this.refs.sel.state.selection : this.state.visible[0];
-    this._onOptionSelected(option)
+    return this._onOptionSelected(option, event);
   },
 
   eventMap: function(event) {
@@ -536,8 +536,8 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
   getDefaultProps: function() {
     return {
       customClasses: {},
-      onClick: function(event) { 
-        event.preventDefault(); 
+      onClick: function(event) {
+        event.preventDefault();
       }
     };
   },
@@ -572,8 +572,9 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     return React.addons.classSet(classes);
   },
 
-  _onClick: function() {
-    return this.props.onClick();
+  _onClick: function(event) {
+    event.preventDefault();
+    return this.props.onClick(event);
   }
 });
 
@@ -649,13 +650,13 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     return this.props.options[index];
   },
 
-  _onClick: function(result) {
-    this.props.onOptionSelected(result);
+  _onClick: function(result, event) {
+    return this.props.onOptionSelected(result, event);
   },
 
   _nav: function(delta) {
     if (!this.props.options) {
-      return; 
+      return;
     }
     var newIndex;
     if (this.state.selectionIndex === null) {
