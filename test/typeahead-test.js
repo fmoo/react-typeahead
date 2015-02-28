@@ -16,40 +16,32 @@ function simulateTextInput(component, value) {
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
-var getSearchString = function() {
-  return this.firstName + " " + this.lastName;
+var getSearchString = function(option) {
+  return option.firstName + " " + option.lastName;
 };
-var getDisplayString = function() {
-  return this.firstName + " (" + this.birthYear + ")";
+var getDisplayString = function(option) {
+  return option.firstName + " (" + option.birthYear + ")";
 };
 var BEATLES_COMPLEX = [
   {
     firstName: 'John',
     lastName: 'Lennon',
-    birthYear: 1940,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1940
   },
   {
     firstName: 'Paul',
     lastName: 'McCartney',
-    birthYear: 1942,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1942
   },
   {
     firstName: 'George',
     lastName: 'Harrison',
-    birthYear: 1943,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1943
   },
   {
     firstName: 'Ringo',
     lastName: 'Starr',
-    birthYear: 1940,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1940
   }
 ];
 
@@ -155,6 +147,8 @@ describe('Typeahead Component', function() {
       it('renders custom options correctly', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES_COMPLEX }
+          getDisplayString={ getDisplayString }
+          getSearchString={ getSearchString }
         />);
         var results = simulateTextInput(component, 'john');
         assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
@@ -163,6 +157,8 @@ describe('Typeahead Component', function() {
       it('filters search string', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES_COMPLEX }
+          getDisplayString={ getDisplayString }
+          getSearchString={ getSearchString }
         />);
         var results = simulateTextInput(component, 'Lennon');
         assert.equal(results[0].getDOMNode().textContent, 'John (1940)');

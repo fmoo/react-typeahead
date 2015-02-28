@@ -34748,7 +34748,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func
+    onKeyDown: React.PropTypes.func,
+    getSearchString: React.PropTypes.func,
+    getDisplayString: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -34758,7 +34760,11 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) { },
+      // If the following two functions are not provides,
+      // assume the options have been passed as strings
+      getSearchString: function(option) { return option },
+      getDisplayString: function(option) { return option }
     };
   },
 
@@ -34775,26 +34781,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     };
   },
 
-  _getSearchString: function(option) {
-    if (option.getSearchString) {
-      return option.getSearchString();
-    } else {
-      return option;
-    }
-  },
-
-  _getDisplayString: function(option) {
-    if (option.getDisplayString) {
-      return option.getDisplayString();
-    } else {
-      return option;
-    }
-  },
-
   getOptionsForValue: function(value, options) {
-    var optionStrings = options.map(this._getSearchString);
-    var valueString = this._getSearchString(value);
-    var result = fuzzy.filter(valueString, optionStrings).map(function(res) {
+    var optionStrings = options.map(this.props.getSearchString);
+    var result = fuzzy.filter(value, optionStrings).map(function(res) {
       return options[res.index];
     });
 
@@ -34830,15 +34819,16 @@ var Typeahead = React.createClass({displayName: "Typeahead",
         ref: "sel", options:  this.state.visible, 
         onOptionSelected:  this._onOptionSelected, 
         customClasses: this.props.customClasses, 
-        getDisplayString: this._getDisplayString})
+        getDisplayString: this.props.getDisplayString})
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = this._getDisplayString(option);
-    this.setState({visible: this.getOptionsForValue(option, this.props.options),
+    nEntry.value = this.props.getDisplayString(option);
+    var optionString = this.props.getDisplayString(option);
+    this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: option,
                    entryValue: option});
     return this.props.onOptionSelected(option, event);
@@ -35148,40 +35138,32 @@ function simulateTextInput(component, value) {
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
-var getSearchString = function() {
-  return this.firstName + " " + this.lastName;
+var getSearchString = function(option) {
+  return option.firstName + " " + option.lastName;
 };
-var getDisplayString = function() {
-  return this.firstName + " (" + this.birthYear + ")";
+var getDisplayString = function(option) {
+  return option.firstName + " (" + option.birthYear + ")";
 };
 var BEATLES_COMPLEX = [
   {
     firstName: 'John',
     lastName: 'Lennon',
-    birthYear: 1940,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1940
   },
   {
     firstName: 'Paul',
     lastName: 'McCartney',
-    birthYear: 1942,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1942
   },
   {
     firstName: 'George',
     lastName: 'Harrison',
-    birthYear: 1943,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1943
   },
   {
     firstName: 'Ringo',
     lastName: 'Starr',
-    birthYear: 1940,
-    getSearchString: getSearchString,
-    getDisplayString: getDisplayString
+    birthYear: 1940
   }
 ];
 
@@ -35286,7 +35268,9 @@ describe('Typeahead Component', function() {
 
       it('renders custom options correctly', function() {
         var component = TestUtils.renderIntoDocument(React.createElement(Typeahead, {
-          options: BEATLES_COMPLEX }
+          options: BEATLES_COMPLEX, 
+          getDisplayString: getDisplayString, 
+          getSearchString: getSearchString }
         ));
         var results = simulateTextInput(component, 'john');
         assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
@@ -35294,7 +35278,9 @@ describe('Typeahead Component', function() {
 
       it('filters search string', function() {
         var component = TestUtils.renderIntoDocument(React.createElement(Typeahead, {
-          options: BEATLES_COMPLEX }
+          options: BEATLES_COMPLEX, 
+          getDisplayString: getDisplayString, 
+          getSearchString: getSearchString }
         ));
         var results = simulateTextInput(component, 'Lennon');
         assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
