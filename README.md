@@ -56,6 +56,7 @@ Type: `Array`
 Default: []
 
 An array supplied to the fuzzy search.
+Can be a list of strings or a list of arbitrary objects. In the latter case, `props.getSearchString` and `props.getDisplayString` should be provided.
 
 #### props.maxVisible
 
@@ -88,6 +89,20 @@ Event handler for the `keyDown` event on the typeahead input.
 Type: `Function`
 
 Event handler triggered whenever a user picks an option
+
+#### props.getSearchString
+
+Type: `Function`
+
+Given an option, it should return a string on which fuzzy search should be applied.
+If the function is not provided `options` is assumed to be a list of strings.
+
+#### props.getDisplayString
+
+Type: `Function`
+
+Given an option, it should return a string which should be displayed in the suggestions list.
+If the function is not provided `options` is assumed to be a list of strings.
 
 ---
 
