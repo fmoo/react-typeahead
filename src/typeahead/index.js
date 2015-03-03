@@ -16,6 +16,10 @@ var fuzzy = require('fuzzy');
 var Typeahead = React.createClass({
   propTypes: {
     customClasses: React.PropTypes.object,
+    CustomComponent: React.PropTypes.oneOfType([
+      React.PropTypes.func,
+      React.PropTypes.string
+    ]),
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
@@ -28,6 +32,7 @@ var Typeahead = React.createClass({
     return {
       options: [],
       customClasses: {},
+      CustomComponent: "input",
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
@@ -168,7 +173,7 @@ var Typeahead = React.createClass({
 
     return (
       <div className={classList}>
-        <input ref="entry" type="text"
+        <this.props.CustomComponent ref="entry" type="text"
           placeholder={this.props.placeholder}
           className={inputClassList} defaultValue={this.state.entryValue}
           onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown} />
