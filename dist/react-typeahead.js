@@ -579,6 +579,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
   },
 
   _onClick: function(event) {
+    event.preventDefault();
     return this.props.onClick(event);
   }
 });
