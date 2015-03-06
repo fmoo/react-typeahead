@@ -22,7 +22,7 @@ For a tokenizer typeahead input:
 
 ```javascript
 var Tokenizer = require('react-typeahead').Tokenizer;
-React.render(Typeahead({
+React.render(Tokenizer({
   options: ['John', 'Paul', 'George', 'Ringo'],
   onTokenAdd: function(token) {
     console.log('token added: ', token);
