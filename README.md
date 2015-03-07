@@ -158,7 +158,10 @@ This will install all the local development dependences, such as `gulp` and `moc
 react-typeahead uses mocha for unit tests and gulp for running them.  Large changes should
 include unittests.
 
-Running tests is easy with `gulp`:
+After updating or creating new tests, run `npm run-script build-test` to regenerate the
+test package.
+
+Once that's done, running the tests is easy with `gulp`:
 
 ```
 > gulp test

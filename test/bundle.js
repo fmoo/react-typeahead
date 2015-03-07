@@ -1594,6 +1594,7 @@ process.browser = true;
 process.env = {};
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
 
 function noop() {}
 
@@ -35096,7 +35097,7 @@ if (window.mochaPhantomJS) {
 var assert = require('chai').assert;
 var React = require('react/addons');
 var ReactTypeahead = require('../src/react-typeahead').Typeahead;
-var ReactTokenizer = require('../src/react-typeahead').Typeahead;
+var ReactTokenizer = require('../src/react-typeahead').Tokenizer;
 
 describe('Main entry point', function() {
 
@@ -35106,7 +35107,7 @@ describe('Main entry point', function() {
   });
 
   it('exports a Tokenizer component', function() {
-    var tokenizer = React.addons.TestUtils.renderIntoDocument(React.createElement(ReactTypeahead, null));
+    var tokenizer = React.addons.TestUtils.renderIntoDocument(React.createElement(ReactTokenizer, null));
     assert.ok(React.addons.TestUtils.isCompositeComponent(tokenizer));
   });
 
