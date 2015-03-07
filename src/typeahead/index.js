@@ -40,8 +40,8 @@ var Typeahead = React.createClass({
       // The set of all options... Does this need to be state?  I guess for lazy load...
       options: this.props.options,
 
-      // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
+      // Keep options hidden until there is user interaction
+      visible: false,
 
       // This should be called something else, "entryValue"
       entryValue: this.props.defaultValue,
@@ -161,6 +161,10 @@ var Typeahead = React.createClass({
     });
   },
 
+  _onBlur: function() {
+    this.setState({ visible: false })
+  },
+
   render: function() {
     var inputClasses = {}
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
@@ -177,7 +181,8 @@ var Typeahead = React.createClass({
         <input ref="entry" type="text"
           placeholder={this.props.placeholder}
           className={inputClassList} defaultValue={this.state.entryValue}
-          onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown} />
+          onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown}
+          onBlur={this._onBlur} />
         { this._renderIncrementalSearchResults() }
       </div>
     );
