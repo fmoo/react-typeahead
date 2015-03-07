@@ -44,7 +44,7 @@ var TypeaheadTokenizer = React.createClass({
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
-    var tokenClasses = {}
+    var tokenClasses = {};
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = React.addons.classSet(tokenClasses);
     var result = this.state.selected.map(function(selected) {
@@ -108,7 +108,7 @@ var TypeaheadTokenizer = React.createClass({
   },
 
   render: function() {
-    var classes = {}
+    var classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
     var classList = React.addons.classSet(classes);
     return (

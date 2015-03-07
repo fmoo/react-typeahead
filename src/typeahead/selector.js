@@ -55,7 +55,7 @@ var TypeaheadSelector = React.createClass({
   setSelectionIndex: function(index) {
     this.setState({
       selectionIndex: index,
-      selection: this.getSelectionForIndex(index),
+      selection: this.getSelectionForIndex(index)
     });
   },
 

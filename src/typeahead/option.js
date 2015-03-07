@@ -32,7 +32,7 @@ var TypeaheadOption = React.createClass({
   render: function() {
     var classes = {
       hover: this.props.hover
-    }
+    };
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
     var classList = React.addons.classSet(classes);
 
@@ -47,7 +47,7 @@ var TypeaheadOption = React.createClass({
 
   _getClasses: function() {
     var classes = {
-      "typeahead-option": true,
+      "typeahead-option": true
     };
     classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
     return React.addons.classSet(classes);

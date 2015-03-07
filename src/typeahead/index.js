@@ -161,14 +161,24 @@ var Typeahead = React.createClass({
     });
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.props = nextProps;
+    this.setState({
+      options: this.props.options,
+      rawOptions: this.props.rawOptions,
+      entryValue: this.props.defaultValue,
+      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options)
+    });
+  },
+
   render: function() {
-    var inputClasses = {}
+    var inputClasses = {};
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
-    var inputClassList = React.addons.classSet(inputClasses)
+    var inputClassList = React.addons.classSet(inputClasses);
 
     var classes = {
       typeahead: true
-    }
+    };
     classes[this.props.className] = !!this.props.className;
     var classList = React.addons.classSet(classes);
 
