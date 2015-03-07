@@ -36,18 +36,21 @@
     }
     </style>
 
-    <div id="example"></div>
-    <script type="text/jsx">
-      /** @jsx React.DOM */
-      React.render(
-        <ReactTypeahead.Tokenizer defaultValue="foo"
-          options={
-            ["foobar", "spameggs", "hameggs",
-             "spamfoo", "spam"]} />,
-        document.getElementById("example")
-      );
-    </script>
-
+    <form>
+      <input type="submit"></input>
+      <div id="example"></div>
+      <script type="text/jsx">
+        /** @jsx React.DOM */
+        React.render(
+          <ReactTypeahead.Tokenizer defaultValue="foo"
+            name="spamselect"
+            options={
+              ["foobar", "spameggs", "hameggs",
+               "spamfoo", "spam"]} />,
+          document.getElementById("example")
+        );
+      </script>
+    </form>
     <hr />
     This is a footer
   </body>

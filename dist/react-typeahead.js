@@ -177,6 +177,7 @@ var Typeahead = require('../typeahead');
  */
 var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
   propTypes: {
+    name: React.PropTypes.string,
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
     defaultSelected: React.PropTypes.array,
@@ -213,7 +214,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     var result = this.state.selected.map(function(selected) {
       return (
         React.createElement(Token, {key: selected, className: classList, 
-          onRemove:  this._removeTokenForValue}, 
+          onRemove:  this._removeTokenForValue, 
+          name:  this.props.name}, 
           selected 
         )
       )
@@ -305,6 +307,7 @@ var React = window.React || require('react');
  */
 var Token = React.createClass({displayName: "Token",
   propTypes: {
+    name: React.PropTypes.string,
     children: React.PropTypes.string,
     onRemove: React.PropTypes.func
   },
@@ -312,8 +315,24 @@ var Token = React.createClass({displayName: "Token",
   render: function() {
     return (
       React.createElement("div", React.__spread({},  this.props, {className: "typeahead-token"}), 
+        this._makeHiddenInput(), 
         this.props.children, 
         this._makeCloseButton()
+      )
+    );
+  },
+
+  _makeHiddenInput: function() {
+    // If no name was set, don't create a hidden input
+    if (!this.props.name) {
+      return null;
+    }
+
+    return (
+      React.createElement("input", {
+        type: "hidden", 
+        name:  this.props.name + '[]', 
+        value:  this.props.children}
       )
     );
   },

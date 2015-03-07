@@ -14,6 +14,7 @@ var Typeahead = require('../typeahead');
  */
 var TypeaheadTokenizer = React.createClass({
   propTypes: {
+    name: React.PropTypes.string,
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
     defaultSelected: React.PropTypes.array,
@@ -50,7 +51,8 @@ var TypeaheadTokenizer = React.createClass({
     var result = this.state.selected.map(function(selected) {
       return (
         <Token key={ selected } className={classList}
-          onRemove={ this._removeTokenForValue }>
+          onRemove={ this._removeTokenForValue }
+          name={ this.props.name }>
           { selected }
         </Token>
       )

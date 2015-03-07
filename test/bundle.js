@@ -34569,6 +34569,7 @@ var Typeahead = require('../typeahead');
  */
 var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
   propTypes: {
+    name: React.PropTypes.string,
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
     defaultSelected: React.PropTypes.array,
@@ -34605,7 +34606,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     var result = this.state.selected.map(function(selected) {
       return (
         React.createElement(Token, {key: selected, className: classList, 
-          onRemove:  this._removeTokenForValue}, 
+          onRemove:  this._removeTokenForValue, 
+          name:  this.props.name}, 
           selected 
         )
       )
@@ -34697,6 +34699,7 @@ var React = window.React || require('react');
  */
 var Token = React.createClass({displayName: "Token",
   propTypes: {
+    name: React.PropTypes.string,
     children: React.PropTypes.string,
     onRemove: React.PropTypes.func
   },
@@ -34704,8 +34707,24 @@ var Token = React.createClass({displayName: "Token",
   render: function() {
     return (
       React.createElement("div", React.__spread({},  this.props, {className: "typeahead-token"}), 
+        this._makeHiddenInput(), 
         this.props.children, 
         this._makeCloseButton()
+      )
+    );
+  },
+
+  _makeHiddenInput: function() {
+    // If no name was set, don't create a hidden input
+    if (!this.props.name) {
+      return null;
+    }
+
+    return (
+      React.createElement("input", {
+        type: "hidden", 
+        name:  this.props.name + '[]', 
+        value:  this.props.children}
       )
     );
   },
@@ -34765,9 +34784,6 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
   getInitialState: function() {
     return {
-      // The set of all options... Does this need to be state?  I guess for lazy load...
-      options: this.props.options,
-
       // The currently visible set of options
       visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
@@ -34823,7 +34839,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
     nEntry.value = option;
-    this.setState({visible: this.getOptionsForValue(option, this.state.options),
+    this.setState({visible: this.getOptionsForValue(option, this.props.options),
                    selection: option,
                    entryValue: option});
     return this.props.onOptionSelected(option, event);
@@ -34831,7 +34847,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.getDOMNode().value;
-    this.setState({visible: this.getOptionsForValue(value, this.state.options),
+    this.setState({visible: this.getOptionsForValue(value, this.props.options),
                    selection: null,
                    entryValue: value});
   },
@@ -34883,6 +34899,12 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     event.preventDefault();
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+    });
+  },
+
   render: function() {
     var inputClasses = {}
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
@@ -34898,7 +34920,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       React.createElement("div", {className: classList}, 
         React.createElement("input", {ref: "entry", type: "text", 
           placeholder: this.props.placeholder, 
-          className: inputClassList, defaultValue: this.state.entryValue, 
+          className: inputClassList, 
+          value: this.state.entryValue, 
+          defaultValue: this.props.defaultValue, 
           onChange: this._onTextEntryUpdated, onKeyDown: this._onKeyDown}), 
          this._renderIncrementalSearchResults() 
       )

@@ -111,6 +111,12 @@ Type: `Number`
 
 Limit the number of options rendered in the results list.
 
+#### props.name
+
+Type: `String`
+
+The name for HTML forms to be used for submitting the tokens' values array.
+
 #### props.customClasses
 
 Type: `Object`
