@@ -34669,7 +34669,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
     var classList = React.addons.classSet(classes);
     return (
-      React.createElement("div", null, 
+      React.createElement("div", {className: "typeahead-tokenizer"}, 
          this._renderTokens(), 
         React.createElement(Typeahead, {ref: "typeahead", 
           className: classList, 
