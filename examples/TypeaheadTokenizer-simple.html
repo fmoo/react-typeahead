@@ -11,12 +11,19 @@
     .hover {
       border-style: dotted;
       border-width: 1px;
+      background-color: LightGray;
+      margin: -1px;
     }
     .typeahead-selector {
+      margin: 0;
+      padding: 4px 0px 4px 0px;
       position: absolute;
       border-style: solid;
       border-width: 1px 2px 2px 1px;
       background-color: white;
+    }
+    .typeahead-option {
+      padding: 0px 4px 0px 4px;
     }
     .typeahead-token {
       border-style: solid;
@@ -27,7 +34,7 @@
       display: inline;
       border-radius: 5px;
     }
-    .typeahead {
+    .typeahead, .typeahead input, #example, .typeahead-tokenizer {
       display: inline;
     }
     .typeahead-token-close {
@@ -37,7 +44,6 @@
     </style>
 
     <form>
-      <input type="submit"></input>
       <div id="example"></div>
       <script type="text/jsx">
         /** @jsx React.DOM */
@@ -50,6 +56,7 @@
           document.getElementById("example")
         );
       </script>
+      <input type="submit"></input>
     </form>
     <hr />
     This is a footer
