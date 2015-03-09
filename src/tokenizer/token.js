@@ -10,6 +10,7 @@ var React = window.React || require('react');
  */
 var Token = React.createClass({
   propTypes: {
+    name: React.PropTypes.string,
     children: React.PropTypes.string,
     onRemove: React.PropTypes.func
   },
@@ -17,9 +18,25 @@ var Token = React.createClass({
   render: function() {
     return (
       <div {...this.props} className="typeahead-token">
+        {this._makeHiddenInput()}
         {this.props.children}
         {this._makeCloseButton()}
       </div>
+    );
+  },
+
+  _makeHiddenInput: function() {
+    // If no name was set, don't create a hidden input
+    if (!this.props.name) {
+      return null;
+    }
+
+    return (
+      <input
+        type="hidden"
+        name={ this.props.name + '[]' }
+        value={ this.props.children }
+      />
     );
   },
 
