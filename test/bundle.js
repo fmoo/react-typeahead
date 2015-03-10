@@ -34572,6 +34572,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     name: React.PropTypes.string,
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
+    allowCustomValues: React.PropTypes.bool,
     defaultSelected: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
@@ -34590,6 +34591,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       options: [],
       defaultSelected: [],
       customClasses: {},
+      allowCustomValues: false,
       defaultValue: "",
       placeholder: "",
       onTokenAdd: function() {},
@@ -34674,6 +34676,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
         React.createElement(Typeahead, {ref: "typeahead", 
           className: classList, 
           placeholder: this.props.placeholder, 
+          allowCustomValues: this.props.allowCustomValues, 
           customClasses: this.props.customClasses, 
           options: this._getOptionsForTypeahead(), 
           defaultValue: this.props.defaultValue, 
@@ -34765,6 +34768,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
+    allowCustomValues: React.PropTypes.bool,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
@@ -34775,6 +34779,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     return {
       options: [],
       customClasses: {},
+      allowCustomValues: false,
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
@@ -34822,9 +34827,37 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       return "";
     }
 
+    // // Gets values for display when text is entered.
+    // // If we have props.allowCustomValues == true then we should add the option
+    // // to add the current entry at the top of the values list.
+    // // TODO: Add length as props for configurable entry
+    // var visible = this.state.visible;
+
+    // if (this.props.allowCustomValues === true && this.state.entryValue.length > 3) {
+    //   // need to push. setState might not update current version of this.state so need to carry value.
+    //   visible.push()
+    //   this.setState({
+    //     visible: visible
+    //   });
+
+    // }
+
     // There are no typeahead / autocomplete suggestions
-    if (!this.state.visible.length) {
+    if (!this.state.visible.length && !this.props.allowCustomValues) {
       return "";
+    }
+
+    if (this.props.allowCustomValues && 
+      this.state.entryValue.length >= this.props.allowCustomValues &&
+      this.state.visible.indexOf(this.state.entryValue) < 0
+      ) {
+      return (
+        React.createElement(TypeaheadSelector, {
+          ref: "sel", options: this.state.visible, 
+          customValue: this.state.entryValue, 
+          onOptionSelected: this._onOptionSelected, 
+          customClasses: this.props.customClasses})
+      );
     }
 
     return (
@@ -34945,6 +34978,7 @@ var React = window.React || require('react/addons');
 var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
   propTypes: {
     customClasses: React.PropTypes.object,
+    customValue: React.PropTypes.string,
     onClick: React.PropTypes.func,
     children: React.PropTypes.string
   },
@@ -34968,7 +35002,13 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     var classes = {
       hover: this.props.hover
     }
+
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
+
+    if (this.props.customValue) {
+      classes[this.props.customClasses.customAdd] = !!this.props.customClasses.customAdd;
+    }
+
     var classList = React.addons.classSet(classes);
 
     return (
@@ -34985,6 +35025,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
       "typeahead-option": true,
     };
     classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
+
     return React.addons.classSet(classes);
   },
 
@@ -35013,6 +35054,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
   propTypes: {
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
+    customValue: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func
   },
@@ -35021,6 +35063,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     return {
       selectionIndex: null,
       customClasses: {},
+      customValue: null,
       onOptionSelected: function(option) { }
     };
   },
@@ -35039,16 +35082,33 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     classes[this.props.customClasses.results] = this.props.customClasses.results;
     var classList = React.addons.classSet(classes);
 
-    var results = this.props.options.map(function(result, i) {
-      return (
+    var results = [];
+    // CustomValue should be added to top of results list with different class name
+    if (this.props.customValue !== null) {
+
+      results.push(
+        React.createElement(TypeaheadOption, {ref: this.props.customValue, key: this.props.customValue, 
+          hover: this.state.selectionIndex === results.length, 
+          customClasses: this.props.customClasses, 
+          customValue: this.props.customValue, 
+          onClick: this._onClick.bind(this, this.props.customValue)}, 
+           this.props.customValue
+        ));
+    }
+
+    this.props.options.map(function(result, i) {
+
+      results.push (
         React.createElement(TypeaheadOption, {ref: result, key: result, 
-          hover: this.state.selectionIndex === i, 
+          hover: this.state.selectionIndex === results.length, 
           customClasses: this.props.customClasses, 
           onClick: this._onClick.bind(this, result)}, 
           result 
         )
       );
     }, this);
+
+
     return React.createElement("ul", {className: classList}, results );
   },
 
@@ -35063,6 +35123,14 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     if (index === null) {
       return null;
     }
+    if (index === 0 && this.props.customValue !== null) {
+      return this.props.customValue;
+    }
+
+    if (this.props.customValue !== null) {
+      index -= 1;
+    }
+
     return this.props.options[index];
   },
 
@@ -35071,24 +35139,21 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
   },
 
   _nav: function(delta) {
-    if (!this.props.options) {
+    if (!this.props.options && this.props.customValue === null) {
       return;
     }
-    var newIndex;
-    if (this.state.selectionIndex === null) {
-      if (delta == 1) {
-        newIndex = 0;
-      } else {
-        newIndex = delta;
-      }
-    } else {
-      newIndex = this.state.selectionIndex + delta;
+    var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
+    var length = this.props.options.length;
+    if (this.props.customValue !== null) {
+      length += 1;
     }
+
     if (newIndex < 0) {
-      newIndex += this.props.options.length;
-    } else if (newIndex >= this.props.options.length) {
-      newIndex -= this.props.options.length;
+      newIndex += length;
+    } else if (newIndex >= length) {
+      newIndex -= length;
     }
+
     var newSelection = this.getSelectionForIndex(newIndex);
     this.setState({selectionIndex: newIndex,
                    selection: newSelection});
@@ -35111,13 +35176,14 @@ module.exports = TypeaheadSelector;
 require('es5-shim');
 require('./react-typeahead-test');
 require('./typeahead-test');
+require('./tokenizer-test');
 if (window.mochaPhantomJS) {
   window.mochaPhantomJS.run();
 } else {
   window.mocha.run();
 }
 
-},{"./react-typeahead-test":211,"./typeahead-test":212,"es5-shim":38}],211:[function(require,module,exports){
+},{"./react-typeahead-test":211,"./tokenizer-test":212,"./typeahead-test":213,"es5-shim":38}],211:[function(require,module,exports){
 var assert = require('chai').assert;
 var React = require('react/addons');
 var ReactTypeahead = require('../src/react-typeahead').Typeahead;
@@ -35138,6 +35204,150 @@ describe('Main entry point', function() {
 });
 
 },{"../src/react-typeahead":204,"chai":6,"react/addons":41}],212:[function(require,module,exports){
+var _ = require('lodash');
+var assert = require('chai').assert;
+var React = require('react/addons');
+var Typeahead = require('../src/typeahead');
+var TypeaheadOption = require('../src/typeahead/option');
+var TypeaheadSelector = require('../src/typeahead/selector');
+var Tokenizer = require('../src/tokenizer');
+var Token = require('../src/tokenizer/token');
+var Keyevent = require('../src/keyevent');
+var TestUtils = React.addons.TestUtils;
+
+function simulateTextInput(component, value) {
+  var node = component.refs.entry.getDOMNode();
+  node.value = value;
+  TestUtils.Simulate.change(node);
+  return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
+}
+
+function simulateTokenInput(component, value) {
+  var typeahead = component.refs.typeahead;
+  return simulateTextInput(typeahead, value);
+}
+
+var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
+
+describe('TypeaheadTokenizer Component', function() {
+
+  describe('sanity', function() {
+    beforeEach(function() {
+      this.component = TestUtils.renderIntoDocument(React.createElement(Tokenizer, {
+        options: BEATLES}
+        )
+      );
+    });
+
+    it('should fuzzy search and render matching results', function() {
+      // input value: num of expected results
+      var testplan = {
+        'o': 3,
+        'pa': 1,
+        'Grg': 1,
+        'Ringo': 1,
+        'xxx': 0
+      };
+
+      _.each(testplan, function(expected, value) {
+        var results = simulateTokenInput(this.component, value);
+        assert.equal(results.length, expected, 'Text input: ' + value);
+      }, this);
+    });
+
+    describe('keyboard controls', function() {
+      it('down arrow + return creates a token', function() {
+        var results = simulateTokenInput(this.component, 'o');
+        var secondItem = results[1].getDOMNode().innerText;
+        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+        var Tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        assert.equal(Tokens[0].props.children, secondItem); // Poor Ringo
+      });
+
+      it('up arrow + return navigates and creates a token', function() {
+        var results = simulateTokenInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode().innerText;
+        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+        var Tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        assert.equal(Tokens[1].props.children, firstItem);
+      });
+
+      it('should remove a token when BKSPC is pressed on an empty input', function() {
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var startLength = results.length;
+        assert.equal(input.value, "");
+        assert.equal(startLength, 2);
+        assert.equal(startLength, results.length);
+
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
+        results = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        assert.equal(startLength, results.length + 1);
+
+      });
+
+      it('should not remove a token on BKSPC when input is not empty', function() {
+        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var startLength = TestUtils.scryRenderedComponentsWithType(this.component, Token).length;
+
+        input.value = "hello";
+        TestUtils.Simulate.change(input);
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
+        
+        results = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        assert.equal(startLength , results.length);
+      });
+
+      it('tab to choose first item', function() {
+        var results = simulateTokenInput(this.component, 'o');
+        var itemText = results[0].getDOMNode().innerText;
+        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+
+        // Need to check Token list for props.children
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+
+        var newTokens = TestUtils.scryRenderedComponentsWithType(this.component, Token)
+        assert.equal(tokens.length, newTokens.length - 1);
+        assert.equal(newTokens[newTokens.length - 1].props.children, itemText);
+
+        // Clear out tokens for next test.
+        node.value = "";
+        TestUtils.Simulate.change(node);
+        for ( var i = 0; i<newTokens.length; i++) {
+          TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
+        }
+        
+        newTokens = TestUtils.scryRenderedComponentsWithType(this.component, Token)
+        assert.equal(0, newTokens.length);
+      });
+
+      it('tab to selected current item', function() {
+        var results = simulateTokenInput(this.component, 'o');
+        var itemText = results[1].getDOMNode().innerText;
+        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        var tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        assert.equal(tokens[tokens.length - 1].props.children, itemText);
+      });
+    });
+
+  });
+
+
+
+});
+
+},{"../src/keyevent":203,"../src/tokenizer":205,"../src/tokenizer/token":206,"../src/typeahead":207,"../src/typeahead/option":208,"../src/typeahead/selector":209,"chai":6,"lodash":40,"react/addons":41}],213:[function(require,module,exports){
 var _ = require('lodash');
 var assert = require('chai').assert;
 var React = require('react/addons');
