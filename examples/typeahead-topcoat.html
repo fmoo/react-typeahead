@@ -33,6 +33,13 @@
       background: #585858;
     }
 
+    .topcat-addme::before {
+      content: 'Add me: '
+    }
+
+    .topcat-addme {
+      text-align: right;
+    }
 
     </style>
 
@@ -55,13 +62,16 @@
 
     React.render(
       <ReactTypeahead.Typeahead
+        allowCustomValues={4}
         defaultValue="src"
         options={req.response.split('\n')}
         className="topcoat-list"
+        maxVisible={3}
         customClasses={{
           input: "topcoat-text-input",
           results: "topcoat-list__container",
-          listItem: "topcoat-list__item"
+          listItem: "topcoat-list__item",
+          customAdd: "topcat-addme"
         }} />,
       document.getElementById("typeahead")
     );

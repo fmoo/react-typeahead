@@ -18,6 +18,7 @@ var Typeahead = React.createClass({
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
+    allowCustomValues: React.PropTypes.bool,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
@@ -28,6 +29,7 @@ var Typeahead = React.createClass({
     return {
       options: [],
       customClasses: {},
+      allowCustomValues: false,
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
@@ -75,9 +77,37 @@ var Typeahead = React.createClass({
       return "";
     }
 
+    // // Gets values for display when text is entered.
+    // // If we have props.allowCustomValues == true then we should add the option
+    // // to add the current entry at the top of the values list.
+    // // TODO: Add length as props for configurable entry
+    // var visible = this.state.visible;
+
+    // if (this.props.allowCustomValues === true && this.state.entryValue.length > 3) {
+    //   // need to push. setState might not update current version of this.state so need to carry value.
+    //   visible.push()
+    //   this.setState({
+    //     visible: visible
+    //   });
+
+    // }
+
     // There are no typeahead / autocomplete suggestions
-    if (!this.state.visible.length) {
+    if (!this.state.visible.length && !this.props.allowCustomValues) {
       return "";
+    }
+
+    if (this.props.allowCustomValues && 
+      this.state.entryValue.length >= this.props.allowCustomValues &&
+      this.state.visible.indexOf(this.state.entryValue) < 0
+      ) {
+      return (
+        <TypeaheadSelector
+          ref="sel" options={this.state.visible}
+          customValue={this.state.entryValue}
+          onOptionSelected={this._onOptionSelected}
+          customClasses={this.props.customClasses} />
+      );
     }
 
     return (
