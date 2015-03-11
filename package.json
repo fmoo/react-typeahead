@@ -32,7 +32,8 @@
   },
   "dependencies": {
     "fuzzy": "^0.1.0",
-    "react": "^0.12.2"
+    "react": "^0.12.2",
+    "sinon": "^1.13.0"
   },
   "main": "src/react-typeahead.js",
   "devDependencies": {
@@ -49,7 +50,7 @@
     "watchify": "^2.2.1"
   },
   "scripts": {
-    "watch": "watchify test/main.js -o test/bundle.js -v",
+    "watchify-test": "watchify test/main.js -o test/bundle.js -v",
     "build-test": "browserify test/main.js -o test/bundle.js",
     "build": "browserify ./src/react-typeahead.js -s ReactTypeahead -i react -x react -x 'react/addons' -o ./dist/react-typeahead.js",
     "watchify": "watchify ./src/react-typeahead.js -s ReactTypeahead -i react -x react -x 'react/addons' -o ./dist/react-typeahead.js"

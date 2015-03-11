@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var assert = require('chai').assert;
+var sinon = require('sinon');
 var React = require('react/addons');
 var Typeahead = require('../src/typeahead');
 var TypeaheadOption = require('../src/typeahead/option');
@@ -100,10 +101,68 @@ describe('Typeahead Component', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead 
           options={ BEATLES }
           maxVisible={ 1 }
-        />);
+          ></Typeahead>);
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
       });
+    });
+
+    context('allowCustomValues', function() {
+
+      beforeEach(function() {
+        function onSelect() {
+          console.log("called!!!");
+        };
+
+        this.selectSpy = sinon.spy(onSelect);
+
+        this.component = TestUtils.renderIntoDocument(<Typeahead
+          options={BEATLES}
+          allowCustomValues={3}
+          onOptionSelect={this.selectSpy}
+          ></Typeahead>);
+      });
+
+      it('should not display custom value if input length is less than entered', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "zz";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        assert.equal(0, results.length);
+        assert.equal(false, this.selectSpy.called);
+      });
+
+      it('should display custom value if input exceeds props.allowCustomValues', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "ZZZ";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        assert.equal(1, results.length);
+        assert.equal(false, this.selectSpy.called);
+      });
+
+      it('should call onOptionSelect when selecting from options', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+
+        assert.equal(true, this.selectSpy.called);
+      })
+
+      it('should call onOptionSelect when custom value is selected', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "ZZZ";
+        TestUtils.Simulate.change(input);
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_RETURN });
+        assert.equal("ZZZ", input.value);
+        assert.equal(true, this.selectSpy.called);
+      })
+
     });
 
     context('customClasses', function() {
@@ -119,7 +178,7 @@ describe('Typeahead Component', function() {
         this.component = TestUtils.renderIntoDocument(<Typeahead 
           options={ BEATLES }
           customClasses={ customClasses }
-        />);
+        ></Typeahead>);
 
         simulateTextInput(this.component, 'o');
       });
