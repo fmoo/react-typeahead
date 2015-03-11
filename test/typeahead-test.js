@@ -110,18 +110,18 @@ describe('Typeahead Component', function() {
     context('allowCustomValues', function() {
 
       beforeEach(function() {
-        function onSelect() {
-          console.log("called!!!");
-        };
-
-        this.selectSpy = sinon.spy(onSelect);
-
+        this.sinon = sinon.sandbox.create()
+        this.selectSpy = this.sinon.spy();
         this.component = TestUtils.renderIntoDocument(<Typeahead
           options={BEATLES}
           allowCustomValues={3}
-          onOptionSelect={this.selectSpy}
+          onOptionSelected={this.selectSpy}
           ></Typeahead>);
       });
+
+      afterEach(function() {
+        this.sinon.restore();
+      })
 
       it('should not display custom value if input length is less than entered', function() {
         var input = this.component.refs.entry.getDOMNode();
@@ -141,7 +141,7 @@ describe('Typeahead Component', function() {
         assert.equal(false, this.selectSpy.called);
       });
 
-      it('should call onOptionSelect when selecting from options', function() {
+      it('should call onOptionSelected when selecting from options', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = results[0].getDOMNode().innerText;
         var node = this.component.refs.entry.getDOMNode();
@@ -151,16 +151,18 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
 
         assert.equal(true, this.selectSpy.called);
+        assert(this.selectSpy.calledWith(firstItem));
       })
 
-      it('should call onOptionSelect when custom value is selected', function() {
+      it('should call onOptionSelected when custom value is selected', function() {
         var input = this.component.refs.entry.getDOMNode();
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_RETURN });
-        assert.equal("ZZZ", input.value);
+        
         assert.equal(true, this.selectSpy.called);
+        assert(this.selectSpy.calledWith(input.value));
       })
 
     });
