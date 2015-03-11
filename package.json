@@ -43,12 +43,13 @@
     "gulp-mocha-phantomjs": "^0.4.0",
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
-    "react-tools": "^0.12.2",
-    "reactify": "^0.17.1",
+    "react-tools": "^0.13.0",
+    "reactify": "^1.0.0",
     "sinon": "^1.10.3",
     "watchify": "^2.2.1"
   },
   "scripts": {
+    "test": "npm run build-test && gulp test",
     "watch": "watchify test/main.js -o test/bundle.js -v",
     "build-test": "browserify test/main.js -o test/bundle.js",
     "build": "browserify src/react-typeahead.js -s ReactTypeahead -i react -x react -x 'react/addons' -o dist/react-typeahead.js"

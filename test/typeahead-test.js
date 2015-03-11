@@ -41,6 +41,14 @@ describe('Typeahead Component', function() {
       }, this);
     });
 
+    it('does not change the url hash when clicking on options', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var firstResult = results[0];
+      var anchor = TestUtils.findRenderedDOMComponentWithTag(firstResult, 'a');
+      var href = anchor.getDOMNode().getAttribute('href');
+      assert.notEqual(href, '#');
+    });
+
     describe('keyboard controls', function() {
       it('down arrow + return selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
