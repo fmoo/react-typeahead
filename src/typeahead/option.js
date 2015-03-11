@@ -33,7 +33,7 @@ var TypeaheadOption = React.createClass({
   render: function() {
     var classes = {
       hover: this.props.hover
-    }
+    };
 
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
 
@@ -45,7 +45,7 @@ var TypeaheadOption = React.createClass({
 
     return (
       <li className={classList} onClick={this._onClick}>
-        <a href="#" className={this._getClasses()} ref="anchor">
+        <a href="javascript: void 0;" className={this._getClasses()} ref="anchor">
           { this.props.children }
         </a>
       </li>
