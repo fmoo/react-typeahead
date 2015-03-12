@@ -22,6 +22,7 @@ var Typeahead = React.createClass({
     ]),
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
+    allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
@@ -33,6 +34,7 @@ var Typeahead = React.createClass({
       options: [],
       customClasses: {},
       CustomComponent: "input",
+      allowCustomValues: 0,
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
@@ -81,8 +83,21 @@ var Typeahead = React.createClass({
     }
 
     // There are no typeahead / autocomplete suggestions
-    if (!this.state.visible.length) {
+    if (!this.state.visible.length && !(this.props.allowCustomValues > 0)) {
       return "";
+    }
+
+    if (this.props.allowCustomValues > 0 && 
+      this.state.entryValue.length >= this.props.allowCustomValues &&
+      this.state.visible.indexOf(this.state.entryValue) < 0
+      ) {
+      return (
+        <TypeaheadSelector
+          ref="sel" options={this.state.visible}
+          customValue={this.state.entryValue}
+          onOptionSelected={this._onOptionSelected}
+          customClasses={this.props.customClasses} />
+      );
     }
 
     return (

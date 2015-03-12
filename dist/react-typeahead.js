@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactTypeahead=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ReactTypeahead = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/hueyhu/Code/react-typeahead/node_modules/fuzzy/lib/fuzzy.js":[function(require,module,exports){
 /*
  * Fuzzy
  * https://github.com/myork/fuzzy
@@ -136,7 +136,7 @@ fuzzy.filter = function(pattern, arr, opts) {
 }());
 
 
-},{}],2:[function(require,module,exports){
+},{}],"/Users/hueyhu/Code/react-typeahead/src/keyevent.js":[function(require,module,exports){
 /**
  * PolyFills make me sad
  */
@@ -151,7 +151,7 @@ KeyEvent.DOM_VK_TAB = KeyEvent.DOM_VK_TAB || 9;
 
 module.exports = KeyEvent;
 
-},{}],3:[function(require,module,exports){
+},{}],"/Users/hueyhu/Code/react-typeahead/src/react-typeahead.js":[function(require,module,exports){
 var Typeahead = require('./typeahead');
 var Tokenizer = require('./tokenizer');
 
@@ -160,7 +160,7 @@ module.exports = {
   Tokenizer: Tokenizer
 };
 
-},{"./tokenizer":4,"./typeahead":6}],4:[function(require,module,exports){
+},{"./tokenizer":"/Users/hueyhu/Code/react-typeahead/src/tokenizer/index.js","./typeahead":"/Users/hueyhu/Code/react-typeahead/src/typeahead/index.js"}],"/Users/hueyhu/Code/react-typeahead/src/tokenizer/index.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -180,6 +180,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     name: React.PropTypes.string,
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
+    allowCustomValues: React.PropTypes.number,
     defaultSelected: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
@@ -198,6 +199,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       options: [],
       defaultSelected: [],
       customClasses: {},
+      allowCustomValues: 0,
       defaultValue: "",
       placeholder: "",
       onTokenAdd: function() {},
@@ -282,6 +284,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
         React.createElement(Typeahead, {ref: "typeahead", 
           className: classList, 
           placeholder: this.props.placeholder, 
+          allowCustomValues: this.props.allowCustomValues, 
           customClasses: this.props.customClasses, 
           options: this._getOptionsForTypeahead(), 
           defaultValue: this.props.defaultValue, 
@@ -294,7 +297,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 
 module.exports = TypeaheadTokenizer;
 
-},{"../keyevent":2,"../typeahead":6,"./token":5,"react":"react"}],5:[function(require,module,exports){
+},{"../keyevent":"/Users/hueyhu/Code/react-typeahead/src/keyevent.js","../typeahead":"/Users/hueyhu/Code/react-typeahead/src/typeahead/index.js","./token":"/Users/hueyhu/Code/react-typeahead/src/tokenizer/token.js","react":"react"}],"/Users/hueyhu/Code/react-typeahead/src/tokenizer/token.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -352,7 +355,7 @@ var Token = React.createClass({displayName: "Token",
 
 module.exports = Token;
 
-},{"react":"react"}],6:[function(require,module,exports){
+},{"react":"react"}],"/Users/hueyhu/Code/react-typeahead/src/typeahead/index.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -373,6 +376,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
+    allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
@@ -383,6 +387,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     return {
       options: [],
       customClasses: {},
+      allowCustomValues: 0,
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
@@ -431,8 +436,21 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     }
 
     // There are no typeahead / autocomplete suggestions
-    if (!this.state.visible.length) {
+    if (!this.state.visible.length && !(this.props.allowCustomValues > 0)) {
       return "";
+    }
+
+    if (this.props.allowCustomValues > 0 && 
+      this.state.entryValue.length >= this.props.allowCustomValues &&
+      this.state.visible.indexOf(this.state.entryValue) < 0
+      ) {
+      return (
+        React.createElement(TypeaheadSelector, {
+          ref: "sel", options: this.state.visible, 
+          customValue: this.state.entryValue, 
+          onOptionSelected: this._onOptionSelected, 
+          customClasses: this.props.customClasses})
+      );
     }
 
     return (
@@ -540,7 +558,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
 module.exports = Typeahead;
 
-},{"../keyevent":2,"./selector":8,"fuzzy":1,"react/addons":"react/addons"}],7:[function(require,module,exports){
+},{"../keyevent":"/Users/hueyhu/Code/react-typeahead/src/keyevent.js","./selector":"/Users/hueyhu/Code/react-typeahead/src/typeahead/selector.js","fuzzy":"/Users/hueyhu/Code/react-typeahead/node_modules/fuzzy/lib/fuzzy.js","react/addons":"react/addons"}],"/Users/hueyhu/Code/react-typeahead/src/typeahead/option.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -553,6 +571,7 @@ var React = window.React || require('react/addons');
 var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
   propTypes: {
     customClasses: React.PropTypes.object,
+    customValue: React.PropTypes.string,
     onClick: React.PropTypes.func,
     children: React.PropTypes.string
   },
@@ -576,7 +595,13 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     var classes = {
       hover: this.props.hover
     }
+
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
+
+    if (this.props.customValue) {
+      classes[this.props.customClasses.customAdd] = !!this.props.customClasses.customAdd;
+    }
+
     var classList = React.addons.classSet(classes);
 
     return (
@@ -593,6 +618,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
       "typeahead-option": true,
     };
     classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
+
     return React.addons.classSet(classes);
   },
 
@@ -605,7 +631,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 
 module.exports = TypeaheadOption;
 
-},{"react/addons":"react/addons"}],8:[function(require,module,exports){
+},{"react/addons":"react/addons"}],"/Users/hueyhu/Code/react-typeahead/src/typeahead/selector.js":[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -621,6 +647,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
   propTypes: {
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
+    customValue: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func
   },
@@ -629,6 +656,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     return {
       selectionIndex: null,
       customClasses: {},
+      customValue: null,
       onOptionSelected: function(option) { }
     };
   },
@@ -647,16 +675,33 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     classes[this.props.customClasses.results] = this.props.customClasses.results;
     var classList = React.addons.classSet(classes);
 
-    var results = this.props.options.map(function(result, i) {
-      return (
+    var results = [];
+    // CustomValue should be added to top of results list with different class name
+    if (this.props.customValue !== null) {
+
+      results.push(
+        React.createElement(TypeaheadOption, {ref: this.props.customValue, key: this.props.customValue, 
+          hover: this.state.selectionIndex === results.length, 
+          customClasses: this.props.customClasses, 
+          customValue: this.props.customValue, 
+          onClick: this._onClick.bind(this, this.props.customValue)}, 
+           this.props.customValue
+        ));
+    }
+
+    this.props.options.map(function(result, i) {
+
+      results.push (
         React.createElement(TypeaheadOption, {ref: result, key: result, 
-          hover: this.state.selectionIndex === i, 
+          hover: this.state.selectionIndex === results.length, 
           customClasses: this.props.customClasses, 
           onClick: this._onClick.bind(this, result)}, 
           result 
         )
       );
     }, this);
+
+
     return React.createElement("ul", {className: classList}, results );
   },
 
@@ -671,6 +716,14 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     if (index === null) {
       return null;
     }
+    if (index === 0 && this.props.customValue !== null) {
+      return this.props.customValue;
+    }
+
+    if (this.props.customValue !== null) {
+      index -= 1;
+    }
+
     return this.props.options[index];
   },
 
@@ -679,24 +732,21 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
   },
 
   _nav: function(delta) {
-    if (!this.props.options) {
+    if (!this.props.options && this.props.customValue === null) {
       return;
     }
-    var newIndex;
-    if (this.state.selectionIndex === null) {
-      if (delta == 1) {
-        newIndex = 0;
-      } else {
-        newIndex = delta;
-      }
-    } else {
-      newIndex = this.state.selectionIndex + delta;
+    var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
+    var length = this.props.options.length;
+    if (this.props.customValue !== null) {
+      length += 1;
     }
+
     if (newIndex < 0) {
-      newIndex += this.props.options.length;
-    } else if (newIndex >= this.props.options.length) {
-      newIndex -= this.props.options.length;
+      newIndex += length;
+    } else if (newIndex >= length) {
+      newIndex -= length;
     }
+
     var newSelection = this.getSelectionForIndex(newIndex);
     this.setState({selectionIndex: newIndex,
                    selection: newSelection});
@@ -714,5 +764,5 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 
 module.exports = TypeaheadSelector;
 
-},{"./option":7,"react/addons":"react/addons"}]},{},[3])(3)
+},{"./option":"/Users/hueyhu/Code/react-typeahead/src/typeahead/option.js","react/addons":"react/addons"}]},{},["/Users/hueyhu/Code/react-typeahead/src/react-typeahead.js"])("/Users/hueyhu/Code/react-typeahead/src/react-typeahead.js")
 });
