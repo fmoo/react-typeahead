@@ -18,14 +18,14 @@ var Token = React.createClass({
   render: function() {
     return (
       <div {...this.props} className="typeahead-token">
-        {this._makeHiddenInput()}
+        {this._renderHiddenInput()}
         {this.props.children}
-        {this._makeCloseButton()}
+        {this._renderCloseButton()}
       </div>
     );
   },
 
-  _makeHiddenInput: function() {
+  _renderHiddenInput: function() {
     // If no name was set, don't create a hidden input
     if (!this.props.name) {
       return null;
@@ -40,7 +40,7 @@ var Token = React.createClass({
     );
   },
 
-  _makeCloseButton: function() {
+  _renderCloseButton: function() {
     if (!this.props.onRemove) {
       return "";
     }
