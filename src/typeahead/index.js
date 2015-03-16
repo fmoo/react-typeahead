@@ -15,6 +15,7 @@ var fuzzy = require('fuzzy');
  */
 var Typeahead = React.createClass({
   propTypes: {
+    name: React.PropTypes.string,
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
@@ -186,6 +187,7 @@ var Typeahead = React.createClass({
 
     return (
       <div className={classList}>
+        { this._renderHiddenInput() }
         <input ref="entry" type="text"
           placeholder={this.props.placeholder}
           className={inputClassList}
@@ -194,6 +196,20 @@ var Typeahead = React.createClass({
           onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown} />
         { this._renderIncrementalSearchResults() }
       </div>
+    );
+  },
+
+  _renderHiddenInput: function() {
+    if (!this.props.name) {
+      return null;
+    }
+
+    return (
+      <input
+        type="hidden"
+        name={ this.props.name }
+        value={ this.state.selection }
+      />
     );
   }
 });
