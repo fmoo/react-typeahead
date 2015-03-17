@@ -99,6 +99,14 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal(node.value, itemText);
       });
+
+      it('tab on no selection should not be undefined', function() {
+        var results = simulateTextInput(this.component, 'oz');
+        assert(results.length == 0);
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        assert.equal("oz", node.value);
+      });
     });
 
   });

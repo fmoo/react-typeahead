@@ -249,6 +249,31 @@ describe('TypeaheadTokenizer Component', function() {
         assert(this.tokenRemove.called);
         assert(this.tokenRemove.calledWith(this.component.state.selected));
       })
+
+      it('should not return undefined for a custom token when not selected', function() {
+        var results = simulateTokenInput(this.component, "abzz");
+        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var tokens = getTokens(this.component);
+        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
+
+        var newTokens = getTokens(this.component)
+        // behavior is custom token is selected
+        assert(tokens.length < newTokens.length);
+        assert(input.value == "");
+        assert.equal(newTokens[0].props.children, "abzz");
+      })
+
+      it('should not select value for a custom token when too short', function() {
+        var results = simulateTokenInput(this.component, "abz");
+        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var tokens = getTokens(this.component);
+        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
+
+        var newTokens = getTokens(this.component)
+        // behavior is custom token is selected
+        assert(newTokens.length == 0);
+        assert(input.value == "abz");
+      })
     })
   });
 
