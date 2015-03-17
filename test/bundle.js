@@ -41456,7 +41456,8 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     customClasses: React.PropTypes.object,
     customValue: React.PropTypes.string,
     onClick: React.PropTypes.func,
-    children: React.PropTypes.string
+    children: React.PropTypes.string,
+    hover: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -41469,9 +41470,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
   },
 
   getInitialState: function() {
-    return {
-      hover: false
-    };
+    return {};
   },
 
   render: function() {
