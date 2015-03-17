@@ -29,12 +29,16 @@
       width: 100%;
     }
 
-    li.hover {
+    .topcoat-active {
       background: #585858;
     }
 
-    .custom-active{
-        background:#CCC;
+    .topcoat-addme::before {
+      content: 'Add me: '
+    }
+
+    .topcoat-addme {
+      text-align: right;
     }
 
     </style>
@@ -56,16 +60,25 @@
       throw new Error('nope');
     }
 
+    var optionSelected = function() {
+      console.log("Option was selected: " , arguments);
+    }
+
     React.render(
       <ReactTypeahead.Typeahead
+        name="myTypeahead"
+        allowCustomValues={3}
         defaultValue="src"
         options={req.response.split('\n')}
         className="topcoat-list"
+        maxVisible={3}
+        onOptionSelected={optionSelected}
         customClasses={{
           input: "topcoat-text-input",
           results: "topcoat-list__container",
           listItem: "topcoat-list__item",
-          hover: 'custom-active'
+          hover: "topcoat-active",
+          customAdd: "topcoat-addme"
         }} />,
       document.getElementById("typeahead")
     );

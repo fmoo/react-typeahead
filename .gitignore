@@ -1,3 +1,6 @@
 node_modules
 .*.swp
 .*.swo
+.*.swn
+test/bundle.js
+npm-debug.log
