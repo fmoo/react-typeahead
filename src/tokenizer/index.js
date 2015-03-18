@@ -22,7 +22,8 @@ var TypeaheadTokenizer = React.createClass({
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onTokenRemove: React.PropTypes.func,
-    onTokenAdd: React.PropTypes.func
+    onTokenAdd: React.PropTypes.func,
+    maxVisible: React.PropTypes.number
   },
 
   getInitialState: function() {
@@ -47,7 +48,7 @@ var TypeaheadTokenizer = React.createClass({
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
-    var tokenClasses = {}
+    var tokenClasses = {};
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = React.addons.classSet(tokenClasses);
     var result = this.state.selected.map(function(selected) {
@@ -57,7 +58,7 @@ var TypeaheadTokenizer = React.createClass({
           name={ this.props.name }>
           { selected }
         </Token>
-      )
+      );
     }, this);
     return result;
   },
@@ -112,7 +113,7 @@ var TypeaheadTokenizer = React.createClass({
   },
 
   render: function() {
-    var classes = {}
+    var classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
     var classList = React.addons.classSet(classes);
     return (
@@ -125,10 +126,11 @@ var TypeaheadTokenizer = React.createClass({
           customClasses={this.props.customClasses}
           options={this._getOptionsForTypeahead()}
           defaultValue={this.props.defaultValue}
+          maxVisible={this.props.maxVisible}
           onOptionSelected={this._addTokenForValue}
           onKeyDown={this._onKeyDown} />
       </div>
-    )
+    );
   }
 });
 
