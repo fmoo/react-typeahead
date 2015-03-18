@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var assert = require('chai').assert;
+var sinon = require('sinon');
 var React = require('react/addons');
 var Typeahead = require('../src/typeahead');
 var TypeaheadOption = require('../src/typeahead/option');
@@ -70,6 +71,14 @@ describe('Typeahead Component', function() {
       }, this);
     });
 
+    it('does not change the url hash when clicking on options', function() {
+      var results = simulateTextInput(this.component, 'o');
+      var firstResult = results[0];
+      var anchor = TestUtils.findRenderedDOMComponentWithTag(firstResult, 'a');
+      var href = anchor.getDOMNode().getAttribute('href');
+      assert.notEqual(href, '#');
+    });
+
     describe('keyboard controls', function() {
       it('down arrow + return selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
@@ -119,6 +128,14 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal(node.value, itemText);
       });
+
+      it('tab on no selection should not be undefined', function() {
+        var results = simulateTextInput(this.component, 'oz');
+        assert(results.length == 0);
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+        assert.equal("oz", node.value);
+      });
     });
 
   });
@@ -129,7 +146,7 @@ describe('Typeahead Component', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
           maxVisible={ 1 }
-        />);
+          ></Typeahead>);
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
       });
@@ -163,6 +180,67 @@ describe('Typeahead Component', function() {
         var results = simulateTextInput(component, 'Lennon');
         assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
       });
+
+    });
+
+    context('allowCustomValues', function() {
+
+      beforeEach(function() {
+        this.sinon = sinon.sandbox.create()
+        this.selectSpy = this.sinon.spy();
+        this.component = TestUtils.renderIntoDocument(<Typeahead
+          options={BEATLES}
+          allowCustomValues={3}
+          onOptionSelected={this.selectSpy}
+          ></Typeahead>);
+      });
+
+      afterEach(function() {
+        this.sinon.restore();
+      })
+
+      it('should not display custom value if input length is less than entered', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "zz";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        assert.equal(0, results.length);
+        assert.equal(false, this.selectSpy.called);
+      });
+
+      it('should display custom value if input exceeds props.allowCustomValues', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "ZZZ";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        assert.equal(1, results.length);
+        assert.equal(false, this.selectSpy.called);
+      });
+
+      it('should call onOptionSelected when selecting from options', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var firstItem = results[0].getDOMNode().innerText;
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+
+        assert.equal(true, this.selectSpy.called);
+        assert(this.selectSpy.calledWith(firstItem));
+      })
+
+      it('should call onOptionSelected when custom value is selected', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "ZZZ";
+        TestUtils.Simulate.change(input);
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_RETURN });
+
+        assert.equal(true, this.selectSpy.called);
+        assert(this.selectSpy.calledWith(input.value));
+      })
+
     });
 
     context('customClasses', function() {
@@ -172,13 +250,14 @@ describe('Typeahead Component', function() {
           input: 'topcoat-text-input',
           results: 'topcoat-list__container',
           listItem: 'topcoat-list__item',
-          listAnchor: 'topcoat-list__link'
+          listAnchor: 'topcoat-list__link',
+          hover: 'topcoat-list__item-active'
         };
 
         this.component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
           customClasses={ customClasses }
-        />);
+        ></Typeahead>);
 
         simulateTextInput(this.component, 'o');
       });
@@ -203,6 +282,18 @@ describe('Typeahead Component', function() {
         var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
         var listAnchor = typeaheadOptions[1].refs.anchor.getDOMNode();
         assert.isTrue(listAnchor.classList.contains('topcoat-list__link'));
+      });
+
+      it('adds a custom class to the list items when active', function() {
+        var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        var node = this.component.refs.entry.getDOMNode();
+
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+
+        var listItem = typeaheadOptions[0];
+        var domListItem = listItem.getDOMNode();
+
+        assert.isTrue(domListItem.classList.contains('topcoat-list__item-active'));
       });
     });
 

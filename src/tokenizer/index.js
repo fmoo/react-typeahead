@@ -14,8 +14,10 @@ var Typeahead = require('../typeahead');
  */
 var TypeaheadTokenizer = React.createClass({
   propTypes: {
+    name: React.PropTypes.string,
     options: React.PropTypes.array,
     customClasses: React.PropTypes.object,
+    allowCustomValues: React.PropTypes.number,
     defaultSelected: React.PropTypes.array,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
@@ -34,6 +36,7 @@ var TypeaheadTokenizer = React.createClass({
       options: [],
       defaultSelected: [],
       customClasses: {},
+      allowCustomValues: 0,
       defaultValue: "",
       placeholder: "",
       onTokenAdd: function() {},
@@ -50,7 +53,8 @@ var TypeaheadTokenizer = React.createClass({
     var result = this.state.selected.map(function(selected) {
       return (
         <Token key={ selected } className={classList}
-          onRemove={ this._removeTokenForValue }>
+          onRemove={ this._removeTokenForValue }
+          name={ this.props.name }>
           { selected }
         </Token>
       )
@@ -112,11 +116,12 @@ var TypeaheadTokenizer = React.createClass({
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
     var classList = React.addons.classSet(classes);
     return (
-      <div>
+      <div className="typeahead-tokenizer">
         { this._renderTokens() }
         <Typeahead ref="typeahead"
           className={classList}
           placeholder={this.props.placeholder}
+          allowCustomValues={this.props.allowCustomValues}
           customClasses={this.props.customClasses}
           options={this._getOptionsForTypeahead()}
           defaultValue={this.props.defaultValue}

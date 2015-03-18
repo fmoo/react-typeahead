@@ -15,9 +15,11 @@ var fuzzy = require('fuzzy');
  */
 var Typeahead = React.createClass({
   propTypes: {
+    name: React.PropTypes.string,
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
+    allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
@@ -30,6 +32,7 @@ var Typeahead = React.createClass({
     return {
       options: [],
       customClasses: {},
+      allowCustomValues: 0,
       defaultValue: "",
       placeholder: "",
       onKeyDown: function(event) { return },
@@ -71,6 +74,22 @@ var Typeahead = React.createClass({
     this._onTextEntryUpdated();
   },
 
+  _hasCustomValue: function() {
+    if (this.props.allowCustomValues > 0 &&
+      this.state.entryValue.length >= this.props.allowCustomValues &&
+      this.state.visible.indexOf(this.state.entryValue) < 0) {
+      return true;
+    }
+    return false;
+  },
+
+  _getCustomValue: function() {
+    if (this._hasCustomValue()) {
+      return this.state.entryValue;
+    }
+    return null
+  },
+
   _renderIncrementalSearchResults: function() {
     // Nothing has been entered into the textbox
     if (!this.state.entryValue) {
@@ -83,8 +102,19 @@ var Typeahead = React.createClass({
     }
 
     // There are no typeahead / autocomplete suggestions
-    if (!this.state.visible.length) {
+    if (!this.state.visible.length && !(this.props.allowCustomValues > 0)) {
       return "";
+    }
+
+    if (this._hasCustomValue()) {
+      return (
+        <TypeaheadSelector
+          ref="sel" options={this.state.visible}
+          customValue={this.state.entryValue}
+          onOptionSelected={this._onOptionSelected}
+          customClasses={this.props.customClasses}
+          getDisplayString={this.props.getDisplayString} />
+      );
     }
 
     return (
@@ -103,7 +133,7 @@ var Typeahead = React.createClass({
     var optionString = this.props.getDisplayString(option);
     this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: option,
-                   entryValue: option});
+                   entryValue: optionString});
     return this.props.onOptionSelected(option, event);
   },
 
@@ -127,8 +157,15 @@ var Typeahead = React.createClass({
 
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
-      this.refs.sel.state.selection : this.state.visible[0];
-    return this._onOptionSelected(option, event);
+      this.refs.sel.state.selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
+
+    if (option === null && this._hasCustomValue()) {
+      option = this._getCustomValue();
+    }
+
+    if (option !== null) {
+      return this._onOptionSelected(option, event);
+    }
   },
 
   eventMap: function(event) {
@@ -161,6 +198,12 @@ var Typeahead = React.createClass({
     event.preventDefault();
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+    });
+  },
+
   render: function() {
     var inputClasses = {}
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
@@ -174,12 +217,29 @@ var Typeahead = React.createClass({
 
     return (
       <div className={classList}>
+        { this._renderHiddenInput() }
         <input ref="entry" type="text"
           placeholder={this.props.placeholder}
-          className={inputClassList} defaultValue={this.state.entryValue}
+          className={inputClassList}
+          value={this.state.entryValue}
+          defaultValue={this.props.defaultValue}
           onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown} />
         { this._renderIncrementalSearchResults() }
       </div>
+    );
+  },
+
+  _renderHiddenInput: function() {
+    if (!this.props.name) {
+      return null;
+    }
+
+    return (
+      <input
+        type="hidden"
+        name={ this.props.name }
+        value={ this.state.selection }
+      />
     );
   }
 });

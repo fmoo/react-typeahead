@@ -2,6 +2,7 @@
 require('es5-shim');
 require('./react-typeahead-test');
 require('./typeahead-test');
+require('./tokenizer-test');
 if (window.mochaPhantomJS) {
   window.mochaPhantomJS.run();
 } else {
