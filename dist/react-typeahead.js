@@ -315,14 +315,20 @@ var React = window.React || require('react');
  */
 var Token = React.createClass({displayName: "Token",
   propTypes: {
+    className: React.PropTypes.string,
     name: React.PropTypes.string,
     children: React.PropTypes.string,
     onRemove: React.PropTypes.func
   },
 
   render: function() {
+    var className = React.addons.classSet(
+      "typeahead-token",
+      this.props.className
+    );
+
     return (
-      React.createElement("div", React.__spread({},  this.props, {className: "typeahead-token"}), 
+      React.createElement("div", {className: className}, 
         this._renderHiddenInput(), 
         this.props.children, 
         this._renderCloseButton()
