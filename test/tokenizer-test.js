@@ -45,7 +45,7 @@ var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
 describe('TypeaheadTokenizer Component', function() {
 
-  describe('sanity', function() {
+  describe('basic tokenizer', function() {
     beforeEach(function() {
       this.component = TestUtils.renderIntoDocument(<Tokenizer
         options={BEATLES}
@@ -148,135 +148,131 @@ describe('TypeaheadTokenizer Component', function() {
       });
     });
 
-    describe('AllowCustomValues property test', function() {
-      var tokenLength = 4;
+  });
 
-      beforeEach(function() {
-        this.sinon = sinon.sandbox.create();
-        this.tokenAdd = this.sinon.spy();
-        this.tokenRemove = this.sinon.spy();
+  describe('AllowCustomValues property test', function() {
+    var tokenLength = 4;
+
+    beforeEach(function() {
+      this.sinon = sinon.sandbox.create();
+      this.tokenAdd = this.sinon.spy();
+      this.tokenRemove = this.sinon.spy();
 
 
-        this.component = TestUtils.renderIntoDocument(<Tokenizer
+      this.component = TestUtils.renderIntoDocument(
+        <Tokenizer
           options={BEATLES}
           onTokenAdd={this.tokenAdd}
           onTokenRemove={this.tokenRemove}
           allowCustomValues={tokenLength}
           customClasses={{
-            input: 'topcoat-text-input',
-            results: 'topcoat-list__container',
-            listItem: 'topcoat-list__item',
-            listAnchor: 'topcoat-list__link',
-            customAdd: 'topcoat-custom__token'
+            customAdd: 'topcoat-custom__token' 
           }}
-          ></Tokenizer>
-        );
-        clearSelection(this.component);
+        />
+      );
+      clearSelection(this.component);
 
-      });
+    });
 
-      afterEach(function() {
-        this.sinon.restore();
-      })
-
-
-      it('should not allow custom tokens that are less than specified allowCustomValues length', function() {
-        var tokens = getTokens(this.component);
-        var results = simulateTokenInput(this.component, "abz");
-        assert.equal(0, results.length);
-      });
-
-      it('should display custom tokens when equal or exceeds allowCustomValues value', function() {
-        var results = simulateTokenInput(this.component, "abzz");
-        assert.equal(1, results.length);
-        assert.equal("abzz", results[0].props.children);
-
-        results = simulateTokenInput(this.component, "bakercharlie")
-        assert.equal(1, results.length);
-        assert.equal("bakercharlie", results[0].props.customValue);
-      })
-
-      it('should not add custom class to non-custom selection', function() {
-        var results = simulateTokenInput(this.component, "o");
-        assert.equal(3, results.length);
-        assert(!results[0].getDOMNode().getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
-      })
-
-      it('should add custom class to custom selection', function() {
-        var results = simulateTokenInput(this.component, "abzz");
-        assert(1, results.length)
-        assert(results[0].getDOMNode().getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
-      })
-
-      it('should allow selection of custom token', function() {
-        var results = simulateTokenInput(this.component, "abzz");
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var tokens = getTokens(this.component);
-
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
-        tokens = getTokens(this.component)
-        assert(tokens.length == 1)
-        assert.equal("abzz", tokens[0].props.children);
-      })
-
-      it('should call onTokenAdd for custom token', function() {
-        var results = simulateTokenInput(this.component, "abzz");
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var tokens = getTokens(this.component);
-
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
-
-        assert(this.tokenAdd.called);
-        assert(this.tokenAdd.calledWith( this.component.state.selected ))
-      })
-
-      it('should call onTokenRemove for custom token', function() {
-        var results = simulateTokenInput(this.component, "abzz");
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var tokens = getTokens(this.component);
-
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
-
-        assert(this.tokenAdd.called);
-        assert(this.tokenAdd.calledWith( this.component.state.selected ))
-
-        tokens = getTokens(this.component);
-        var tokenClose = TestUtils.scryRenderedDOMComponentsWithTag(tokens[0], "a")[0].getDOMNode();
-        TestUtils.Simulate.click(tokenClose);
-        assert(this.tokenRemove.called);
-        assert(this.tokenRemove.calledWith(this.component.state.selected));
-      })
-
-      it('should not return undefined for a custom token when not selected', function() {
-        var results = simulateTokenInput(this.component, "abzz");
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var tokens = getTokens(this.component);
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
-
-        var newTokens = getTokens(this.component)
-        // behavior is custom token is selected
-        assert(tokens.length < newTokens.length);
-        assert(input.value == "");
-        assert.equal(newTokens[0].props.children, "abzz");
-      })
-
-      it('should not select value for a custom token when too short', function() {
-        var results = simulateTokenInput(this.component, "abz");
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var tokens = getTokens(this.component);
-        TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
-
-        var newTokens = getTokens(this.component)
-        // behavior is custom token is selected
-        assert(newTokens.length == 0);
-        assert(input.value == "abz");
-      })
+    afterEach(function() {
+      this.sinon.restore();
     })
-  });
 
 
+    it('should not allow custom tokens that are less than specified allowCustomValues length', function() {
+      var tokens = getTokens(this.component);
+      var results = simulateTokenInput(this.component, "abz");
+      assert.equal(0, results.length);
+    });
+
+    it('should display custom tokens when equal or exceeds allowCustomValues value', function() {
+      var results = simulateTokenInput(this.component, "abzz");
+      assert.equal(1, results.length);
+      assert.equal("abzz", results[0].props.children);
+
+      results = simulateTokenInput(this.component, "bakercharlie")
+      assert.equal(1, results.length);
+      assert.equal("bakercharlie", results[0].props.customValue);
+    })
+
+    it('should not add custom class to non-custom selection', function() {
+      var results = simulateTokenInput(this.component, "o");
+      assert.equal(3, results.length);
+      assert(!results[0].getDOMNode().getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
+    })
+
+    it('should add custom class to custom selection', function() {
+      var results = simulateTokenInput(this.component, "abzz");
+      assert(1, results.length)
+      assert(results[0].getDOMNode().getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
+    })
+
+    it('should allow selection of custom token', function() {
+      var results = simulateTokenInput(this.component, "abzz");
+      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var tokens = getTokens(this.component);
+
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
+      tokens = getTokens(this.component)
+      assert(tokens.length == 1)
+      assert.equal("abzz", tokens[0].props.children);
+    })
+
+    it('should call onTokenAdd for custom token', function() {
+      var results = simulateTokenInput(this.component, "abzz");
+      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var tokens = getTokens(this.component);
+
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
+
+      assert(this.tokenAdd.called);
+      assert(this.tokenAdd.calledWith( this.component.state.selected ))
+    })
+
+    it('should call onTokenRemove for custom token', function() {
+      var results = simulateTokenInput(this.component, "abzz");
+      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var tokens = getTokens(this.component);
+
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
+
+      assert(this.tokenAdd.called);
+      assert(this.tokenAdd.calledWith( this.component.state.selected ))
+
+      tokens = getTokens(this.component);
+      var tokenClose = TestUtils.scryRenderedDOMComponentsWithTag(tokens[0], "a")[0].getDOMNode();
+      TestUtils.Simulate.click(tokenClose);
+      assert(this.tokenRemove.called);
+      assert(this.tokenRemove.calledWith(this.component.state.selected));
+    })
+
+    it('should not return undefined for a custom token when not selected', function() {
+      var results = simulateTokenInput(this.component, "abzz");
+      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var tokens = getTokens(this.component);
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
+
+      var newTokens = getTokens(this.component)
+      // behavior is custom token is selected
+      assert(tokens.length < newTokens.length);
+      assert(input.value == "");
+      assert.equal(newTokens[0].props.children, "abzz");
+    })
+
+    it('should not select value for a custom token when too short', function() {
+      var results = simulateTokenInput(this.component, "abz");
+      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var tokens = getTokens(this.component);
+      TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
+
+      var newTokens = getTokens(this.component)
+      // behavior is custom token is selected
+      assert(newTokens.length == 0);
+      assert(input.value == "abz");
+    })
+  })
 
 });
