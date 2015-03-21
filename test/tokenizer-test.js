@@ -36,7 +36,7 @@ function clearSelection(component) {
     TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
   }
   
-  tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token)
+  tokens = getTokens(this.component)
   assert.equal(0, tokens.length);
 }
 
@@ -77,7 +77,7 @@ describe('TypeaheadTokenizer Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
-        var Tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        var Tokens = getTokens(this.component);
         assert.equal(Tokens[0].props.children, secondItem); // Poor Ringo
       });
 
@@ -89,12 +89,12 @@ describe('TypeaheadTokenizer Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
-        var Tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        var Tokens = getTokens(this.component);
         assert.equal(Tokens[1].props.children, firstItem);
       });
 
       it('should remove a token when BKSPC is pressed on an empty input', function() {
-        var results = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        var results = getTokens(this.component);
         var input = this.component.refs.typeahead.refs.entry.getDOMNode();
         var startLength = results.length;
         assert.equal(input.value, "");
@@ -102,20 +102,20 @@ describe('TypeaheadTokenizer Component', function() {
         assert.equal(startLength, results.length);
 
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
-        results = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        results = getTokens(this.component);
         assert.equal(startLength, results.length + 1);
 
       });
 
       it('should not remove a token on BKSPC when input is not empty', function() {
         var input = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var startLength = TestUtils.scryRenderedComponentsWithType(this.component, Token).length;
+        var startLength = getTokens(this.component).length;
 
         input.value = "hello";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
         
-        results = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        results = getTokens(this.component);
         assert.equal(startLength , results.length);
       });
 
@@ -123,12 +123,12 @@ describe('TypeaheadTokenizer Component', function() {
         var results = simulateTokenInput(this.component, 'o');
         var itemText = results[0].getDOMNode().innerText;
         var node = this.component.refs.typeahead.refs.entry.getDOMNode();
-        var tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        var tokens = getTokens(this.component);
 
         // Need to check Token list for props.children
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
 
-        var newTokens = TestUtils.scryRenderedComponentsWithType(this.component, Token)
+        var newTokens = getTokens(this.component)
         assert.equal(tokens.length, newTokens.length - 1);
         assert.equal(newTokens[newTokens.length - 1].props.children, itemText);
 
@@ -143,7 +143,7 @@ describe('TypeaheadTokenizer Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
-        var tokens = TestUtils.scryRenderedComponentsWithType(this.component, Token);
+        var tokens = getTokens(this.component);
         assert.equal(tokens[tokens.length - 1].props.children, itemText);
       });
     });
