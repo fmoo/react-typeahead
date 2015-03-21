@@ -28,7 +28,9 @@ var TypeaheadTokenizer = React.createClass({
 
   getInitialState: function() {
     return {
-      selected: this.props.defaultSelected
+      // We need to copy this to avoid incorrect sharing
+      // of state across instances (e.g., via getDefaultProps())
+      selected: this.props.defaultSelected.slice(0)
     };
   },
 

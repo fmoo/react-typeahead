@@ -26,20 +26,6 @@ function getTokens(component) {
   return TestUtils.scryRenderedComponentsWithType(component, Token);
 }
 
-function clearSelection(component) {
-  var node = component.refs.typeahead.refs.entry.getDOMNode();
-  var tokens = getTokens(component);
-  node.value = "";
-
-  TestUtils.Simulate.change(node);
-  for ( var i = 0; i<tokens.length; i++) {
-    TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
-  }
-  
-  tokens = getTokens(this.component)
-  assert.equal(0, tokens.length);
-}
-
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
@@ -90,21 +76,32 @@ describe('TypeaheadTokenizer Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
         var Tokens = getTokens(this.component);
-        assert.equal(Tokens[1].props.children, firstItem);
+        assert.equal(Tokens[0].props.children, firstItem);
       });
 
       it('should remove a token when BKSPC is pressed on an empty input', function() {
+        // Select two items
+        simulateTokenInput(this.component, 'o');
+        var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+        simulateTokenInput(this.component, 'o');
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+        // re-set the typeahead entry
         var results = getTokens(this.component);
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
         var startLength = results.length;
-        assert.equal(input.value, "");
+        assert.equal(entry.value, "");
         assert.equal(startLength, 2);
         assert.equal(startLength, results.length);
 
-        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
+        // Now press backspace with the empty entry
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
         results = getTokens(this.component);
-        assert.equal(startLength, results.length + 1);
-
+        assert.equal(results.length + 1, startLength);
       });
 
       it('should not remove a token on BKSPC when input is not empty', function() {
@@ -131,9 +128,6 @@ describe('TypeaheadTokenizer Component', function() {
         var newTokens = getTokens(this.component)
         assert.equal(tokens.length, newTokens.length - 1);
         assert.equal(newTokens[newTokens.length - 1].props.children, itemText);
-
-        // Clear out tokens for next test.
-        clearSelection(this.component);
       });
 
       it('tab to selected current item', function() {
@@ -170,8 +164,6 @@ describe('TypeaheadTokenizer Component', function() {
           }}
         />
       );
-      clearSelection(this.component);
-
     });
 
     afterEach(function() {
