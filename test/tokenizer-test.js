@@ -33,8 +33,12 @@ describe('TypeaheadTokenizer Component', function() {
 
   describe('basic tokenizer', function() {
     beforeEach(function() {
-      this.component = TestUtils.renderIntoDocument(<Tokenizer
-        options={BEATLES}
+      this.component = TestUtils.renderIntoDocument(
+        <Tokenizer
+          options={BEATLES}
+          customClasses={{
+            token: 'custom-token'
+          }}
         />
       );
     });
@@ -53,6 +57,21 @@ describe('TypeaheadTokenizer Component', function() {
         var results = simulateTokenInput(this.component, value);
         assert.equal(results.length, expected, 'Text input: ' + value);
       }, this);
+    });
+
+    it('should have custom and default token classes', function() {
+      simulateTokenInput(this.component, 'o');
+      var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+      var tokens = getTokens(this.component);
+      assert.equal(tokens.length, 1);
+      assert.isDefined(tokens[0]);
+
+      TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'typeahead-token');
+      TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'custom-token');
+      
     });
 
     describe('keyboard controls', function() {
