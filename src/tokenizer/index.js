@@ -6,6 +6,7 @@ var React = window.React || require('react');
 var Token = require('./token');
 var KeyEvent = require('../keyevent');
 var Typeahead = require('../typeahead');
+var classNames = require('classnames');
 
 /**
  * A typeahead that, when an option is selected, instead of simply filling
@@ -52,7 +53,8 @@ var TypeaheadTokenizer = React.createClass({
   _renderTokens: function() {
     var tokenClasses = {};
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
-    var classList = React.addons.classSet(tokenClasses);
+    debugger;
+    var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
       return (
         <Token key={ selected } className={classList}
@@ -117,7 +119,7 @@ var TypeaheadTokenizer = React.createClass({
   render: function() {
     var classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
     return (
       <div className="typeahead-tokenizer">
         { this._renderTokens() }

@@ -4,6 +4,7 @@
 
 var React = window.React || require('react/addons');
 var TypeaheadOption = require('./option');
+var classNames = require('classnames');
 
 /**
  * Container for the options rendered as part of the autocompletion process
@@ -39,7 +40,7 @@ var TypeaheadSelector = React.createClass({
       "typeahead-selector": true
     };
     classes[this.props.customClasses.results] = this.props.customClasses.results;
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
 
     var results = [];
     // CustomValue should be added to top of results list with different class name
