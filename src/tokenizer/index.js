@@ -53,7 +53,6 @@ var TypeaheadTokenizer = React.createClass({
   _renderTokens: function() {
     var tokenClasses = {};
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
-    debugger;
     var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
       return (
