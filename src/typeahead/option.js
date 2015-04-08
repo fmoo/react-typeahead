@@ -3,6 +3,7 @@
  */
 
 var React = window.React || require('react/addons');
+var classNames = require('classnames');
 
 /**
  * A single option within the TypeaheadSelector
@@ -38,7 +39,7 @@ var TypeaheadOption = React.createClass({
       classes[this.props.customClasses.customAdd] = !!this.props.customClasses.customAdd;
     }
 
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
 
     return (
       <li className={classList} onClick={this._onClick}>
@@ -55,7 +56,7 @@ var TypeaheadOption = React.createClass({
     };
     classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
 
-    return React.addons.classSet(classes);
+    return classNames(classes);
   },
 
   _onClick: function(event) {

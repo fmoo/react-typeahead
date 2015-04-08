@@ -3,6 +3,7 @@
  */
 
 var React = window.React || require('react');
+var classNames = require('classnames');
 
 /**
  * Encapsulates the rendering of an option that has been "selected" in a
@@ -17,10 +18,10 @@ var Token = React.createClass({
   },
 
   render: function() {
-    var className = React.addons.classSet(
+    var className = classNames([
       "typeahead-token",
       this.props.className
-    );
+    ]);
 
     return (
       <div className={className}>

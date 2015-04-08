@@ -1,4 +1,36 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactTypeahead=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+function classNames() {
+	var classes = '';
+	var arg;
+
+	for (var i = 0; i < arguments.length; i++) {
+		arg = arguments[i];
+		if (!arg) {
+			continue;
+		}
+
+		if ('string' === typeof arg || 'number' === typeof arg) {
+			classes += ' ' + arg;
+		} else if (Object.prototype.toString.call(arg) === '[object Array]') {
+			classes += ' ' + classNames.apply(null, arg);
+		} else if ('object' === typeof arg) {
+			for (var key in arg) {
+				if (!arg.hasOwnProperty(key) || !arg[key]) {
+					continue;
+				}
+				classes += ' ' + key;
+			}
+		}
+	}
+	return classes.substr(1);
+}
+
+// safely export classNames in case the script is included directly on a page
+if (typeof module !== 'undefined' && module.exports) {
+	module.exports = classNames;
+}
+
+},{}],2:[function(require,module,exports){
 /*
  * Fuzzy
  * https://github.com/myork/fuzzy
@@ -136,7 +168,7 @@ fuzzy.filter = function(pattern, arr, opts) {
 }());
 
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /**
  * PolyFills make me sad
  */
@@ -152,7 +184,7 @@ KeyEvent.DOM_VK_TAB = KeyEvent.DOM_VK_TAB || 9;
 module.exports = KeyEvent;
 
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var Typeahead = require('./typeahead');
 var Tokenizer = require('./tokenizer');
 
@@ -162,7 +194,7 @@ module.exports = {
 };
 
 
-},{"./tokenizer":4,"./typeahead":6}],4:[function(require,module,exports){
+},{"./tokenizer":5,"./typeahead":7}],5:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -171,6 +203,7 @@ var React = window.React || require('react');
 var Token = require('./token');
 var KeyEvent = require('../keyevent');
 var Typeahead = require('../typeahead');
+var classNames = require('classnames');
 
 /**
  * A typeahead that, when an option is selected, instead of simply filling
@@ -217,7 +250,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
   _renderTokens: function() {
     var tokenClasses = {};
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
-    var classList = React.addons.classSet(tokenClasses);
+    var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
       return (
         React.createElement(Token, {key:  selected, className: classList, 
@@ -282,7 +315,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
   render: function() {
     var classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
     return (
       React.createElement("div", {className: "typeahead-tokenizer"}, 
          this._renderTokens(), 
@@ -304,12 +337,13 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 module.exports = TypeaheadTokenizer;
 
 
-},{"../keyevent":2,"../typeahead":6,"./token":5,"react":"react"}],5:[function(require,module,exports){
+},{"../keyevent":3,"../typeahead":7,"./token":6,"classnames":1,"react":"react"}],6:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
 var React = window.React || require('react');
+var classNames = require('classnames');
 
 /**
  * Encapsulates the rendering of an option that has been "selected" in a
@@ -324,10 +358,10 @@ var Token = React.createClass({displayName: "Token",
   },
 
   render: function() {
-    var className = React.addons.classSet(
+    var className = classNames([
       "typeahead-token",
       this.props.className
-    );
+    ]);
 
     return (
       React.createElement("div", {className: className}, 
@@ -369,7 +403,7 @@ var Token = React.createClass({displayName: "Token",
 module.exports = Token;
 
 
-},{"react":"react"}],6:[function(require,module,exports){
+},{"classnames":1,"react":"react"}],7:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -378,6 +412,7 @@ var React = window.React || require('react/addons');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
+var classNames = require('classnames');
 
 /**
  * A "typeahead", an auto-completing text input
@@ -569,13 +604,13 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   render: function() {
     var inputClasses = {}
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
-    var inputClassList = React.addons.classSet(inputClasses)
+    var inputClassList = classNames(inputClasses);
 
     var classes = {
       typeahead: true
     }
     classes[this.props.className] = !!this.props.className;
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
 
     return (
       React.createElement("div", {className: classList}, 
@@ -609,12 +644,13 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 module.exports = Typeahead;
 
 
-},{"../keyevent":2,"./selector":8,"fuzzy":1,"react/addons":"react/addons"}],7:[function(require,module,exports){
+},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2,"react/addons":"react/addons"}],8:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
 var React = window.React || require('react/addons');
+var classNames = require('classnames');
 
 /**
  * A single option within the TypeaheadSelector
@@ -650,7 +686,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
       classes[this.props.customClasses.customAdd] = !!this.props.customClasses.customAdd;
     }
 
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
 
     return (
       React.createElement("li", {className: classList, onClick: this._onClick}, 
@@ -667,7 +703,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
     };
     classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
 
-    return React.addons.classSet(classes);
+    return classNames(classes);
   },
 
   _onClick: function(event) {
@@ -680,13 +716,14 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 module.exports = TypeaheadOption;
 
 
-},{"react/addons":"react/addons"}],8:[function(require,module,exports){
+},{"classnames":1,"react/addons":"react/addons"}],9:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
 var React = window.React || require('react/addons');
 var TypeaheadOption = require('./option');
+var classNames = require('classnames');
 
 /**
  * Container for the options rendered as part of the autocompletion process
@@ -722,7 +759,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
       "typeahead-selector": true
     };
     classes[this.props.customClasses.results] = this.props.customClasses.results;
-    var classList = React.addons.classSet(classes);
+    var classList = classNames(classes);
 
     var results = [];
     // CustomValue should be added to top of results list with different class name
@@ -813,5 +850,5 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 module.exports = TypeaheadSelector;
 
 
-},{"./option":7,"react/addons":"react/addons"}]},{},[3])(3)
+},{"./option":8,"classnames":1,"react/addons":"react/addons"}]},{},[4])(4)
 });
