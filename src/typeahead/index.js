@@ -69,12 +69,12 @@ var Typeahead = React.createClass({
   },
 
   _hasCustomValue: function() {
-    if (this.props.allowCustomValues > 0 && 
+    if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
       this.state.visible.indexOf(this.state.entryValue) < 0) {
       return true;
     }
-    return false; 
+    return false;
   },
 
   _getCustomValue: function() {
@@ -149,7 +149,7 @@ var Typeahead = React.createClass({
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
       this.refs.sel.state.selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
-      
+
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
     }
