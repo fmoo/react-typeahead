@@ -201,7 +201,7 @@ module.exports = {
  * @jsx React.DOM
  */
 
-var React = window.React;
+var React = window.React || require('react');
 var Token = require('./token');
 var KeyEvent = require('../keyevent');
 var Typeahead = require('../typeahead');
@@ -340,12 +340,12 @@ module.exports = TypeaheadTokenizer;
 
 
 
-},{"../keyevent":3,"../typeahead":7,"./token":6,"classnames":1}],6:[function(require,module,exports){
+},{"../keyevent":3,"../typeahead":7,"./token":6,"classnames":1,"react":"react"}],6:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React;
+var React = window.React || require('react');
 var classNames = require('classnames');
 
 /**
@@ -407,12 +407,12 @@ module.exports = Token;
 
 
 
-},{"classnames":1}],7:[function(require,module,exports){
+},{"classnames":1,"react":"react"}],7:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React;
+var React = window.React || require('react/addons');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
@@ -649,12 +649,12 @@ module.exports = Typeahead;
 
 
 
-},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2}],8:[function(require,module,exports){
+},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2,"react/addons":"react/addons"}],8:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React;
+var React = window.React || require('react/addons');
 var classNames = require('classnames');
 
 /**
@@ -722,12 +722,12 @@ module.exports = TypeaheadOption;
 
 
 
-},{"classnames":1}],9:[function(require,module,exports){
+},{"classnames":1,"react/addons":"react/addons"}],9:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React;
+var React = window.React || require('react/addons');
 var TypeaheadOption = require('./option');
 var classNames = require('classnames');
 
@@ -857,5 +857,5 @@ module.exports = TypeaheadSelector;
 
 
 
-},{"./option":8,"classnames":1}]},{},[4])(4)
+},{"./option":8,"classnames":1,"react/addons":"react/addons"}]},{},[4])(4)
 });
