@@ -199,7 +199,7 @@ module.exports = {
  * @jsx React.DOM
  */
 
-var React = window.React || require('react');
+var React = window.React;
 var Token = require('./token');
 var KeyEvent = require('../keyevent');
 var Typeahead = require('../typeahead');
@@ -337,12 +337,12 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 module.exports = TypeaheadTokenizer;
 
 
-},{"../keyevent":3,"../typeahead":7,"./token":6,"classnames":1,"react":"react"}],6:[function(require,module,exports){
+},{"../keyevent":3,"../typeahead":7,"./token":6,"classnames":1}],6:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React || require('react');
+var React = window.React;
 var classNames = require('classnames');
 
 /**
@@ -403,12 +403,12 @@ var Token = React.createClass({displayName: "Token",
 module.exports = Token;
 
 
-},{"classnames":1,"react":"react"}],7:[function(require,module,exports){
+},{"classnames":1}],7:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React || require('react/addons');
+var React = window.React;
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
@@ -475,12 +475,12 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   },
 
   _hasCustomValue: function() {
-    if (this.props.allowCustomValues > 0 && 
+    if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
       this.state.visible.indexOf(this.state.entryValue) < 0) {
       return true;
     }
-    return false; 
+    return false;
   },
 
   _getCustomValue: function() {
@@ -555,7 +555,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   _onTab: function(event) {
     var option = this.refs.sel.state.selection ?
       this.refs.sel.state.selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
-      
+
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
     }
@@ -644,12 +644,12 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 module.exports = Typeahead;
 
 
-},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2,"react/addons":"react/addons"}],8:[function(require,module,exports){
+},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2}],8:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React || require('react/addons');
+var React = window.React;
 var classNames = require('classnames');
 
 /**
@@ -716,12 +716,12 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 module.exports = TypeaheadOption;
 
 
-},{"classnames":1,"react/addons":"react/addons"}],9:[function(require,module,exports){
+},{"classnames":1}],9:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React || require('react/addons');
+var React = window.React;
 var TypeaheadOption = require('./option');
 var classNames = require('classnames');
 
@@ -850,5 +850,5 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 module.exports = TypeaheadSelector;
 
 
-},{"./option":8,"classnames":1,"react/addons":"react/addons"}]},{},[4])(4)
+},{"./option":8,"classnames":1}]},{},[4])(4)
 });
