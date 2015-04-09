@@ -33,8 +33,7 @@
   "dependencies": {
     "classnames": "^1.2.0",
     "fuzzy": "^0.1.0",
-    "react": "^0.13.1",
-    "sinon": "^1.13.0"
+    "react": "^0.13.1"
   },
   "main": "lib/react-typeahead.js",
   "devDependencies": {
