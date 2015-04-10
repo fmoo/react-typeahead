@@ -2,7 +2,7 @@
  * @jsx React.DOM
  */
 
-var React = window.React || require('react');
+var React = require('react');
 var classNames = require('classnames');
 
 /**

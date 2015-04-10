@@ -43,6 +43,7 @@
     "gulp": "^3.8.7",
     "gulp-mocha-phantomjs": "^0.4.0",
     "gulp-react": "^3.0.1",
+    "literalify": "^0.4.0",
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
     "react-tools": "^0.13.0",
@@ -54,10 +55,14 @@
     "test": "npm run build-test && gulp test",
     "watchify-test": "watchify test/main.js -o test/bundle.js -v",
     "build-test": "browserify test/main.js -o test/bundle.js",
-    "build": "browserify ./src/react-typeahead.js -s ReactTypeahead -i react -x react -x 'react/addons' -o ./dist/react-typeahead.js",
-    "watchify": "watchify ./src/react-typeahead.js -s ReactTypeahead -i react -x react -x 'react/addons' -o ./dist/react-typeahead.js",
+    "build": "browserify ./src/react-typeahead.js -t reactify -t literalify -x react -x 'react/addons' -s ReactTypeahead -o ./dist/react-typeahead.js",
+    "watchify": "watchify ./src/react-typeahead.js -t reactify -t literalify -x react -x 'react/addons' -s ReactTypeahead -o ./dist/react-typeahead.js",
     "lib": "gulp build",
     "prepublish": "npm run lib"
+  },
+  "literalify": {
+    "react": "window.React || require('react')",
+    "react/addons": "window.React || require('react/addons')"
   },
   "browserify": {
     "transform": [
