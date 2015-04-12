@@ -6,6 +6,7 @@
     "react",
     "typeahead",
     "tokenizer",
+    "autocomplete",
     "react-component"
   ],
   "homepage": "https://github.com/fmoo/react-typeahead",
