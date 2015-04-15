@@ -56,7 +56,7 @@ Basic typeahead input and results list.
 Type: `Array`
 Default: []
 
-An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects. In the latter case, `props.getSearchString` and `props.getDisplayString` should be provided.
+An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects. In the latter case, `filterOption` and `displayOption` should be provided.
 
 #### props.maxVisible
 
@@ -92,23 +92,19 @@ Event handler triggered whenever a user picks an option.
 
 #### props.filterOption
 
-Type: `Function`
+Type: `String` or `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
-#### props.getSearchString
+If provided as a string, it will interpret it as a field name and fuzzy filter on that field of each option object.
 
-Type: `Function`
+#### props.displayOption
 
-Given an option, it should return a string on which fuzzy search should be applied.
-If the function is not provided `options` is assumed to be a list of strings.
+Type: `String` or `Function`
 
-#### props.getDisplayString
+A function to map an option onto a string for display in the list. Must return a string.
 
-Type: `Function`
-
-Given an option, it should return a string which should be displayed in the suggestions list.
-If the function is not provided `options` is assumed to be a list of strings.
+If provided as a string, it will interpret it as a field name and use that field from each option object.
 
 ---
 
