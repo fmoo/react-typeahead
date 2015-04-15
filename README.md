@@ -78,6 +78,12 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
+#### props.inputProps
+
+Type: `Object`
+
+Props to pass directly to the `<input>` element.
+
 #### props.onKeyDown
 
 Type: `Function`
@@ -131,6 +137,12 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
+#### props.inputProps
+
+Type: `Object`
+
+Props to pass directly to the `<input>` element.
+
 #### props.defaultSelected
 
 Type: `Array`
@@ -174,7 +186,7 @@ Once that's done, running the tests is easy with `gulp`:
 [00:17:25] Using gulpfile ~/src/react-typeahead/gulpfile.js
 [00:17:25] Starting 'test'...
 
-  
+
   ․․․․․․․․․․․․․․․
 
   15 passing (43ms)

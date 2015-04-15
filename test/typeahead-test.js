@@ -114,7 +114,7 @@ describe('Typeahead Component', function() {
   describe('props', function() {
     context('maxVisible', function() {
       it('limits the result set based on the maxVisible option', function() {
-        var component = TestUtils.renderIntoDocument(<Typeahead 
+        var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
           maxVisible={ 1 }
           ></Typeahead>);
@@ -176,7 +176,7 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_RETURN });
-        
+
         assert.equal(true, this.selectSpy.called);
         assert(this.selectSpy.calledWith(input.value));
       })
@@ -194,7 +194,7 @@ describe('Typeahead Component', function() {
           hover: 'topcoat-list__item-active'
         };
 
-        this.component = TestUtils.renderIntoDocument(<Typeahead 
+        this.component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
           customClasses={ customClasses }
         ></Typeahead>);
@@ -223,16 +223,16 @@ describe('Typeahead Component', function() {
         var listAnchor = typeaheadOptions[1].refs.anchor.getDOMNode();
         assert.isTrue(listAnchor.classList.contains('topcoat-list__link'));
       });
-      
+
       it('adds a custom class to the list items when active', function() {
         var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
         var node = this.component.refs.entry.getDOMNode();
-        
+
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
-        
-        var listItem = typeaheadOptions[0]; 
+
+        var listItem = typeaheadOptions[0];
         var domListItem = listItem.getDOMNode();
-          
+
         assert.isTrue(domListItem.classList.contains('topcoat-list__item-active'));
       });
     });
@@ -261,6 +261,18 @@ describe('Typeahead Component', function() {
 
         var input = component.refs.entry.getDOMNode();
         TestUtils.Simulate.keyDown(input, { keyCode: 87 });
+      });
+    });
+
+    context('inputProps', function() {
+      it('should forward props to the input element', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          inputProps={{ autoCorrect: 'off' }}
+        />);
+
+        var input = component.refs.entry;
+        assert.equal(input.props.autoCorrect, 'off');
       });
     });
   });

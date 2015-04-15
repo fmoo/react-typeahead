@@ -23,6 +23,7 @@ var Typeahead = React.createClass({
     allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
+    inputProps: React.PropTypes.object,
     onOptionSelected: React.PropTypes.func,
     onKeyDown: React.PropTypes.func
   },
@@ -34,6 +35,7 @@ var Typeahead = React.createClass({
       allowCustomValues: 0,
       defaultValue: "",
       placeholder: "",
+      inputProps: {},
       onKeyDown: function(event) { return },
       onOptionSelected: function(option) { }
     };
@@ -210,6 +212,7 @@ var Typeahead = React.createClass({
       <div className={classList}>
         { this._renderHiddenInput() }
         <input ref="entry" type="text"
+          {...this.props.inputProps}
           placeholder={this.props.placeholder}
           className={inputClassList}
           value={this.state.entryValue}
