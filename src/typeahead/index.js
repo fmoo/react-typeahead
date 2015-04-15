@@ -255,9 +255,10 @@ var Typeahead = React.createClass({
         mapper = function(o) { return o; }
       }
       return function(value, options) {
+        var transformedOptions = options.map(mapper);
         return fuzzy
-          .filter(value, options.map(mapper))
-          .map(function(res) { return res.string; });
+          .filter(value, transformedOptions)
+          .map(function(res) { return options[res.index]; });
       };
     }
   },

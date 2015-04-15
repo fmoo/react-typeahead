@@ -349,10 +349,11 @@ describe('Typeahead Component', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES_COMPLEX }
           filterOption='firstName'
+          displayOption='firstName'
         />);
 
         _.each(STRING_TEST_PLANS, function(expected, value) {
-          var results = simulateTextInput(this.component, value);
+          var results = simulateTextInput(component, value);
           assert.equal(results.length, expected, 'Text input: ' + value);
         }, this);
       });
