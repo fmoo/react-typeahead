@@ -437,9 +437,11 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
-    filterOption: React.PropTypes.func,
-    getSearchString: React.PropTypes.func,
-    getDisplayString: React.PropTypes.func
+    filterOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    displayOption: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -450,12 +452,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       defaultValue: "",
       placeholder: "",
       onOptionSelected: function(option) {},
-      onKeyDown: function(event) {},
-      filterOption: null,
-      // If the following two functions are not provides,
-      // assume the options have been passed as strings
-      getSearchString: function(option) { return option },
-      getDisplayString: function(option) { return option }
+      onKeyDown: function(event) {}
     };
   },
 
@@ -473,15 +470,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   },
 
   getOptionsForValue: function(value, options) {
-    var result;
-    if (this.props.filterOption) {
-      result = options.filter((function(o) { return this.props.filterOption(value, o); }).bind(this));
-    } else {
-      var optionStrings = options.map(this.props.getSearchString);
-      result = fuzzy.filter(value, optionStrings).map(function(res) {
-        return options[res.index];
-      });
-    }
+    var filterOptions = this._generateFilterFunction();
+    var result = filterOptions(value, options);
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -532,7 +522,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
           customValue: this.state.entryValue, 
           onOptionSelected: this._onOptionSelected, 
           customClasses: this.props.customClasses, 
-          getDisplayString: this.props.getDisplayString})
+          displayOption: this._generateDisplayFunction()})
       );
     }
 
@@ -541,15 +531,16 @@ var Typeahead = React.createClass({displayName: "Typeahead",
         ref: "sel", options:  this.state.visible, 
         onOptionSelected:  this._onOptionSelected, 
         customClasses: this.props.customClasses, 
-        getDisplayString: this.props.getDisplayString})
+        displayOption: this._generateDisplayFunction()})
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = this.props.getDisplayString(option);
-    var optionString = this.props.getDisplayString(option);
+    var displayOption = this._generateDisplayFunction();
+    var optionString = displayOption(option);
+    nEntry.value = optionString;
     this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: option,
                    entryValue: optionString});
@@ -660,6 +651,39 @@ var Typeahead = React.createClass({displayName: "Typeahead",
         value:  this.state.selection}
       )
     );
+  },
+
+  _generateFilterFunction: function() {
+    var filterOptionProp = this.props.filterOption;
+    if (typeof filterOptionProp === 'function') {
+      return function(value, options) {
+        return options.filter(function(o) { return filterOptionProp(value, o); });
+      };
+    } else {
+      var mapper;
+      if (typeof filterOptionProp === 'string') {
+        mapper = function(o) { return o[filterOptionProp]; };
+      } else {
+        mapper = function(o) { return o; }
+      }
+      return function(value, options) {
+        var transformedOptions = options.map(mapper);
+        return fuzzy
+          .filter(value, transformedOptions)
+          .map(function(res) { return options[res.index]; });
+      };
+    }
+  },
+
+  _generateDisplayFunction: function() {
+    var displayOptionProp = this.props.displayOption;
+    if (typeof displayOptionProp === 'string') {
+      return function(o) {
+        return o[displayOptionProp];
+      };
+    } else {
+      return function(o) { return o; }
+    }
   }
 });
 
@@ -760,7 +784,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     customValue: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func,
-    getDisplayString: React.PropTypes.func.isRequired
+    displayOption: React.PropTypes.func.isRequired
   },
 
   getDefaultProps: function() {
@@ -801,7 +825,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     }
 
     this.props.options.forEach(function(result, i) {
-      var displayString = this.props.getDisplayString(result);
+      var displayString = this.props.displayOption(result);
       results.push (
         React.createElement(TypeaheadOption, {ref: displayString, key: displayString, 
           hover: this.state.selectionIndex === results.length, 
