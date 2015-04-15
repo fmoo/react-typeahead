@@ -25,9 +25,11 @@ var Typeahead = React.createClass({
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
-    filterOption: React.PropTypes.func,
-    getSearchString: React.PropTypes.func,
-    getDisplayString: React.PropTypes.func
+    filterOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ])
+    displayOption: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -38,12 +40,7 @@ var Typeahead = React.createClass({
       defaultValue: "",
       placeholder: "",
       onOptionSelected: function(option) {},
-      onKeyDown: function(event) {},
-      filterOption: null,
-      // If the following two functions are not provides,
-      // assume the options have been passed as strings
-      getSearchString: function(option) { return option },
-      getDisplayString: function(option) { return option }
+      onKeyDown: function(event) {}
     };
   },
 
@@ -61,15 +58,7 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
-    var result;
-    if (this.props.filterOption) {
-      result = options.filter((function(o) { return this.props.filterOption(value, o); }).bind(this));
-    } else {
-      var optionStrings = options.map(this.props.getSearchString);
-      result = fuzzy.filter(value, optionStrings).map(function(res) {
-        return options[res.index];
-      });
-    }
+    var result = this.state.filterOptionsFn(value, options);
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -120,7 +109,7 @@ var Typeahead = React.createClass({
           customValue={this.state.entryValue}
           onOptionSelected={this._onOptionSelected}
           customClasses={this.props.customClasses}
-          getDisplayString={this.props.getDisplayString} />
+          displayOption={this.state.displayOptionFn} />
       );
     }
 
@@ -129,15 +118,15 @@ var Typeahead = React.createClass({
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
         customClasses={this.props.customClasses}
-        getDisplayString={this.props.getDisplayString} />
+        displayOption={this.state.displayOptionFn} />
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = this.props.getDisplayString(option);
-    var optionString = this.props.getDisplayString(option);
+    var optionString = this.state.displayOptionFn(option);
+    nEntry.value = optionString;
     this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: option,
                    entryValue: optionString});
@@ -207,7 +196,9 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options),
+      filterOptionsFn: this._generateFilterFunction(this.props.filterOption),
+      displayOptionFn: this._generateDisplayFunction(this.props.displayOption)
     });
   },
 
@@ -248,6 +239,36 @@ var Typeahead = React.createClass({
         value={ this.state.selection }
       />
     );
+  },
+
+  _generateFilterFunction: function(filterOptionProp) {
+    if (typeof filterOptionProp === 'function') {
+      return function(value, options) {
+        return options.filter(function(o) { return filterOptionProp(value, o); });
+      };
+    } else {
+      var mapper;
+      if (typeof filterOptionProp === 'string') {
+        mapper = function(o) { return o[filterOptionProp]; };
+      } else {
+        mapper = function(o) { return o; }
+      }
+      return function(value, options) {
+        return fuzzy
+          .filter(value, options.map(mapper))
+          .map(function(res) { return res.string; });
+      });
+    }
+  },
+
+  _generateDisplayFunction: function(displayOptionProp) {
+    if (typeof displayOptionProp === 'string') {
+      return function(o) {
+        return o[displayOptionProp];
+      };
+    } else {
+      return function(o) { return o; }
+    }
   }
 });
 

@@ -17,7 +17,7 @@ var TypeaheadSelector = React.createClass({
     customValue: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func,
-    getDisplayString: React.PropTypes.func.isRequired
+    displayOption: React.PropTypes.func.isRequired
   },
 
   getDefaultProps: function() {
@@ -58,7 +58,7 @@ var TypeaheadSelector = React.createClass({
     }
 
     this.props.options.forEach(function(result, i) {
-      var displayString = this.props.getDisplayString(result);
+      var displayString = this.props.displayOption(result);
       results.push (
         <TypeaheadOption ref={displayString} key={displayString}
           hover={this.state.selectionIndex === results.length}
