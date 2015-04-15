@@ -17,12 +17,6 @@ function simulateTextInput(component, value) {
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
-var getSearchString = function(option) {
-  return option.firstName + " " + option.lastName;
-};
-var getDisplayString = function(option) {
-  return option.firstName + " (" + option.birthYear + ")";
-};
 var BEATLES_COMPLEX = [
   {
     firstName: 'John',
@@ -166,6 +160,16 @@ describe('Typeahead Component', function() {
         />);
         var results = simulateTextInput(component, 'john');
         assert.equal(results[0].getDOMNode().textContent, 'John Winston Ono Lennon MBE');
+      });
+
+      it('renders custom options when specified as a function', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+          filterOption='firstName'
+          displayOption={ function(o, i) { return i + ' ' + o.firstName + ' ' + o.lastName; } }
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
       });
     });
 

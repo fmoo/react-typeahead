@@ -29,7 +29,10 @@ var Typeahead = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
-    displayOption: React.PropTypes.string
+    displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ])
   },
 
   getDefaultProps: function() {
@@ -269,6 +272,8 @@ var Typeahead = React.createClass({
       return function(o) {
         return o[displayOptionProp];
       };
+    } else if (typeof displayOptionProp === 'function') {
+      return displayOptionProp;
     } else {
       return function(o) { return o; }
     }
