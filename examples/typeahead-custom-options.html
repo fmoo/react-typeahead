@@ -44,12 +44,6 @@
     <script type="text/jsx">
 /** @jsx React.DOM */
 
-var getSearchString = function(option) {
-  return option.firstName + " " + option.lastName;
-};
-var getDisplayString = function(option) {
-  return option.firstName + " (" + option.birthYear + ")";
-};
 var options = [
   {
     firstName: 'John',
@@ -71,15 +65,22 @@ var options = [
     lastName: 'Starr',
     birthYear: 1940
   }
-];
+].map(function(option) {
+  option.fullName = option.firstName + ' ' + option.lastName;
+  return option;
+});
+
+var displayOption = function(option) {
+  return option.firstName + " (" + option.birthYear + ")";
+};
 
 window.onload = function() {
   React.render(
     <ReactTypeahead.Typeahead
       defaultValue="a"
       options={options}
-      getSearchString={getSearchString}
-      getDisplayString={getDisplayString}
+      filterOption='fullName'
+      displayOption={ displayOption }
       className="topcoat-list"
       customClasses={{
         input: "topcoat-text-input",
