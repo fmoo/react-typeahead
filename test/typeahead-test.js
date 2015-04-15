@@ -27,22 +27,19 @@ var BEATLES_COMPLEX = [
   {
     firstName: 'John',
     lastName: 'Lennon',
-    birthYear: 1940
-  },
-  {
+    nameWithTitle: 'John Winston Ono Lennon MBE'
+  }, {
     firstName: 'Paul',
     lastName: 'McCartney',
-    birthYear: 1942
-  },
-  {
+    nameWithTitle: 'Sir James Paul McCartney MBE'
+  }, {
     firstName: 'George',
     lastName: 'Harrison',
-    birthYear: 1943
-  },
-  {
+    nameWithTitle: 'George Harrison MBE'
+  }, {
     firstName: 'Ringo',
     lastName: 'Starr',
-    birthYear: 1940
+    nameWithTitle: 'Richard Starkey Jr. MBE'
   }
 ];
 
@@ -152,8 +149,8 @@ describe('Typeahead Component', function() {
       });
     });
 
-    context('options', function() {
-      it('renders simple options correctly', function() {
+    context('displayOption', function() {
+      it('renders simple options verbatim when not specified', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
         />);
@@ -161,26 +158,15 @@ describe('Typeahead Component', function() {
         assert.equal(results[0].getDOMNode().textContent, 'John');
       });
 
-      it('renders custom options correctly', function() {
+      it('renders custom options when specified as a string', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES_COMPLEX }
-          getDisplayString={ getDisplayString }
-          getSearchString={ getSearchString }
+          filterOption='firstName'
+          displayOption='nameWithTitle'
         />);
         var results = simulateTextInput(component, 'john');
-        assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
+        assert.equal(results[0].getDOMNode().textContent, 'John Winston Ono Lennon MBE');
       });
-
-      it('filters search string', function() {
-        var component = TestUtils.renderIntoDocument(<Typeahead
-          options={ BEATLES_COMPLEX }
-          getDisplayString={ getDisplayString }
-          getSearchString={ getSearchString }
-        />);
-        var results = simulateTextInput(component, 'Lennon');
-        assert.equal(results[0].getDOMNode().textContent, 'John (1940)');
-      });
-
     });
 
     context('allowCustomValues', function() {
@@ -324,8 +310,8 @@ describe('Typeahead Component', function() {
       });
     });
 
-    context('filterOptions', function() {
-      var TEST_PLANS = [
+    context('filterOption', function() {
+      var FN_TEST_PLANS = [
         {
           name: 'accepts everything',
           fn: function() { return true; },
@@ -339,7 +325,7 @@ describe('Typeahead Component', function() {
         }
       ];
 
-      _.each(TEST_PLANS, function(testplan) {
+      _.each(FN_TEST_PLANS, function(testplan) {
         it('should filter with a custom function that ' + testplan.name, function() {
           var component = TestUtils.renderIntoDocument(<Typeahead
             options={ BEATLES }
@@ -349,6 +335,26 @@ describe('Typeahead Component', function() {
           var results = simulateTextInput(component, testplan.input);
           assert.equal(results.length, testplan.output);
         });
+      });
+
+      var STRING_TEST_PLANS = {
+        'o': 3,
+        'pa': 1,
+        'Grg': 1,
+        'Ringo': 1,
+        'xxx': 0
+      };
+
+      it('should filter using fuzzy matching on the provided field name', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+          filterOption='firstName'
+        />);
+
+        _.each(STRING_TEST_PLANS, function(expected, value) {
+          var results = simulateTextInput(this.component, value);
+          assert.equal(results.length, expected, 'Text input: ' + value);
+        }, this);
       });
     });
   });

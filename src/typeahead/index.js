@@ -28,7 +28,7 @@ var Typeahead = React.createClass({
     filterOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
-    ])
+    ]),
     displayOption: React.PropTypes.string
   },
 
@@ -257,7 +257,7 @@ var Typeahead = React.createClass({
         return fuzzy
           .filter(value, options.map(mapper))
           .map(function(res) { return res.string; });
-      });
+      };
     }
   },
 
