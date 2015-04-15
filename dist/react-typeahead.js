@@ -441,7 +441,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       React.PropTypes.string,
       React.PropTypes.func
     ]),
-    displayOption: React.PropTypes.string
+    displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ])
   },
 
   getDefaultProps: function() {
@@ -681,6 +684,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       return function(o) {
         return o[displayOptionProp];
       };
+    } else if (typeof displayOptionProp === 'function') {
+      return displayOptionProp;
     } else {
       return function(o) { return o; }
     }
@@ -825,7 +830,7 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     }
 
     this.props.options.forEach(function(result, i) {
-      var displayString = this.props.displayOption(result);
+      var displayString = this.props.displayOption(result, i);
       results.push (
         React.createElement(TypeaheadOption, {ref: displayString, key: displayString, 
           hover: this.state.selectionIndex === results.length, 
