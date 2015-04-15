@@ -25,7 +25,9 @@ var Typeahead = React.createClass({
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
-    filterOption: React.PropTypes.func
+    filterOption: React.PropTypes.func,
+    getSearchString: React.PropTypes.func,
+    getDisplayString: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -37,7 +39,11 @@ var Typeahead = React.createClass({
       placeholder: "",
       onOptionSelected: function(option) {},
       onKeyDown: function(event) {},
-      filterOption: null
+      filterOption: null,
+      // If the following two functions are not provides,
+      // assume the options have been passed as strings
+      getSearchString: function(option) { return option },
+      getDisplayString: function(option) { return option }
     };
   },
 
@@ -59,8 +65,9 @@ var Typeahead = React.createClass({
     if (this.props.filterOption) {
       result = options.filter((function(o) { return this.props.filterOption(value, o); }).bind(this));
     } else {
-      result = fuzzy.filter(value, options).map(function(res) {
-        return res.string;
+      var optionStrings = options.map(this.props.getSearchString);
+      result = fuzzy.filter(value, optionStrings).map(function(res) {
+        return options[res.index];
       });
     }
     if (this.props.maxVisible) {
@@ -112,7 +119,8 @@ var Typeahead = React.createClass({
           ref="sel" options={this.state.visible}
           customValue={this.state.entryValue}
           onOptionSelected={this._onOptionSelected}
-          customClasses={this.props.customClasses} />
+          customClasses={this.props.customClasses}
+          getDisplayString={this.props.getDisplayString} />
       );
     }
 
@@ -120,17 +128,19 @@ var Typeahead = React.createClass({
       <TypeaheadSelector
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
-        customClasses={this.props.customClasses} />
+        customClasses={this.props.customClasses}
+        getDisplayString={this.props.getDisplayString} />
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
-    this.setState({visible: this.getOptionsForValue(option, this.props.options),
+    nEntry.value = this.props.getDisplayString(option);
+    var optionString = this.props.getDisplayString(option);
+    this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: option,
-                   entryValue: option});
+                   entryValue: optionString});
     return this.props.onOptionSelected(option, event);
   },
 
