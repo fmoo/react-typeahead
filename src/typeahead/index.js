@@ -58,7 +58,8 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
-    var result = this.state.filterOptionsFn(value, options);
+    var filterOptions = this._generateFilterFunction();
+    var result = filterOptions(value, options);
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -109,7 +110,7 @@ var Typeahead = React.createClass({
           customValue={this.state.entryValue}
           onOptionSelected={this._onOptionSelected}
           customClasses={this.props.customClasses}
-          displayOption={this.state.displayOptionFn} />
+          displayOption={this._generateDisplayFunction()} />
       );
     }
 
@@ -118,14 +119,15 @@ var Typeahead = React.createClass({
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
         customClasses={this.props.customClasses}
-        displayOption={this.state.displayOptionFn} />
+        displayOption={this._generateDisplayFunction()} />
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    var optionString = this.state.displayOptionFn(option);
+    var displayOption = this._generateDisplayFunction();
+    var optionString = displayOption(option);
     nEntry.value = optionString;
     this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: option,
@@ -196,9 +198,7 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options),
-      filterOptionsFn: this._generateFilterFunction(this.props.filterOption),
-      displayOptionFn: this._generateDisplayFunction(this.props.displayOption)
+      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
     });
   },
 
@@ -241,7 +241,8 @@ var Typeahead = React.createClass({
     );
   },
 
-  _generateFilterFunction: function(filterOptionProp) {
+  _generateFilterFunction: function() {
+    var filterOptionProp = this.props.filterOption;
     if (typeof filterOptionProp === 'function') {
       return function(value, options) {
         return options.filter(function(o) { return filterOptionProp(value, o); });
@@ -261,7 +262,8 @@ var Typeahead = React.createClass({
     }
   },
 
-  _generateDisplayFunction: function(displayOptionProp) {
+  _generateDisplayFunction: function() {
+    var displayOptionProp = this.props.displayOption;
     if (typeof displayOptionProp === 'string') {
       return function(o) {
         return o[displayOptionProp];
