@@ -56,7 +56,7 @@ Basic typeahead input and results list.
 Type: `Array`
 Default: []
 
-An array supplied to the fuzzy search.
+An array supplied to the filtering function.
 
 #### props.maxVisible
 
@@ -88,7 +88,13 @@ Event handler for the `keyDown` event on the typeahead input.
 
 Type: `Function`
 
-Event handler triggered whenever a user picks an option
+Event handler triggered whenever a user picks an option.
+
+#### props.filterOption
+
+Type: `Function`
+
+A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
 ---
 
@@ -103,7 +109,7 @@ Typeahead component that allows for multiple options to be selected.
 Type: `Array`
 Default: []
 
-An array supplied to the fuzzy search.
+An array supplied to the filter function.
 
 #### props.maxVisible
 
@@ -149,6 +155,12 @@ Type: `Function`
 
 Event handler triggered whenever a token is removed.
 
+#### props.filterOption
+
+Type: `Function`
+
+A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
+
 
 ## Developing
 
@@ -174,7 +186,7 @@ Once that's done, running the tests is easy with `gulp`:
 [00:17:25] Using gulpfile ~/src/react-typeahead/gulpfile.js
 [00:17:25] Starting 'test'...
 
-  
+
   ․․․․․․․․․․․․․․․
 
   15 passing (43ms)
