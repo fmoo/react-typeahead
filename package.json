@@ -1,6 +1,6 @@
 {
   "name": "react-typeahead",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -34,8 +34,10 @@
   "dependencies": {
     "classnames": "^1.2.0",
     "fuzzy": "^0.1.0",
-    "react": "^0.13.1",
     "reactify": "^1.0.0"
+  },
+  "peerDependencies": {
+    "react": ">= 0.13.0"
   },
   "main": "lib/react-typeahead.js",
   "devDependencies": {
