@@ -25,6 +25,7 @@ var TypeaheadTokenizer = React.createClass({
     inputProps: React.PropTypes.object,
     onTokenRemove: React.PropTypes.func,
     onTokenAdd: React.PropTypes.func,
+    filterOption: React.PropTypes.func,
     maxVisible: React.PropTypes.number
   },
 
@@ -134,7 +135,8 @@ var TypeaheadTokenizer = React.createClass({
           defaultValue={this.props.defaultValue}
           maxVisible={this.props.maxVisible}
           onOptionSelected={this._addTokenForValue}
-          onKeyDown={this._onKeyDown} />
+          onKeyDown={this._onKeyDown}
+          filterOption={this.props.filterOption} />
       </div>
     );
   }

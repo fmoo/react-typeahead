@@ -224,6 +224,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     inputProps: React.PropTypes.object,
     onTokenRemove: React.PropTypes.func,
     onTokenAdd: React.PropTypes.func,
+    filterOption: React.PropTypes.func,
     maxVisible: React.PropTypes.number
   },
 
@@ -333,7 +334,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
           defaultValue: this.props.defaultValue, 
           maxVisible: this.props.maxVisible, 
           onOptionSelected: this._addTokenForValue, 
-          onKeyDown: this._onKeyDown})
+          onKeyDown: this._onKeyDown, 
+          filterOption: this.props.filterOption})
       )
     );
   }
@@ -438,7 +440,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     placeholder: React.PropTypes.string,
     inputProps: React.PropTypes.object,
     onOptionSelected: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func
+    onKeyDown: React.PropTypes.func,
+    filterOption: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -449,8 +452,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       defaultValue: "",
       placeholder: "",
       inputProps: {},
-      onKeyDown: function(event) { return },
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) {},
+      onKeyDown: function(event) {},
+      filterOption: null
     };
   },
 
@@ -468,10 +472,14 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   },
 
   getOptionsForValue: function(value, options) {
-    var result = fuzzy.filter(value, options).map(function(res) {
-      return res.string;
-    });
-
+    var result;
+    if (this.props.filterOption) {
+      result = options.filter((function(o) { return this.props.filterOption(value, o); }).bind(this));
+    } else {
+      result = fuzzy.filter(value, options).map(function(res) {
+        return res.string;
+      });
+    }
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }

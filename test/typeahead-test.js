@@ -275,8 +275,33 @@ describe('Typeahead Component', function() {
         assert.equal(input.props.autoCorrect, 'off');
       });
     });
+
+    context('filterOptions', function() {
+      var TEST_PLANS = [
+        {
+          name: 'accepts everything',
+          fn: function() { return true; },
+          input: 'xxx',
+          output: 4
+        }, {
+          name: 'rejects everything',
+          fn: function() { return false; },
+          input: 'o',
+          output: 0
+        }
+      ];
+
+      _.each(TEST_PLANS, function(testplan) {
+        it('should filter with a custom function that ' + testplan.name, function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            options={ BEATLES }
+            filterOption={ testplan.fn }
+          />);
+
+          var results = simulateTextInput(component, testplan.input);
+          assert.equal(results.length, testplan.output);
+        });
+      });
+    });
   });
-
-
-
 });
