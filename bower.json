@@ -1,0 +1,23 @@
+{
+  "name": "react-typeahead",
+  "version": "1.0.4",
+  "homepage": "https://github.com/fmoo/react-typeahead",
+  "authors": [
+    "Peter Ruibal <ruibalp@gmail.com>"
+  ],
+  "description": "A typeahead/autocomplete component for React",
+  "main": "dist/react-typeahead.js",
+  "keywords": [
+    "react",
+    "typeahead"
+  ],
+  "readme": "README.md",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
