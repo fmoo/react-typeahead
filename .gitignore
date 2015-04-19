@@ -1,5 +1,6 @@
 lib
 node_modules
+bower_components
 .*.swp
 .*.swo
 .*.swn
