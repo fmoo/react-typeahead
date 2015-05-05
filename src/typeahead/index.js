@@ -24,7 +24,11 @@ var Typeahead = React.createClass({
     defaultValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     onOptionSelected: React.PropTypes.func,
+    onChange: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
+    onKeyUp: React.PropTypes.func,
+    onFocus: React.PropTypes.func,
+    onBlur: React.PropTypes.func,
     filterOption: React.PropTypes.func
   },
 
@@ -36,7 +40,11 @@ var Typeahead = React.createClass({
       defaultValue: "",
       placeholder: "",
       onOptionSelected: function(option) {},
+      onChange: function(event) {},
       onKeyDown: function(event) {},
+      onKeyUp: function(event) {},
+      onFocus: function(event) {},
+      onBlur: function(event) {},
       filterOption: null
     };
   },
@@ -177,6 +185,14 @@ var Typeahead = React.createClass({
     return events;
   },
 
+  _onChange: function(event) {
+    if (this.props.onChange) {
+      this.props.onChange(event);
+    }
+
+    this._onTextEntryUpdated();
+  },
+
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler
@@ -220,7 +236,12 @@ var Typeahead = React.createClass({
           className={inputClassList}
           value={this.state.entryValue}
           defaultValue={this.props.defaultValue}
-          onChange={this._onTextEntryUpdated} onKeyDown={this._onKeyDown} />
+          onChange={this._onChange}
+          onKeyDown={this._onKeyDown}
+          onKeyUp={this.props.onKeyUp}
+          onFocus={this.props.onFocus}
+          onBlur={this.props.onBlur}
+        />
         { this._renderIncrementalSearchResults() }
       </div>
     );
