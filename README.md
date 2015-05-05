@@ -82,6 +82,12 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
+#### props.inputProps
+
+Type: `Object`
+
+Props to pass directly to the `<input>` element.
+
 #### props.onKeyDown
 
 Type: `Function`
@@ -140,6 +146,12 @@ integrating with 3rd party UI kits.
 Type: `String`
 
 Placeholder text for the typeahead input.
+
+#### props.inputProps
+
+Type: `Object`
+
+Props to pass directly to the `<input>` element.
 
 #### props.defaultSelected
 

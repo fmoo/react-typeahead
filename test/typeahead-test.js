@@ -264,6 +264,18 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('inputProps', function() {
+      it('should forward props to the input element', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          inputProps={{ autoCorrect: 'off' }}
+        />);
+
+        var input = component.refs.entry;
+        assert.equal(input.props.autoCorrect, 'off');
+      });
+    });
+
     context('filterOptions', function() {
       var TEST_PLANS = [
         {
