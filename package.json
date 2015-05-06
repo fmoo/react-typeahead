@@ -66,10 +66,5 @@
   "literalify": {
     "react": "window.React || require('react')",
     "react/addons": "window.React || require('react/addons')"
-  },
-  "browserify": {
-    "transform": [
-      "reactify"
-    ]
   }
 }

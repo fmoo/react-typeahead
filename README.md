@@ -12,22 +12,26 @@ For a typeahead input:
 
 ```javascript
 var Typeahead = require('react-typeahead').Typeahead;
-React.render(Typeahead({
-  options: ['John', 'Paul', 'George', 'Ringo'],
-  maxVisible: 2
-}));
+React.render(
+  <Typeahead
+    options={['John', 'Paul', 'George', 'Ringo']}
+    maxVisible= 2
+  />
+);
 ```
 
 For a tokenizer typeahead input:
 
 ```javascript
 var Tokenizer = require('react-typeahead').Tokenizer;
-React.render(Tokenizer({
-  options: ['John', 'Paul', 'George', 'Ringo'],
-  onTokenAdd: function(token) {
-    console.log('token added: ', token);
-  }
-}));
+React.render(
+  <Tokenizer
+    options={['John', 'Paul', 'George', 'Ringo']}
+    onTokenAdd={function(token) {
+      console.log('token added: ', token);
+    }}
+  />
+);
 ```
 
 ## Examples
@@ -77,6 +81,12 @@ integrating with 3rd party UI kits.
 Type: `String`
 
 Placeholder text for the typeahead input.
+
+#### props.inputProps
+
+Type: `Object`
+
+Props to pass directly to the `<input>` element.
 
 #### props.onKeyDown
 
@@ -146,6 +156,12 @@ integrating with 3rd party UI kits.
 Type: `String`
 
 Placeholder text for the typeahead input.
+
+#### props.inputProps
+
+Type: `Object`
+
+Props to pass directly to the `<input>` element.
 
 #### props.defaultSelected
 
