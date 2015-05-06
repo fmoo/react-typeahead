@@ -374,5 +374,59 @@ describe('Typeahead Component', function() {
         }, this);
       });
     });
+
+    context('formInputOption', function() {
+      var FORM_INPUT_TEST_PLANS = [
+        {
+          name: 'uses simple options verbatim when not specified',
+          props: {
+            options: BEATLES
+          },
+          output: 'John'
+        }, {
+          name: 'defaults to the display string when not specified',
+          props: {
+            options: BEATLES_COMPLEX,
+            filterOption: 'firstName',
+            displayOption: 'nameWithTitle'
+          },
+          output: 'John Winston Ono Lennon MBE'
+        }, {
+          name: 'uses custom options when specified as a string',
+          props: {
+            options: BEATLES_COMPLEX,
+            filterOption: 'firstName',
+            displayOption: 'nameWithTitle',
+            formInputOption: 'lastName'
+          },
+          output: 'Lennon'
+        }, {
+          name: 'uses custom optinos when specified as a function',
+          props: {
+            options: BEATLES_COMPLEX,
+            filterOption: 'firstName',
+            displayOption: 'nameWithTitle',
+            formInputOption: function(o, i) { return i + ' ' + o.firstName + ' ' + o.lastName; }
+          },
+          output: '0 John Lennon'
+        }
+      ];
+
+      _.each(FORM_INPUT_TEST_PLANS, function(testplan) {
+        it(testplan.name, function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            {...testplan.props}
+            name='beatles'
+          />);
+          var results = simulateTextInput(component, 'john');
+
+          var node = component.refs.entry.getDOMNode();
+          TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+          TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+
+          assert.equal(component.state.selection, testplan.output);
+        });
+      });
+    });
   });
 });

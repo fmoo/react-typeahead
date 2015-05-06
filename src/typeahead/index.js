@@ -38,6 +38,10 @@ var Typeahead = React.createClass({
     displayOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
+    ]),
+    formInputOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
     ])
   },
 
@@ -120,7 +124,7 @@ var Typeahead = React.createClass({
           customValue={this.state.entryValue}
           onOptionSelected={this._onOptionSelected}
           customClasses={this.props.customClasses}
-          displayOption={this._generateDisplayFunction()} />
+          displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
       );
     }
 
@@ -129,18 +133,23 @@ var Typeahead = React.createClass({
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
         customClasses={this.props.customClasses}
-        displayOption={this._generateDisplayFunction()} />
+        displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    var displayOption = this._generateDisplayFunction();
-    var optionString = displayOption(option);
+
+    var displayOption = this._generateOptionToStringFor(this.props.displayOption);
+    var optionString = displayOption(option, 0);
+
+    var formInputOption = this._generateOptionToStringFor(this.props.formInputOption || displayOption);
+    var formInputOptionString = formInputOption(option, 0);
+
     nEntry.value = optionString;
     this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
-                   selection: option,
+                   selection: formInputOptionString,
                    entryValue: optionString});
     return this.props.onOptionSelected(option, event);
   },
@@ -274,12 +283,11 @@ var Typeahead = React.createClass({
     }
   },
 
-  _generateDisplayFunction: function() {
-    var displayOptionProp = this.props.displayOption;
-    if (typeof displayOptionProp === 'string') {
-      return _generateAccessor(displayOptionProp);
-    } else if (typeof displayOptionProp === 'function') {
-      return displayOptionProp;
+  _generateOptionToStringFor: function(prop) {
+    if (typeof prop === 'string') {
+      return _generateAccessor(prop);
+    } else if (typeof prop === 'function') {
+      return prop;
     } else {
       return IDENTITY_FN;
     }
