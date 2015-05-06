@@ -116,6 +116,18 @@ A function to map an option onto a string for display in the list. Receives `(op
 
 If provided as a string, it will interpret it as a field name and use that field from each option object.
 
+#### props.formInputOption
+
+Type: `String` or `Function`
+
+A function to map an option onto a string to include in HTML forms (see `props.name`). Receives `(option)` as arguments. Must return a string.
+
+If specified as a string, it will interpret it as a field name and use that field from each option object.
+
+If not specified, it will fall back onto the semantics described in `props.displayOption`.
+
+This option is ignored if you don't specify the `name` prop. It is required if you both specify the `name` prop and are using non-string options. It is optional otherwise.
+
 ---
 
 ### Tokenizer(props)
