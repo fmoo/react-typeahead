@@ -406,9 +406,9 @@ describe('Typeahead Component', function() {
             options: BEATLES_COMPLEX,
             filterOption: 'firstName',
             displayOption: 'nameWithTitle',
-            formInputOption: function(o, i) { return i + ' ' + o.firstName + ' ' + o.lastName; }
+            formInputOption: function(o, i) { return o.firstName + ' ' + o.lastName; }
           },
-          output: '0 John Lennon'
+          output: 'John Lennon'
         }
       ];
 
