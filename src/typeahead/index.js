@@ -8,6 +8,11 @@ var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
 var classNames = require('classnames');
 
+var IDENTITY_FN = function(input) { return input; };
+var _generateAccessor = function(field) {
+  return function(object) { return object[field]; };
+};
+
 /**
  * A "typeahead", an auto-completing text input
  *
@@ -256,9 +261,9 @@ var Typeahead = React.createClass({
     } else {
       var mapper;
       if (typeof filterOptionProp === 'string') {
-        mapper = function(o) { return o[filterOptionProp]; };
+        mapper = _generateAccessor(filterOptionProp);
       } else {
-        mapper = function(o) { return o; }
+        mapper = IDENTITY_FN;
       }
       return function(value, options) {
         var transformedOptions = options.map(mapper);
@@ -272,13 +277,11 @@ var Typeahead = React.createClass({
   _generateDisplayFunction: function() {
     var displayOptionProp = this.props.displayOption;
     if (typeof displayOptionProp === 'string') {
-      return function(o) {
-        return o[displayOptionProp];
-      };
+      return _generateAccessor(displayOptionProp);
     } else if (typeof displayOptionProp === 'function') {
       return displayOptionProp;
     } else {
-      return function(o) { return o; }
+      return IDENTITY_FN;
     }
   }
 });
