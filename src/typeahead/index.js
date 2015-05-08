@@ -2,7 +2,7 @@
  * @jsx React.DOM
  */
 
-var React = require('react/addons');
+var React = require('react');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
