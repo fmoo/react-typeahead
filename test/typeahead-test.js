@@ -264,6 +264,21 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('onKeyUp', function() {
+      it('should bind to key events on the input', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          onKeyUp={ function(e) {
+              assert.equal(e.keyCode, 87);
+            }
+          }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyUp(input, { keyCode: 87 });
+      });
+    });
+
     context('inputProps', function() {
       it('should forward props to the input element', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
