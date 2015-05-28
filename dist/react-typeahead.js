@@ -413,7 +413,7 @@ module.exports = Token;
  * @jsx React.DOM
  */
 
-var React = window.React || require('react/addons');
+var React = window.React || require('react');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
@@ -679,12 +679,12 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 module.exports = Typeahead;
 
 
-},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2,"react/addons":"react/addons"}],8:[function(require,module,exports){
+},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2,"react":"react"}],8:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React || require('react/addons');
+var React = window.React || require('react');
 var classNames = require('classnames');
 
 /**
@@ -751,12 +751,12 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 module.exports = TypeaheadOption;
 
 
-},{"classnames":1,"react/addons":"react/addons"}],9:[function(require,module,exports){
+},{"classnames":1,"react":"react"}],9:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 
-var React = window.React || require('react/addons');
+var React = window.React || require('react');
 var TypeaheadOption = require('./option');
 var classNames = require('classnames');
 
@@ -885,5 +885,5 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 module.exports = TypeaheadSelector;
 
 
-},{"./option":8,"classnames":1,"react/addons":"react/addons"}]},{},[4])(4)
+},{"./option":8,"classnames":1,"react":"react"}]},{},[4])(4)
 });
