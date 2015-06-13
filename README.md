@@ -27,8 +27,9 @@ var Tokenizer = require('react-typeahead').Tokenizer;
 React.render(
   <Tokenizer
     options={['John', 'Paul', 'George', 'Ringo']}
-    onTokenAdd={function(token) {
+    onTokenAdd={function(selectedTokens, token) {
       console.log('token added: ', token);
+      console.log('current tokens: ', selectedTokens);
     }}
   />
 );
@@ -162,12 +163,14 @@ A set of values of tokens to be loaded on first render.
 #### props.onTokenRemove
 
 Type: `Function`
+Params: `(selectedTokens, removedToken)`
 
 Event handler triggered whenever a token is removed.
 
 #### props.onTokenAdd
 
 Type: `Function`
+Params: `(selectedTokens, addedToken)`
 
 Event handler triggered whenever a token is removed.
 
