@@ -8,6 +8,11 @@ var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
 var classNames = require('classnames');
 
+var IDENTITY_FN = function(input) { return input; };
+var _generateAccessor = function(field) {
+  return function(object) { return object[field]; };
+};
+
 /**
  * A "typeahead", an auto-completing text input
  *
@@ -30,7 +35,18 @@ var Typeahead = React.createClass({
     onKeyUp: React.PropTypes.func,
     onFocus: React.PropTypes.func,
     onBlur: React.PropTypes.func,
-    filterOption: React.PropTypes.func
+    filterOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    formInputOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ])
   },
 
   getDefaultProps: function() {
@@ -65,14 +81,8 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
-    var result;
-    if (this.props.filterOption) {
-      result = options.filter((function(o) { return this.props.filterOption(value, o); }).bind(this));
-    } else {
-      result = fuzzy.filter(value, options).map(function(res) {
-        return res.string;
-      });
-    }
+    var filterOptions = this._generateFilterFunction();
+    var result = filterOptions(value, options);
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -122,7 +132,8 @@ var Typeahead = React.createClass({
           ref="sel" options={this.state.visible}
           customValue={this.state.entryValue}
           onOptionSelected={this._onOptionSelected}
-          customClasses={this.props.customClasses} />
+          customClasses={this.props.customClasses}
+          displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
       );
     }
 
@@ -130,17 +141,25 @@ var Typeahead = React.createClass({
       <TypeaheadSelector
         ref="sel" options={ this.state.visible }
         onOptionSelected={ this._onOptionSelected }
-        customClasses={this.props.customClasses} />
+        customClasses={this.props.customClasses}
+        displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
    );
   },
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
     nEntry.focus();
-    nEntry.value = option;
-    this.setState({visible: this.getOptionsForValue(option, this.props.options),
-                   selection: option,
-                   entryValue: option});
+
+    var displayOption = this._generateOptionToStringFor(this.props.displayOption);
+    var optionString = displayOption(option, 0);
+
+    var formInputOption = this._generateOptionToStringFor(this.props.formInputOption || displayOption);
+    var formInputOptionString = formInputOption(option);
+
+    nEntry.value = optionString;
+    this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
+                   selection: formInputOptionString,
+                   entryValue: optionString});
     return this.props.onOptionSelected(option, event);
   },
 
@@ -262,6 +281,38 @@ var Typeahead = React.createClass({
         value={ this.state.selection }
       />
     );
+  },
+
+  _generateFilterFunction: function() {
+    var filterOptionProp = this.props.filterOption;
+    if (typeof filterOptionProp === 'function') {
+      return function(value, options) {
+        return options.filter(function(o) { return filterOptionProp(value, o); });
+      };
+    } else {
+      var mapper;
+      if (typeof filterOptionProp === 'string') {
+        mapper = _generateAccessor(filterOptionProp);
+      } else {
+        mapper = IDENTITY_FN;
+      }
+      return function(value, options) {
+        var transformedOptions = options.map(mapper);
+        return fuzzy
+          .filter(value, transformedOptions)
+          .map(function(res) { return options[res.index]; });
+      };
+    }
+  },
+
+  _generateOptionToStringFor: function(prop) {
+    if (typeof prop === 'string') {
+      return _generateAccessor(prop);
+    } else if (typeof prop === 'function') {
+      return prop;
+    } else {
+      return IDENTITY_FN;
+    }
   }
 });
 

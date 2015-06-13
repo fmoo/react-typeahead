@@ -56,8 +56,8 @@
   },
   "scripts": {
     "test": "npm run build-test && gulp test",
-    "watchify-test": "watchify test/main.js -o test/bundle.js -v",
-    "build-test": "browserify test/main.js -o test/bundle.js",
+    "watchify-test": "watchify test/main.js -t reactify -o test/bundle.js -v",
+    "build-test": "browserify test/main.js -t reactify -o test/bundle.js",
     "build": "browserify ./src/react-typeahead.js -t reactify -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
     "watchify": "watchify ./src/react-typeahead.js -t reactify -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
     "lib": "gulp build",

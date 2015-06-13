@@ -17,6 +17,26 @@ function simulateTextInput(component, value) {
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
+var BEATLES_COMPLEX = [
+  {
+    firstName: 'John',
+    lastName: 'Lennon',
+    nameWithTitle: 'John Winston Ono Lennon MBE'
+  }, {
+    firstName: 'Paul',
+    lastName: 'McCartney',
+    nameWithTitle: 'Sir James Paul McCartney MBE'
+  }, {
+    firstName: 'George',
+    lastName: 'Harrison',
+    nameWithTitle: 'George Harrison MBE'
+  }, {
+    firstName: 'Ringo',
+    lastName: 'Starr',
+    nameWithTitle: 'Richard Starkey Jr. MBE'
+  }
+];
+
 describe('Typeahead Component', function() {
 
   describe('sanity', function() {
@@ -120,6 +140,36 @@ describe('Typeahead Component', function() {
           ></Typeahead>);
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
+      });
+    });
+
+    context('displayOption', function() {
+      it('renders simple options verbatim when not specified', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().textContent, 'John');
+      });
+
+      it('renders custom options when specified as a string', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+          filterOption='firstName'
+          displayOption='nameWithTitle'
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().textContent, 'John Winston Ono Lennon MBE');
+      });
+
+      it('renders custom options when specified as a function', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+          filterOption='firstName'
+          displayOption={ function(o, i) { return i + ' ' + o.firstName + ' ' + o.lastName; } }
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
       });
     });
 
@@ -291,8 +341,8 @@ describe('Typeahead Component', function() {
       });
     });
 
-    context('filterOptions', function() {
-      var TEST_PLANS = [
+    context('filterOption', function() {
+      var FN_TEST_PLANS = [
         {
           name: 'accepts everything',
           fn: function() { return true; },
@@ -306,7 +356,7 @@ describe('Typeahead Component', function() {
         }
       ];
 
-      _.each(TEST_PLANS, function(testplan) {
+      _.each(FN_TEST_PLANS, function(testplan) {
         it('should filter with a custom function that ' + testplan.name, function() {
           var component = TestUtils.renderIntoDocument(<Typeahead
             options={ BEATLES }
@@ -315,6 +365,81 @@ describe('Typeahead Component', function() {
 
           var results = simulateTextInput(component, testplan.input);
           assert.equal(results.length, testplan.output);
+        });
+      });
+
+      var STRING_TEST_PLANS = {
+        'o': 3,
+        'pa': 1,
+        'Grg': 1,
+        'Ringo': 1,
+        'xxx': 0
+      };
+
+      it('should filter using fuzzy matching on the provided field name', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+          filterOption='firstName'
+          displayOption='firstName'
+        />);
+
+        _.each(STRING_TEST_PLANS, function(expected, value) {
+          var results = simulateTextInput(component, value);
+          assert.equal(results.length, expected, 'Text input: ' + value);
+        }, this);
+      });
+    });
+
+    context('formInputOption', function() {
+      var FORM_INPUT_TEST_PLANS = [
+        {
+          name: 'uses simple options verbatim when not specified',
+          props: {
+            options: BEATLES
+          },
+          output: 'John'
+        }, {
+          name: 'defaults to the display string when not specified',
+          props: {
+            options: BEATLES_COMPLEX,
+            filterOption: 'firstName',
+            displayOption: 'nameWithTitle'
+          },
+          output: 'John Winston Ono Lennon MBE'
+        }, {
+          name: 'uses custom options when specified as a string',
+          props: {
+            options: BEATLES_COMPLEX,
+            filterOption: 'firstName',
+            displayOption: 'nameWithTitle',
+            formInputOption: 'lastName'
+          },
+          output: 'Lennon'
+        }, {
+          name: 'uses custom optinos when specified as a function',
+          props: {
+            options: BEATLES_COMPLEX,
+            filterOption: 'firstName',
+            displayOption: 'nameWithTitle',
+            formInputOption: function(o, i) { return o.firstName + ' ' + o.lastName; }
+          },
+          output: 'John Lennon'
+        }
+      ];
+
+      _.each(FORM_INPUT_TEST_PLANS, function(testplan) {
+        it(testplan.name, function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            {...testplan.props}
+            name='beatles'
+          />);
+          var results = simulateTextInput(component, 'john');
+
+          var node = component.refs.entry.getDOMNode();
+          TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+          TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
+
+          assert.equal(component.state.selection, testplan.output);
         });
       });
     });
