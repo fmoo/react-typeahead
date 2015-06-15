@@ -239,7 +239,7 @@ describe('TypeaheadTokenizer Component', function() {
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
 
       assert(this.tokenAdd.called);
-      assert(this.tokenAdd.calledWith( this.component.state.selected ))
+      assert(this.tokenAdd.calledWith( "abzz" ))
     })
 
     it('should call onTokenRemove for custom token', function() {
@@ -251,13 +251,13 @@ describe('TypeaheadTokenizer Component', function() {
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
 
       assert(this.tokenAdd.called);
-      assert(this.tokenAdd.calledWith( this.component.state.selected ))
+      assert(this.tokenAdd.calledWith( "abzz" ))
 
       tokens = getTokens(this.component);
       var tokenClose = TestUtils.scryRenderedDOMComponentsWithTag(tokens[0], "a")[0].getDOMNode();
       TestUtils.Simulate.click(tokenClose);
       assert(this.tokenRemove.called);
-      assert(this.tokenRemove.calledWith(this.component.state.selected));
+      assert(this.tokenRemove.calledWith("abzz"));
     })
 
     it('should not return undefined for a custom token when not selected', function() {
