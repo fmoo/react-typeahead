@@ -1,4 +1,10 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactTypeahead=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+  Copyright (c) 2015 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
 function classNames() {
 	var classes = '';
 	var arg;
@@ -25,9 +31,16 @@ function classNames() {
 	return classes.substr(1);
 }
 
-// safely export classNames in case the script is included directly on a page
+// safely export classNames for node / browserify
 if (typeof module !== 'undefined' && module.exports) {
 	module.exports = classNames;
+}
+
+// safely export classNames for RequireJS
+if (typeof define !== 'undefined' && define.amd) {
+	define('classnames', [], function() {
+		return classNames;
+	});
 }
 
 },{}],2:[function(require,module,exports){
@@ -456,6 +469,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
+    defaultVisible: React.PropTypes.oneOfType([
+      React.PropTypes.array,
+      React.PropTypes.bool
+    ]),
     placeholder: React.PropTypes.string,
     inputProps: React.PropTypes.object,
     onOptionSelected: React.PropTypes.func,
@@ -484,6 +501,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       customClasses: {},
       allowCustomValues: 0,
       defaultValue: "",
+      defaultVisible: false,
       placeholder: "",
       inputProps: {},
       onOptionSelected: function(option) {},
@@ -499,13 +517,13 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   getInitialState: function() {
     return {
       // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
+      visible: this.props.defaultVisible || this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
       // This should be called something else, "entryValue"
       entryValue: this.props.defaultValue,
 
       // A valid typeahead value
-      selection: null
+      selection: this.props.defaultValue
     };
   },
 
@@ -662,9 +680,11 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   },
 
   componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
-    });
+    if(!this.props.defaultVisible) {
+      this.setState({
+        visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      });
+    }
   },
 
   render: function() {
