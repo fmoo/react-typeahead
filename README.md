@@ -201,6 +201,15 @@ Type: `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
+### Tokenizer (Exposed Component Functions)
+
+[React docs](https://facebook.github.io/react/tips/expose-component-functions.html) on exposed component functions.
+
+#### getSelectedTokens
+
+Type: `Function`
+
+A function to return the currently selected tokens.
 
 ## Developing
 

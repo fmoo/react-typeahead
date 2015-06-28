@@ -71,7 +71,17 @@ describe('TypeaheadTokenizer Component', function() {
 
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'typeahead-token');
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'custom-token');
-      
+
+    });
+
+    it('should provide an exposed component function to get the selected tokens', function() {
+      simulateTokenInput(this.component, 'o');
+      var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+      assert.equal(this.component.getSelectedTokens().length, 1);
+      assert.equal(this.component.getSelectedTokens()[0], "John");
     });
 
     describe('keyboard controls', function() {
@@ -130,7 +140,7 @@ describe('TypeaheadTokenizer Component', function() {
         input.value = "hello";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
-        
+
         results = getTokens(this.component);
         assert.equal(startLength , results.length);
       });
@@ -179,7 +189,7 @@ describe('TypeaheadTokenizer Component', function() {
           onTokenRemove={this.tokenRemove}
           allowCustomValues={tokenLength}
           customClasses={{
-            customAdd: 'topcoat-custom__token' 
+            customAdd: 'topcoat-custom__token'
           }}
         />
       );

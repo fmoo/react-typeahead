@@ -69,6 +69,10 @@ var TypeaheadTokenizer = React.createClass({
     }
   },
 
+  getSelectedTokens: function(){
+    return this.state.selected;
+  },
+
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
