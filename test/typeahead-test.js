@@ -127,6 +127,14 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal("oz", node.value);
       });
+
+      it('should set hover', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var node = this.component.refs.entry.getDOMNode();
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
+        assert.equal(true, results[1].props.hover);
+      });
     });
 
   });
@@ -226,10 +234,19 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_RETURN });
-
         assert.equal(true, this.selectSpy.called);
         assert(this.selectSpy.calledWith(input.value));
       })
+
+      it('should add hover prop to customValue', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "ZZZ";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
+        assert.equal(true, results[0].props.hover)
+      })
+
 
     });
 
