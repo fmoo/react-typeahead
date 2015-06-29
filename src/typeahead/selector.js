@@ -45,23 +45,26 @@ var TypeaheadSelector = React.createClass({
 
     var results = [];
     // CustomValue should be added to top of results list with different class name
+    var customValue = null;
+    var customValueOffset = 0;
     if (this.props.customValue !== null) {
-
-      results.push(
+      customValueOffset++;
+      customValue = (
         <TypeaheadOption ref={this.props.customValue} key={this.props.customValue}
-          hover={this.state.selectionIndex === results.length}
+          hover={this.state.selectionIndex === 0}
           customClasses={this.props.customClasses}
           customValue={this.props.customValue}
           onClick={this._onClick.bind(this, this.props.customValue)}>
           { this.props.customValue }
-        </TypeaheadOption>);
+        </TypeaheadOption>
+      );
     }
 
-    this.props.options.forEach(function(result, i) {
+    var results = this.props.options.map(function(result, i) {
       var displayString = this.props.displayOption(result, i);
-      results.push (
+      return (
         <TypeaheadOption ref={displayString} key={displayString}
-          hover={this.state.selectionIndex === results.length}
+          hover={this.state.selectionIndex === i + customValueOffset}
           customClasses={this.props.customClasses}
           onClick={this._onClick.bind(this, result)}>
           { displayString }
@@ -70,7 +73,12 @@ var TypeaheadSelector = React.createClass({
     }, this);
 
 
-    return <ul className={classList}>{ results }</ul>;
+    return (
+      <ul className={classList}>
+        { customValue }
+        { results }
+      </ul>
+    );
   },
 
   setSelectionIndex: function(index) {
