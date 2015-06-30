@@ -26,10 +26,6 @@ var TypeaheadOption = React.createClass({
     };
   },
 
-  getInitialState: function() {
-    return {};
-  },
-
   render: function() {
     var classes = {};
     classes[this.props.customClasses.hover || "hover"] = !!this.props.hover;
