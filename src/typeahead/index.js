@@ -46,7 +46,8 @@ var Typeahead = React.createClass({
     formInputOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
-    ])
+    ]),
+    customListComponent: React.PropTypes.func
   },
 
   getDefaultProps: function() {
@@ -63,7 +64,8 @@ var Typeahead = React.createClass({
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
-      filterOption: null
+      filterOption: null,
+      customListComponent: TypeaheadSelector
     };
   },
 
@@ -124,13 +126,8 @@ var Typeahead = React.createClass({
       return "";
     }
 
-    // There are no typeahead / autocomplete suggestions
-    if (!this._hasHint()) {
-      return "";
-    }
-
     return (
-      <TypeaheadSelector
+      <this.props.customListComponent
         ref="sel" options={this.state.visible}
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
