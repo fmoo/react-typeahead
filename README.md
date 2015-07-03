@@ -129,6 +129,12 @@ If not specified, it will fall back onto the semantics described in `props.displ
 
 This option is ignored if you don't specify the `name` prop. It is required if you both specify the `name` prop and are using non-string options. It is optional otherwise.
 
+### Typeahead(exposed component functions)
+
+#### typeahead.focus
+
+Focuses the typeahead input.
+
 ---
 
 ### Tokenizer(props)
@@ -202,6 +208,11 @@ Type: `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
+### Tokenizer(exposed component functions)
+
+#### tokenizer.focus
+
+Focuses the tokenizer input.
 
 ## Developing
 
