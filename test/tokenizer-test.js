@@ -71,7 +71,21 @@ describe('TypeaheadTokenizer Component', function() {
 
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'typeahead-token');
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'custom-token');
-      
+
+    });
+
+    describe('component functions', function() {
+      beforeEach(function() {
+        this.sinon = sinon.sandbox.create();
+      });
+      afterEach(function() {
+        this.sinon.restore();
+      });
+      it('focuses the typeahead', function() {
+        this.sinon.spy(this.component.refs.typeahead, 'focus');
+        this.component.focus();
+        assert.equal(this.component.refs.typeahead.focus.calledOnce, true)
+      });
     });
 
     describe('keyboard controls', function() {

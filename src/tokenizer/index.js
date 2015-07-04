@@ -69,6 +69,10 @@ var TypeaheadTokenizer = React.createClass({
     }
   },
 
+  focus: function(){
+    this.refs.typeahead.focus();
+  },
+
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
