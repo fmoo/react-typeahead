@@ -27,9 +27,8 @@ var Tokenizer = require('react-typeahead').Tokenizer;
 React.render(
   <Tokenizer
     options={['John', 'Paul', 'George', 'Ringo']}
-    onTokenAdd={function(selectedTokens, token) {
+    onTokenAdd={function(token) {
       console.log('token added: ', token);
-      console.log('current tokens: ', selectedTokens);
     }}
   />
 );
@@ -135,7 +134,7 @@ If not specified, it will fall back onto the semantics described in `props.displ
 
 This option is ignored if you don't specify the `name` prop. It is required if you both specify the `name` prop and are using non-string options. It is optional otherwise.
 
-### Typeahead(exposed component functions)
+### Typeahead ([Exposed Component Functions][reactecf])
 
 #### typeahead.focus
 
@@ -210,14 +209,14 @@ A set of values of tokens to be loaded on first render.
 #### props.onTokenRemove
 
 Type: `Function`
-Params: `(selectedTokens, removedToken)`
+Params: `(removedToken)`
 
 Event handler triggered whenever a token is removed.
 
 #### props.onTokenAdd
 
 Type: `Function`
-Params: `(selectedTokens, addedToken)`
+Params: `(addedToken)`
 
 Event handler triggered whenever a token is removed.
 
@@ -227,11 +226,17 @@ Type: `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
-### Tokenizer(exposed component functions)
+### Tokenizer ([Exposed Component Functions][reactecf])
 
 #### tokenizer.focus
 
 Focuses the tokenizer input.
+
+#### tokenizer.getSelectedTokens
+
+Type: `Function`
+
+A function to return the currently selected tokens.
 
 ## Developing
 
@@ -277,3 +282,5 @@ here are some general rules to follow for getting your PR accepted more quickly:
 - Feel free to rebase, merge, and rewrite commits to make them more readible.
 - Add comments explaining anything that's not painfully obvious.
 - Add unittests for your change if possible.
+
+[reactecf]: https://facebook.github.io/react/tips/expose-component-functions.html

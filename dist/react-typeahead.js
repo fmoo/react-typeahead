@@ -1,4 +1,10 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactTypeahead=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+  Copyright (c) 2015 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
 function classNames() {
 	var classes = '';
 	var arg;
@@ -25,9 +31,16 @@ function classNames() {
 	return classes.substr(1);
 }
 
-// safely export classNames in case the script is included directly on a page
+// safely export classNames for node / browserify
 if (typeof module !== 'undefined' && module.exports) {
 	module.exports = classNames;
+}
+
+// safely export classNames for RequireJS
+if (typeof define !== 'undefined' && define.amd) {
+	define('classnames', [], function() {
+		return classNames;
+	});
 }
 
 },{}],2:[function(require,module,exports){
@@ -274,6 +287,10 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     this.refs.typeahead.focus();
   },
 
+  getSelectedTokens: function(){
+    return this.state.selected;
+  },
+
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
@@ -330,7 +347,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 
     this.state.selected.splice(index, 1);
     this.setState({selected: this.state.selected});
-    this.props.onTokenRemove(this.state.selected, value);
+    this.props.onTokenRemove(value);
     return;
   },
 
@@ -341,7 +358,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     this.state.selected.push(value);
     this.setState({selected: this.state.selected});
     this.refs.typeahead.setEntryText("");
-    this.props.onTokenAdd(this.state.selected, value);
+    this.props.onTokenAdd(value);
   },
 
   render: function() {

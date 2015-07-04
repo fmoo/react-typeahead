@@ -77,6 +77,10 @@ var TypeaheadTokenizer = React.createClass({
     this.refs.typeahead.focus();
   },
 
+  getSelectedTokens: function(){
+    return this.state.selected;
+  },
+
   // TODO: Support initialized tokens
   //
   _renderTokens: function() {
@@ -133,7 +137,7 @@ var TypeaheadTokenizer = React.createClass({
 
     this.state.selected.splice(index, 1);
     this.setState({selected: this.state.selected});
-    this.props.onTokenRemove(this.state.selected, value);
+    this.props.onTokenRemove(value);
     return;
   },
 
@@ -144,7 +148,7 @@ var TypeaheadTokenizer = React.createClass({
     this.state.selected.push(value);
     this.setState({selected: this.state.selected});
     this.refs.typeahead.setEntryText("");
-    this.props.onTokenAdd(this.state.selected, value);
+    this.props.onTokenAdd(value);
   },
 
   render: function() {
