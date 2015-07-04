@@ -27,6 +27,10 @@ var Typeahead = React.createClass({
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
+    defaultVisible: React.PropTypes.oneOfType([
+      React.PropTypes.array,
+      React.PropTypes.bool
+    ]),
     placeholder: React.PropTypes.string,
     inputProps: React.PropTypes.object,
     onOptionSelected: React.PropTypes.func,
@@ -55,6 +59,7 @@ var Typeahead = React.createClass({
       customClasses: {},
       allowCustomValues: 0,
       defaultValue: "",
+      defaultVisible: false,
       placeholder: "",
       inputProps: {},
       onOptionSelected: function(option) {},
@@ -70,13 +75,13 @@ var Typeahead = React.createClass({
   getInitialState: function() {
     return {
       // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
+      visible: this.props.defaultVisible || this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
       // This should be called something else, "entryValue"
       entryValue: this.props.defaultValue,
 
       // A valid typeahead value
-      selection: null
+      selection: this.props.defaultValue
     };
   },
 
@@ -237,9 +242,11 @@ var Typeahead = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
-    });
+    if(!this.props.defaultVisible) {
+      this.setState({
+        visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      });
+    }
   },
 
   render: function() {
