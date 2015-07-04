@@ -76,7 +76,10 @@ var Typeahead = React.createClass({
       entryValue: this.props.defaultValue,
 
       // A valid typeahead value
-      selection: null
+      selection: null,
+
+      // Index of the selection
+      selectionIndex: null
     };
   },
 
@@ -111,7 +114,7 @@ var Typeahead = React.createClass({
     if (this._hasCustomValue()) {
       return this.state.entryValue;
     }
-    return null
+    return null;
   },
 
   _renderIncrementalSearchResults: function() {
@@ -126,28 +129,31 @@ var Typeahead = React.createClass({
     }
 
     // There are no typeahead / autocomplete suggestions
-    if (!this.state.visible.length && !(this.props.allowCustomValues > 0)) {
+    if (!this._hasHint()) {
       return "";
-    }
-
-    if (this._hasCustomValue()) {
-      return (
-        <TypeaheadSelector
-          ref="sel" options={this.state.visible}
-          customValue={this.state.entryValue}
-          onOptionSelected={this._onOptionSelected}
-          customClasses={this.props.customClasses}
-          displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
-      );
     }
 
     return (
       <TypeaheadSelector
-        ref="sel" options={ this.state.visible }
-        onOptionSelected={ this._onOptionSelected }
+        ref="sel" options={this.state.visible}
+        onOptionSelected={this._onOptionSelected}
+        customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
+        selectionIndex={this.state.selectionIndex}
         displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
-   );
+    );
+  },
+
+  getSelection: function() {
+    var index = this.state.selectionIndex;
+    if (this._hasCustomValue()) {
+      if (index === 0) {
+        return this.state.entryValue;
+      } else {
+        index--;
+      }
+    }
+    return this.state.visible[index];
   },
 
   _onOptionSelected: function(option, event) {
@@ -175,19 +181,23 @@ var Typeahead = React.createClass({
   },
 
   _onEnter: function(event) {
-    if (!this.refs.sel.state.selection) {
+    var selection = this.getSelection();
+    if (!selection) {
       return this.props.onKeyDown(event);
     }
-    return this._onOptionSelected(this.refs.sel.state.selection, event);
+    return this._onOptionSelected(selection, event);
   },
 
   _onEscape: function() {
-    this.refs.sel.setSelectionIndex(null)
+    this.setState({
+      selectionIndex: null
+    });
   },
 
   _onTab: function(event) {
-    var option = this.refs.sel.state.selection ?
-      this.refs.sel.state.selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
+    var selection = this.getSelection();
+    var option = selection ?
+      selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
 
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
@@ -201,13 +211,40 @@ var Typeahead = React.createClass({
   eventMap: function(event) {
     var events = {};
 
-    events[KeyEvent.DOM_VK_UP] = this.refs.sel.navUp;
-    events[KeyEvent.DOM_VK_DOWN] = this.refs.sel.navDown;
+    events[KeyEvent.DOM_VK_UP] = this.navUp;
+    events[KeyEvent.DOM_VK_DOWN] = this.navDown;
     events[KeyEvent.DOM_VK_RETURN] = events[KeyEvent.DOM_VK_ENTER] = this._onEnter;
     events[KeyEvent.DOM_VK_ESCAPE] = this._onEscape;
     events[KeyEvent.DOM_VK_TAB] = this._onTab;
 
     return events;
+  },
+
+  _nav: function(delta) {
+    if (!this._hasHint()) {
+      return;
+    }
+    var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
+    var length = this.state.visible.length;
+    if (this._hasCustomValue()) {
+      length += 1;
+    }
+
+    if (newIndex < 0) {
+      newIndex += length;
+    } else if (newIndex >= length) {
+      newIndex -= length;
+    }
+
+    this.setState({selectionIndex: newIndex});
+  },
+
+  navDown: function() {
+    this._nav(1);
+  },
+
+  navUp: function() {
+    this._nav(-1);
   },
 
   _onChange: function(event) {
@@ -221,7 +258,7 @@ var Typeahead = React.createClass({
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler
-    if (!this.refs.sel) {
+    if (!this._hasHint()) {
       return this.props.onKeyDown(event);
     }
 
@@ -243,13 +280,13 @@ var Typeahead = React.createClass({
   },
 
   render: function() {
-    var inputClasses = {}
+    var inputClasses = {};
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
     var inputClassList = classNames(inputClasses);
 
     var classes = {
       typeahead: true
-    }
+    };
     classes[this.props.className] = !!this.props.className;
     var classList = classNames(classes);
 
@@ -317,6 +354,10 @@ var Typeahead = React.createClass({
     } else {
       return IDENTITY_FN;
     }
+  },
+
+  _hasHint: function() {
+    return this.state.visible.length > 0 || this._hasCustomValue();
   }
 });
 
