@@ -232,6 +232,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     placeholder: React.PropTypes.string,
     inputProps: React.PropTypes.object,
     onTokenRemove: React.PropTypes.func,
+    onKeyDown: React.PropTypes.func,
+    onKeyUp: React.PropTypes.func,
     onTokenAdd: React.PropTypes.func,
     filterOption: React.PropTypes.func,
     maxVisible: React.PropTypes.number
@@ -254,6 +256,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       defaultValue: "",
       placeholder: "",
       inputProps: {},
+      onKeyDown: function(event) {},
+      onKeyUp: function(event) {},
       onTokenAdd: function() {},
       onTokenRemove: function() {}
     };
@@ -264,6 +268,10 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     if (_arraysAreDifferent(this.props.defaultSelected, nextProps.defaultSelected)){
       this.setState({selected: nextProps.defaultSelected.slice(0)})
     }
+  },
+
+  focus: function(){
+    this.refs.typeahead.focus();
   },
 
   // TODO: Support initialized tokens
@@ -291,10 +299,13 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 
   _onKeyDown: function(event) {
     // We only care about intercepting backspaces
-    if (event.keyCode !== KeyEvent.DOM_VK_BACK_SPACE) {
-      return;
+    if (event.keyCode === KeyEvent.DOM_VK_BACK_SPACE) {
+      return this._handleBackspace(event);
     }
+    this.props.onKeyDown(event);
+  },
 
+  _handleBackspace: function(event){
     // No tokens
     if (!this.state.selected.length) {
       return;
@@ -351,6 +362,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
           maxVisible: this.props.maxVisible, 
           onOptionSelected: this._addTokenForValue, 
           onKeyDown: this._onKeyDown, 
+          onKeyUp: this.props.onKeyUp, 
           filterOption: this.props.filterOption})
       )
     );
@@ -521,6 +533,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   setEntryText: function(value) {
     this.refs.entry.getDOMNode().value = value;
     this._onTextEntryUpdated();
+  },
+
+  focus: function(){
+    React.findDOMNode(this.refs.entry).focus()
   },
 
   _hasCustomValue: function() {
