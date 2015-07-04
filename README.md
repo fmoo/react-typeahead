@@ -95,6 +95,12 @@ Type: `Function`
 
 Event handler for the `keyDown` event on the typeahead input.
 
+#### props.onKeyUp
+
+Type: `Function`
+
+Event handler for the `keyUp` event on the typeahead input.
+
 #### props.onOptionSelected
 
 Type: `Function`
@@ -181,6 +187,19 @@ Placeholder text for the typeahead input.
 Type: `Object`
 
 Props to pass directly to the `<input>` element.
+
+#### props.onKeyDown
+
+Type: `Function`
+
+Event handler for the `keyDown` event on the typeahead input.
+
+#### props.onKeyUp
+
+Type: `Function`
+
+Event handler for the `keyUp` event on the typeahead input.
+
 
 #### props.defaultSelected
 

@@ -71,7 +71,37 @@ describe('TypeaheadTokenizer Component', function() {
 
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'typeahead-token');
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'custom-token');
+    });
 
+    context('onKeyDown', function() {
+      it('should bind to key events on the input', function(done) {
+        var component = TestUtils.renderIntoDocument(<Tokenizer
+          options={ BEATLES }
+          onKeyDown={ function(e) {
+              assert.equal(e.keyCode, 87);
+              done();
+            }
+          }
+        />);
+        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        TestUtils.Simulate.keyDown(input, { keyCode: 87 });
+      });
+    });
+
+    context('onKeyUp', function() {
+      it('should bind to key events on the input', function(done) {
+        var component = TestUtils.renderIntoDocument(<Tokenizer
+          options={ BEATLES }
+          onKeyUp={ function(e) {
+              assert.equal(e.keyCode, 87);
+              done();
+            }
+          }
+        />);
+
+        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        TestUtils.Simulate.keyUp(input, { keyCode: 87 });
+      });
     });
 
     describe('component functions', function() {
@@ -81,10 +111,11 @@ describe('TypeaheadTokenizer Component', function() {
       afterEach(function() {
         this.sinon.restore();
       });
+
       it('focuses the typeahead', function() {
         this.sinon.spy(this.component.refs.typeahead, 'focus');
         this.component.focus();
-        assert.equal(this.component.refs.typeahead.focus.calledOnce, true)
+        assert.equal(this.component.refs.typeahead.focus.calledOnce, true);
       });
     });
 
@@ -144,7 +175,7 @@ describe('TypeaheadTokenizer Component', function() {
         input.value = "hello";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
-        
+
         results = getTokens(this.component);
         assert.equal(startLength , results.length);
       });
@@ -193,7 +224,7 @@ describe('TypeaheadTokenizer Component', function() {
           onTokenRemove={this.tokenRemove}
           allowCustomValues={tokenLength}
           customClasses={{
-            customAdd: 'topcoat-custom__token' 
+            customAdd: 'topcoat-custom__token'
           }}
         />
       );
