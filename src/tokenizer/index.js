@@ -38,7 +38,14 @@ var TypeaheadTokenizer = React.createClass({
     onKeyDown: React.PropTypes.func,
     onKeyUp: React.PropTypes.func,
     onTokenAdd: React.PropTypes.func,
-    filterOption: React.PropTypes.func,
+    filterOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
     maxVisible: React.PropTypes.number
   },
 
@@ -59,6 +66,8 @@ var TypeaheadTokenizer = React.createClass({
       defaultValue: "",
       placeholder: "",
       inputProps: {},
+      filterOption: null,
+      displayOption: function(token){return token },
       onKeyDown: function(event) {},
       onKeyUp: function(event) {},
       onTokenAdd: function() {},
@@ -88,11 +97,12 @@ var TypeaheadTokenizer = React.createClass({
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
+      var displayString = this.props.displayOption(selected);
       return (
         <Token key={ selected } className={classList}
           onRemove={ this._removeTokenForValue }
           name={ this.props.name }>
-          { selected }
+          { displayString }
         </Token>
       );
     }, this);
@@ -170,6 +180,7 @@ var TypeaheadTokenizer = React.createClass({
           onOptionSelected={this._addTokenForValue}
           onKeyDown={this._onKeyDown}
           onKeyUp={this.props.onKeyUp}
+          displayOption={this.props.displayOption}
           filterOption={this.props.filterOption} />
       </div>
     );
