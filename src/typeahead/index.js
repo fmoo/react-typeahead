@@ -47,7 +47,7 @@ var Typeahead = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
-    customListComponent: React.PropTypes.func
+    customListComponent: React.PropTypes.element
   },
 
   getDefaultProps: function() {
