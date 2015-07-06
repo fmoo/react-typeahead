@@ -101,6 +101,7 @@ var TypeaheadTokenizer = React.createClass({
       return (
         <Token key={ displayString } className={classList}
           onRemove={ this._removeTokenForValue }
+          object={selected}
           name={ this.props.name }>
           { displayString }
         </Token>
