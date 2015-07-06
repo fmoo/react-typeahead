@@ -17,7 +17,8 @@ var TypeaheadSelector = React.createClass({
     customValue: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func,
-    displayOption: React.PropTypes.func.isRequired
+    displayOption: React.PropTypes.func.isRequired,
+    defaultClassNames: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -25,13 +26,14 @@ var TypeaheadSelector = React.createClass({
       selectionIndex: null,
       customClasses: {},
       customValue: null,
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) { },
+      defaultClassNames: true
     };
   },
 
   render: function() {
     var classes = {
-      "typeahead-selector": true
+      "typeahead-selector": this.props.defaultClassNames
     };
     classes[this.props.customClasses.results] = this.props.customClasses.results;
     var classList = classNames(classes);

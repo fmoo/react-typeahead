@@ -46,7 +46,8 @@ var Typeahead = React.createClass({
     formInputOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
-    ])
+    ]),
+    defaultClassNames: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -63,7 +64,8 @@ var Typeahead = React.createClass({
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
-      filterOption: null
+      filterOption: null,
+      defaultClassNames: true
     };
   },
 
@@ -140,6 +142,7 @@ var Typeahead = React.createClass({
         customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
         selectionIndex={this.state.selectionIndex}
+        defaultClassNames={this.props.defaultClassNames}
         displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
     );
   },
@@ -285,7 +288,7 @@ var Typeahead = React.createClass({
     var inputClassList = classNames(inputClasses);
 
     var classes = {
-      typeahead: true
+      typeahead: this.props.defaultClassNames
     };
     classes[this.props.className] = !!this.props.className;
     var classList = classNames(classes);

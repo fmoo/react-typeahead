@@ -372,6 +372,19 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('defaultClassNames', function() {
+      it('should remove default classNames when this prop is specified and false', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          defaultClassNames={false}
+        />);
+        simulateTextInput(component, 'o');
+
+        assert.notOk(component.getDOMNode().classList.contains("typeahead"));
+        assert.notOk(component.refs.sel.getDOMNode().classList.contains("typeahead-selector"));
+      });
+    });
+
     context('filterOption', function() {
       var FN_TEST_PLANS = [
         {
