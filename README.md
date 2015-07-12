@@ -82,6 +82,12 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
+#### props.textarea
+
+Type: `Boolean`
+
+Set to `true` to use a `<textarea>` element rather than an `<input>` element
+
 #### props.inputProps
 
 Type: `Object`
