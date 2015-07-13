@@ -515,6 +515,25 @@ describe('Typeahead Component', function() {
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_TAB });
         var results = TestUtils.scryRenderedComponentsWithType(this.component, this.ListComponent);
         assert.equal(0, results.length);
+
+    context('textarea', function() {
+      it('should render a <textarea> input', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          textarea={ true }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        assert.equal(input.tagName.toLowerCase(), 'textarea');
+      });
+
+      it('should render a <input> input', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        assert.equal(input.tagName.toLowerCase(), 'input');
       });
     })
   });

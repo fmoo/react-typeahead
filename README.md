@@ -82,6 +82,12 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
+#### props.textarea
+
+Type: `Boolean`
+
+Set to `true` to use a `<textarea>` element rather than an `<input>` element
+
 #### props.inputProps
 
 Type: `Object`
@@ -241,6 +247,14 @@ Params: `(addedToken)`
 
 Event handler triggered whenever a token is removed.
 
+#### props.displayOption
+
+Type: `String` or `Function`
+
+A function to map an option onto a string for display in the list. Receives `(option, index)` where index is relative to the results list, not all the options. Must return a string.
+
+If provided as a string, it will interpret it as a field name and use that field from each option object.
+
 #### props.filterOption
 
 Type: `Function`
@@ -298,6 +312,7 @@ Once that's done, running the tests is easy with `gulp`:
 Basically, fork the repository and send a pull request.  It can be difficult to review these, so
 here are some general rules to follow for getting your PR accepted more quickly:
 
+- All new properties and exposed component function should be documented in the README.md
 - Break your changes into smaller, easy to understand commits.
 - Send separate PRs for each commit when possible.
 - Feel free to rebase, merge, and rewrite commits to make them more readible.

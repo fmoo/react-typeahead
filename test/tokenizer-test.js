@@ -29,6 +29,26 @@ function getTokens(component) {
 
 var BEATLES = ['John', 'Paul', 'George', 'Ringo'];
 
+var BEATLES_COMPLEX = [
+  {
+    firstName: 'John',
+    lastName: 'Lennon',
+    nameWithTitle: 'John Winston Ono Lennon MBE'
+  }, {
+    firstName: 'Paul',
+    lastName: 'McCartney',
+    nameWithTitle: 'Sir James Paul McCartney MBE'
+  }, {
+    firstName: 'George',
+    lastName: 'Harrison',
+    nameWithTitle: 'George Harrison MBE'
+  }, {
+    firstName: 'Ringo',
+    lastName: 'Starr',
+    nameWithTitle: 'Richard Starkey Jr. MBE'
+  }
+];
+
 describe('TypeaheadTokenizer Component', function() {
 
   describe('basic tokenizer', function() {
@@ -101,6 +121,37 @@ describe('TypeaheadTokenizer Component', function() {
 
         var input = React.findDOMNode(component.refs.typeahead.refs.entry);
         TestUtils.Simulate.keyUp(input, { keyCode: 87 });
+      });
+    });
+    describe('props', function(){
+      context('displayOption', function() {
+        it('renders simple options verbatim when not specified', function() {
+          var component = TestUtils.renderIntoDocument(<Tokenizer
+            options={ BEATLES }
+          />);
+          var results = simulateTokenInput(component, 'john');
+          assert.equal(results[0].getDOMNode().textContent, 'John');
+        });
+
+        it('renders custom options when specified as a string', function() {
+          var component = TestUtils.renderIntoDocument(<Tokenizer
+            options={ BEATLES_COMPLEX }
+            filterOption='firstName'
+            displayOption='nameWithTitle'
+          />);
+          var results = simulateTokenInput(component, 'john');
+          assert.equal(results[0].getDOMNode().textContent, 'John Winston Ono Lennon MBE');
+        });
+
+        it('renders custom options when specified as a function', function() {
+          var component = TestUtils.renderIntoDocument(<Tokenizer
+            options={ BEATLES_COMPLEX }
+            filterOption='firstName'
+            displayOption={ function(o, i) { return i + ' ' + o.firstName + ' ' + o.lastName; } }
+          />);
+          var results = simulateTokenInput(component, 'john');
+          assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
+        });
       });
     });
 
