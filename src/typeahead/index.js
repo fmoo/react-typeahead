@@ -99,6 +99,10 @@ var Typeahead = React.createClass({
     this._onTextEntryUpdated();
   },
 
+  focus: function(){
+    React.findDOMNode(this.refs.entry).focus()
+  },
+
   _hasCustomValue: function() {
     if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&

@@ -71,7 +71,62 @@ describe('TypeaheadTokenizer Component', function() {
 
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'typeahead-token');
       TestUtils.findRenderedDOMComponentWithClass(tokens[0], 'custom-token');
-      
+    });
+
+    context('onKeyDown', function() {
+      it('should bind to key events on the input', function(done) {
+        var component = TestUtils.renderIntoDocument(<Tokenizer
+          options={ BEATLES }
+          onKeyDown={ function(e) {
+              assert.equal(e.keyCode, 87);
+              done();
+            }
+          }
+        />);
+        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        TestUtils.Simulate.keyDown(input, { keyCode: 87 });
+      });
+    });
+
+    context('onKeyUp', function() {
+      it('should bind to key events on the input', function(done) {
+        var component = TestUtils.renderIntoDocument(<Tokenizer
+          options={ BEATLES }
+          onKeyUp={ function(e) {
+              assert.equal(e.keyCode, 87);
+              done();
+            }
+          }
+        />);
+
+        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        TestUtils.Simulate.keyUp(input, { keyCode: 87 });
+      });
+    });
+
+    describe('component functions', function() {
+      beforeEach(function() {
+        this.sinon = sinon.sandbox.create();
+      });
+      afterEach(function() {
+        this.sinon.restore();
+      });
+
+      it('focuses the typeahead', function() {
+        this.sinon.spy(this.component.refs.typeahead, 'focus');
+        this.component.focus();
+        assert.equal(this.component.refs.typeahead.focus.calledOnce, true);
+      });
+    });
+
+    it('should provide an exposed component function to get the selected tokens', function() {
+      simulateTokenInput(this.component, 'o');
+      var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+      assert.equal(this.component.getSelectedTokens().length, 1);
+      assert.equal(this.component.getSelectedTokens()[0], "John");
     });
 
     describe('keyboard controls', function() {
@@ -130,7 +185,7 @@ describe('TypeaheadTokenizer Component', function() {
         input.value = "hello";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_BACK_SPACE });
-        
+
         results = getTokens(this.component);
         assert.equal(startLength , results.length);
       });
@@ -179,7 +234,7 @@ describe('TypeaheadTokenizer Component', function() {
           onTokenRemove={this.tokenRemove}
           allowCustomValues={tokenLength}
           customClasses={{
-            customAdd: 'topcoat-custom__token' 
+            customAdd: 'topcoat-custom__token'
           }}
         />
       );
@@ -239,7 +294,7 @@ describe('TypeaheadTokenizer Component', function() {
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
 
       assert(this.tokenAdd.called);
-      assert(this.tokenAdd.calledWith( this.component.state.selected ))
+      assert(this.tokenAdd.calledWith( "abzz" ))
     })
 
     it('should call onTokenRemove for custom token', function() {
@@ -251,13 +306,13 @@ describe('TypeaheadTokenizer Component', function() {
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_RETURN})
 
       assert(this.tokenAdd.called);
-      assert(this.tokenAdd.calledWith( this.component.state.selected ))
+      assert(this.tokenAdd.calledWith( "abzz" ))
 
       tokens = getTokens(this.component);
       var tokenClose = TestUtils.scryRenderedDOMComponentsWithTag(tokens[0], "a")[0].getDOMNode();
       TestUtils.Simulate.click(tokenClose);
       assert(this.tokenRemove.called);
-      assert(this.tokenRemove.calledWith(this.component.state.selected));
+      assert(this.tokenRemove.calledWith("abzz"));
     })
 
     it('should not return undefined for a custom token when not selected', function() {

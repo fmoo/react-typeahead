@@ -27,9 +27,8 @@ var Tokenizer = require('react-typeahead').Tokenizer;
 React.render(
   <Tokenizer
     options={['John', 'Paul', 'George', 'Ringo']}
-    onTokenAdd={function(selectedTokens, token) {
+    onTokenAdd={function(token) {
       console.log('token added: ', token);
-      console.log('current tokens: ', selectedTokens);
     }}
   />
 );
@@ -95,6 +94,12 @@ Type: `Function`
 
 Event handler for the `keyDown` event on the typeahead input.
 
+#### props.onKeyUp
+
+Type: `Function`
+
+Event handler for the `keyUp` event on the typeahead input.
+
 #### props.onOptionSelected
 
 Type: `Function`
@@ -149,6 +154,13 @@ This component receives the following props :
 - `props.selectedIndex`
   - The index of the highlighted option for rendering
 
+
+### Typeahead ([Exposed Component Functions][reactecf])
+
+#### typeahead.focus
+
+Focuses the typeahead input.
+
 ---
 
 ### Tokenizer(props)
@@ -196,6 +208,19 @@ Type: `Object`
 
 Props to pass directly to the `<input>` element.
 
+#### props.onKeyDown
+
+Type: `Function`
+
+Event handler for the `keyDown` event on the typeahead input.
+
+#### props.onKeyUp
+
+Type: `Function`
+
+Event handler for the `keyUp` event on the typeahead input.
+
+
 #### props.defaultSelected
 
 Type: `Array`
@@ -205,14 +230,14 @@ A set of values of tokens to be loaded on first render.
 #### props.onTokenRemove
 
 Type: `Function`
-Params: `(selectedTokens, removedToken)`
+Params: `(removedToken)`
 
 Event handler triggered whenever a token is removed.
 
 #### props.onTokenAdd
 
 Type: `Function`
-Params: `(selectedTokens, addedToken)`
+Params: `(addedToken)`
 
 Event handler triggered whenever a token is removed.
 
@@ -222,6 +247,17 @@ Type: `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
+### Tokenizer ([Exposed Component Functions][reactecf])
+
+#### tokenizer.focus
+
+Focuses the tokenizer input.
+
+#### tokenizer.getSelectedTokens
+
+Type: `Function`
+
+A function to return the currently selected tokens.
 
 ## Developing
 
@@ -267,3 +303,5 @@ here are some general rules to follow for getting your PR accepted more quickly:
 - Feel free to rebase, merge, and rewrite commits to make them more readible.
 - Add comments explaining anything that's not painfully obvious.
 - Add unittests for your change if possible.
+
+[reactecf]: https://facebook.github.io/react/tips/expose-component-functions.html

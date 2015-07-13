@@ -137,6 +137,20 @@ describe('Typeahead Component', function() {
       });
     });
 
+    describe('component functions', function() {
+      beforeEach(function() {
+        this.sinon = sinon.sandbox.create();
+      });
+      afterEach(function() {
+        this.sinon.restore();
+      });
+      it('focuses the typeahead', function() {
+        var node = React.findDOMNode(this.component.refs.entry);
+        this.sinon.spy(node, 'focus');
+        this.component.focus();
+        assert.equal(node.focus.calledOnce, true);
+      });
+    });
   });
 
   describe('props', function() {
