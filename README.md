@@ -129,6 +129,26 @@ If not specified, it will fall back onto the semantics described in `props.displ
 
 This option is ignored if you don't specify the `name` prop. It is required if you both specify the `name` prop and are using non-string options. It is optional otherwise.
 
+#### props.customListComponent
+
+Type: `React Component`
+
+A React Component that renders the list of typeahead results. This replaces the default list of results.
+
+This component receives the following props :
+
+##### Passed through
+
+- `props.displayOptions`
+- `props.customClasses`
+- `props.onOptionSelected`
+
+##### Created or modified
+- `props.options`
+  - This is the Typeahead's `props.options` filtered and limited to `Typeahead.props.maxVisible`.
+- `props.selectedIndex`
+  - The index of the highlighted option for rendering
+
 ---
 
 ### Tokenizer(props)
