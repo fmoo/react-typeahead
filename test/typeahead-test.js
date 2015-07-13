@@ -487,5 +487,26 @@ describe('Typeahead Component', function() {
         });
       });
     });
+
+    context('textarea', function() {
+      it('should render a <textarea> input', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          textarea={ true }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        assert.equal(input.tagName.toLowerCase(), 'textarea');
+      });
+
+      it('should render a <input> input', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        assert.equal(input.tagName.toLowerCase(), 'input');
+      });
+    })
   });
 });
