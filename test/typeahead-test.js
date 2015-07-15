@@ -330,6 +330,18 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('value', function() {
+      it('should set input value', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          value={ 'John' }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        assert.equal(input.value, 'John');
+      });
+    });
+
     context('onKeyDown', function() {
       it('should bind to key events on the input', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
