@@ -106,6 +106,18 @@ Type: `Function`
 
 Event handler for the `keyUp` event on the typeahead input.
 
+#### props.onBlur
+
+Type: `Function`
+
+Event handler for the `blur` event on the typeahead input.
+
+#### props.onFocus
+
+Type: `Function`
+
+Event handler for the `focus` event on the typeahead input.
+
 #### props.onOptionSelected
 
 Type: `Function`
@@ -205,6 +217,17 @@ Type: `Function`
 
 Event handler for the `keyUp` event on the typeahead input.
 
+#### props.onBlur
+
+Type: `Function`
+
+Event handler for the `blur` event on the typeahead input.
+
+#### props.onFocus
+
+Type: `Function`
+
+Event handler for the `focus` event on the typeahead input.
 
 #### props.defaultSelected
 
