@@ -235,7 +235,16 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     onKeyDown: React.PropTypes.func,
     onKeyUp: React.PropTypes.func,
     onTokenAdd: React.PropTypes.func,
-    filterOption: React.PropTypes.func,
+    onFocus: React.PropTypes.func,
+    onBlur: React.PropTypes.func,
+    filterOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
     maxVisible: React.PropTypes.number
   },
 
@@ -256,8 +265,12 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       defaultValue: "",
       placeholder: "",
       inputProps: {},
+      filterOption: null,
+      displayOption: function(token){return token },
       onKeyDown: function(event) {},
       onKeyUp: function(event) {},
+      onFocus: function(event) {},
+      onBlur: function(event) {},
       onTokenAdd: function() {},
       onTokenRemove: function() {}
     };
@@ -285,11 +298,13 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
+      var displayString = this.props.displayOption(selected);
       return (
-        React.createElement(Token, {key:  selected, className: classList, 
+        React.createElement(Token, {key:  displayString, className: classList, 
           onRemove:  this._removeTokenForValue, 
+          object: selected, 
           name:  this.props.name}, 
-           selected 
+           displayString 
         )
       );
     }, this);
@@ -367,6 +382,9 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
           onOptionSelected: this._addTokenForValue, 
           onKeyDown: this._onKeyDown, 
           onKeyUp: this.props.onKeyUp, 
+          onFocus: this.props.onFocus, 
+          onBlur: this.props.onBlur, 
+          displayOption: this.props.displayOption, 
           filterOption: this.props.filterOption})
       )
     );
@@ -393,6 +411,10 @@ var Token = React.createClass({displayName: "Token",
     className: React.PropTypes.string,
     name: React.PropTypes.string,
     children: React.PropTypes.string,
+    object: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.object,
+    ]),
     onRemove: React.PropTypes.func
   },
 
@@ -421,7 +443,7 @@ var Token = React.createClass({displayName: "Token",
       React.createElement("input", {
         type: "hidden", 
         name:  this.props.name + '[]', 
-        value:  this.props.children}
+        value:  this.props.object}
       )
     );
   },
@@ -432,7 +454,7 @@ var Token = React.createClass({displayName: "Token",
     }
     return (
       React.createElement("a", {className: "typeahead-token-close", href: "#", onClick: function(event) {
-          this.props.onRemove(this.props.children);
+          this.props.onRemove(this.props.object);
           event.preventDefault();
         }.bind(this)}, "×")
     );
@@ -472,7 +494,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
     defaultValue: React.PropTypes.string,
+    value: React.PropTypes.string,
     placeholder: React.PropTypes.string,
+    textarea: React.PropTypes.bool,
     inputProps: React.PropTypes.object,
     onOptionSelected: React.PropTypes.func,
     onChange: React.PropTypes.func,
@@ -500,7 +524,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       customClasses: {},
       allowCustomValues: 0,
       defaultValue: "",
+      value: null,
       placeholder: "",
+      textarea: false,
       inputProps: {},
       onOptionSelected: function(option) {},
       onChange: function(event) {},
@@ -518,10 +544,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
 
       // This should be called something else, "entryValue"
-      entryValue: this.props.defaultValue,
+      entryValue: this.props.value || this.props.defaultValue,
 
       // A valid typeahead value
-      selection: null,
+      selection: this.props.value,
 
       // Index of the selection
       selectionIndex: null
@@ -735,10 +761,12 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     classes[this.props.className] = !!this.props.className;
     var classList = classNames(classes);
 
+    var InputElement = this.props.textarea ? 'textarea' : 'input';
+
     return (
       React.createElement("div", {className: classList}, 
          this._renderHiddenInput(), 
-        React.createElement("input", React.__spread({ref: "entry", type: "text"}, 
+        React.createElement(InputElement, React.__spread({ref: "entry", type: "text"}, 
           this.props.inputProps, 
           {placeholder: this.props.placeholder, 
           className: inputClassList, 
@@ -934,8 +962,9 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 
     var results = this.props.options.map(function(result, i) {
       var displayString = this.props.displayOption(result, i);
+      var uniqueKey = displayString + '_' + i;
       return (
-        React.createElement(TypeaheadOption, {ref: displayString, key: displayString, 
+        React.createElement(TypeaheadOption, {ref: uniqueKey, key: uniqueKey, 
           hover: this.props.selectionIndex === i + customValueOffset, 
           customClasses: this.props.customClasses, 
           onClick: this._onClick.bind(this, result)}, 
