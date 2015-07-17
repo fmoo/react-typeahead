@@ -62,6 +62,18 @@ Default: []
 
 An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects. In the latter case, `filterOption` and `displayOption` should be provided.
 
+#### props.defaultValue
+
+Type: `String`
+
+A default value used when the component has no value. If it matches any options a option list will show.
+
+#### props.value
+
+Type: `String`
+
+Specify a value for the text input.
+
 #### props.maxVisible
 
 Type: `Number`
