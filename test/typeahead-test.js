@@ -500,6 +500,47 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('customListComponent', function() {
+      before(function() {
+        ListComponent = React.createClass({
+          render: function() {
+            return <div></div>;
+          }
+        });
+
+        this.ListComponent = ListComponent;
+      })
+
+      beforeEach(function() {
+
+        this.component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+            customListComponent={this.ListComponent}/>
+        );
+      });
+
+      it('should not show the customListComponent when the input is empty', function() {
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, this.ListComponent);
+        assert.equal(0, results.length);
+      });
+
+      it('should show the customListComponent when the input is not empty', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "o";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, this.ListComponent);
+        assert.equal(1, results.length);
+      });
+
+      it('should no longer show the customListComponent after an option has been selected', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "o";
+        TestUtils.Simulate.change(input);
+        TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_TAB });
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, this.ListComponent);
+        assert.equal(0, results.length);
+
     context('textarea', function() {
       it('should render a <textarea> input', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
