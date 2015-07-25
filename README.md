@@ -164,6 +164,13 @@ If not specified, it will fall back onto the semantics described in `props.displ
 
 This option is ignored if you don't specify the `name` prop. It is required if you both specify the `name` prop and are using non-string options. It is optional otherwise.
 
+#### props.defaultClassNames
+
+Type: `boolean`
+Default: true
+
+If false, the default classNames are removed from the typeahead.
+
 ### Typeahead ([Exposed Component Functions][reactecf])
 
 #### typeahead.focus
@@ -274,6 +281,13 @@ If provided as a string, it will interpret it as a field name and use that field
 Type: `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
+
+#### props.defaultClassNames
+
+Type: `boolean`
+Default: true
+
+If false, the default classNames are removed from the tokenizer and the typeahead.
 
 ### Tokenizer ([Exposed Component Functions][reactecf])
 
