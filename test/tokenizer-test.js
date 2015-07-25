@@ -392,4 +392,15 @@ describe('TypeaheadTokenizer Component', function() {
     })
   })
 
+  describe('defaultClassNames', function() {
+    it('should remove default classNames when this prop is specified and false', function() {
+      var component = TestUtils.renderIntoDocument(<Tokenizer
+        options={ BEATLES }
+        defaultClassNames={false}
+      />);
+
+      assert.notOk(component.getDOMNode().classList.contains("tokenizer-typeahead"));
+      assert.equal(false, component.refs.typeahead.props.defaultClassNames);
+    });
+  });
 });

@@ -48,7 +48,8 @@ var TypeaheadTokenizer = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
-    maxVisible: React.PropTypes.number
+    maxVisible: React.PropTypes.number,
+    defaultClassNames: React.PropTypes.bool
   },
 
   getInitialState: function() {
@@ -68,6 +69,7 @@ var TypeaheadTokenizer = React.createClass({
       defaultValue: "",
       placeholder: "",
       inputProps: {},
+      defaultClassNames: true,
       filterOption: null,
       displayOption: function(token){return token },
       onKeyDown: function(event) {},
@@ -170,8 +172,12 @@ var TypeaheadTokenizer = React.createClass({
     var classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
     var classList = classNames(classes);
+    var tokenizerClasses = [this.props.defaultClassNames && "typeahead-tokenizer"];
+    tokenizerClasses[this.props.className] = !!this.props.className;
+    var tokenizerClassList = classNames(tokenizerClasses)
+
     return (
-      <div className="typeahead-tokenizer">
+      <div className={tokenizerClassList}>
         { this._renderTokens() }
         <Typeahead ref="typeahead"
           className={classList}
@@ -188,6 +194,7 @@ var TypeaheadTokenizer = React.createClass({
           onFocus={this.props.onFocus}
           onBlur={this.props.onBlur}
           displayOption={this.props.displayOption}
+          defaultClassNames={this.props.defaultClassNames}
           filterOption={this.props.filterOption} />
       </div>
     );
