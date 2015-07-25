@@ -245,7 +245,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       React.PropTypes.string,
       React.PropTypes.func
     ]),
-    maxVisible: React.PropTypes.number
+    maxVisible: React.PropTypes.number,
+    defaultClassNames: React.PropTypes.bool
   },
 
   getInitialState: function() {
@@ -265,6 +266,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       defaultValue: "",
       placeholder: "",
       inputProps: {},
+      defaultClassNames: true,
       filterOption: null,
       displayOption: function(token){return token },
       onKeyDown: function(event) {},
@@ -367,8 +369,12 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     var classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
     var classList = classNames(classes);
+    var tokenizerClasses = [this.props.defaultClassNames && "typeahead-tokenizer"];
+    tokenizerClasses[this.props.className] = !!this.props.className;
+    var tokenizerClassList = classNames(tokenizerClasses)
+
     return (
-      React.createElement("div", {className: "typeahead-tokenizer"}, 
+      React.createElement("div", {className: tokenizerClassList}, 
          this._renderTokens(), 
         React.createElement(Typeahead, {ref: "typeahead", 
           className: classList, 
@@ -385,6 +391,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
           onFocus: this.props.onFocus, 
           onBlur: this.props.onBlur, 
           displayOption: this.props.displayOption, 
+          defaultClassNames: this.props.defaultClassNames, 
           filterOption: this.props.filterOption})
       )
     );
@@ -515,7 +522,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     formInputOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
-    ])
+    ]),
+    defaultClassNames: React.PropTypes.bool,
+    customListComponent: React.PropTypes.element
   },
 
   getDefaultProps: function() {
@@ -534,7 +543,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
-      filterOption: null
+      filterOption: null,
+      defaultClassNames: true,
+      customListComponent: TypeaheadSelector
     };
   },
 
@@ -599,18 +610,14 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       return "";
     }
 
-    // There are no typeahead / autocomplete suggestions
-    if (!this._hasHint()) {
-      return "";
-    }
-
     return (
-      React.createElement(TypeaheadSelector, {
+      React.createElement(this.props.customListComponent, {
         ref: "sel", options: this.state.visible, 
         onOptionSelected: this._onOptionSelected, 
         customValue: this._getCustomValue(), 
         customClasses: this.props.customClasses, 
         selectionIndex: this.state.selectionIndex, 
+        defaultClassNames: this.props.defaultClassNames, 
         displayOption: this._generateOptionToStringFor(this.props.displayOption)})
     );
   },
@@ -756,7 +763,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     var inputClassList = classNames(inputClasses);
 
     var classes = {
-      typeahead: true
+      typeahead: this.props.defaultClassNames
     };
     classes[this.props.className] = !!this.props.className;
     var classList = classNames(classes);
@@ -925,7 +932,8 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
     customValue: React.PropTypes.string,
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func,
-    displayOption: React.PropTypes.func.isRequired
+    displayOption: React.PropTypes.func.isRequired,
+    defaultClassNames: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -933,13 +941,14 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
       selectionIndex: null,
       customClasses: {},
       customValue: null,
-      onOptionSelected: function(option) { }
+      onOptionSelected: function(option) { },
+      defaultClassNames: true
     };
   },
 
   render: function() {
     var classes = {
-      "typeahead-selector": true
+      "typeahead-selector": this.props.defaultClassNames
     };
     classes[this.props.customClasses.results] = this.props.customClasses.results;
     var classList = classNames(classes);
