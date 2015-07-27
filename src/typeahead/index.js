@@ -261,8 +261,9 @@ var Typeahead = React.createClass({
 
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
-    // Just pass this up to the upstream onKeydown handler
-    if (!this._hasHint()) {
+    // Just pass this up to the upstream onKeydown handler.
+    // Also skip if the user is pressing the shift key, since none of our handlers are looking for shift
+    if (!this._hasHint() || event.shiftKey) {
       return this.props.onKeyDown(event);
     }
 
