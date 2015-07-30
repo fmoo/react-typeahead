@@ -26,6 +26,7 @@ var Typeahead = React.createClass({
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
+    focusOnOptionSelected: React.PropTypes.bool,
     defaultValue: React.PropTypes.string,
     value: React.PropTypes.string,
     placeholder: React.PropTypes.string,
@@ -61,6 +62,7 @@ var Typeahead = React.createClass({
       options: [],
       customClasses: {},
       allowCustomValues: 0,
+      focusOnOptionSelected: true,
       defaultValue: "",
       value: null,
       placeholder: "",
@@ -109,7 +111,7 @@ var Typeahead = React.createClass({
   },
 
   focus: function(){
-    React.findDOMNode(this.refs.entry).focus()
+    React.findDOMNode(this.refs.entry).focus();
   },
 
   _hasCustomValue: function() {
@@ -165,7 +167,9 @@ var Typeahead = React.createClass({
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry.getDOMNode();
-    nEntry.focus();
+    if (this.props.focusOnOptionSelected) {
+      nEntry.focus();
+    }
 
     var displayOption = this._generateOptionToStringFor(this.props.displayOption);
     var optionString = displayOption(option, 0);
