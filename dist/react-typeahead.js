@@ -524,7 +524,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       React.PropTypes.func
     ]),
     defaultClassNames: React.PropTypes.bool,
-    customListComponent: React.PropTypes.element
+    customListComponent: React.PropTypes.oneOfType([
+      React.PropTypes.element,
+      React.PropTypes.func
+    ])
   },
 
   getDefaultProps: function() {
