@@ -139,16 +139,18 @@ var Typeahead = React.createClass({
       return "";
     }
 
-    return (
-      <this.props.customListComponent
-        ref="sel" options={this.state.visible}
-        onOptionSelected={this._onOptionSelected}
-        customValue={this._getCustomValue()}
-        customClasses={this.props.customClasses}
-        selectionIndex={this.state.selectionIndex}
-        defaultClassNames={this.props.defaultClassNames}
-        displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
-    );
+    if (this.state.visible.length || this._getCustomValue()) {
+      return (
+        <this.props.customListComponent
+          ref="sel" options={this.state.visible}
+          onOptionSelected={this._onOptionSelected}
+          customValue={this._getCustomValue()}
+          customClasses={this.props.customClasses}
+          selectionIndex={this.state.selectionIndex}
+          defaultClassNames={this.props.defaultClassNames}
+          displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
+      );
+    }
   },
 
   getSelection: function() {
