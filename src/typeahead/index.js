@@ -145,6 +145,7 @@ var Typeahead = React.createClass({
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
+        entryValue={this.state.entryValue}
         selectionIndex={this.state.selectionIndex}
         defaultClassNames={this.props.defaultClassNames}
         displayOption={this._generateOptionToStringFor(this.props.displayOption)} />

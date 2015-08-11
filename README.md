@@ -189,7 +189,9 @@ This component receives the following props :
 - `props.options`
   - This is the Typeahead's `props.options` filtered and limited to `Typeahead.props.maxVisible`.
 - `props.selectedIndex`
-  - The index of the highlighted option for rendering
+  - The index of the highlighted option for rendering.
+  `props.entryValue`
+    The input value as it's entered.
 
 
 ### Typeahead ([Exposed Component Functions][reactecf])
