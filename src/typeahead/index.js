@@ -349,9 +349,8 @@ var Typeahead = React.createClass({
         mapper = IDENTITY_FN;
       }
       return function(value, options) {
-        var transformedOptions = options.map(mapper);
         return fuzzy
-          .filter(value, transformedOptions)
+          .filter(value, options, {extract: mapper})
           .map(function(res) { return options[res.index]; });
       };
     }
