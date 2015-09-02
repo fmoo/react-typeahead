@@ -1,4 +1,10 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactTypeahead=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+  Copyright (c) 2015 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
 function classNames() {
 	var classes = '';
 	var arg;
@@ -25,9 +31,16 @@ function classNames() {
 	return classes.substr(1);
 }
 
-// safely export classNames in case the script is included directly on a page
+// safely export classNames for node / browserify
 if (typeof module !== 'undefined' && module.exports) {
 	module.exports = classNames;
+}
+
+// safely export classNames for RequireJS
+if (typeof define !== 'undefined' && define.amd) {
+	define('classnames', [], function() {
+		return classNames;
+	});
 }
 
 },{}],2:[function(require,module,exports){
@@ -483,6 +496,7 @@ var fuzzy = require('fuzzy');
 var classNames = require('classnames');
 
 var IDENTITY_FN = function(input) { return input; };
+var SHOULD_SEARCH_VALUE = function(input) { return input && input.trim().length > 0; };
 var _generateAccessor = function(field) {
   return function(object) { return object[field]; };
 };
@@ -569,6 +583,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
   },
 
   getOptionsForValue: function(value, options) {
+    if (!SHOULD_SEARCH_VALUE(value)) { return []; }
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
     if (this.props.maxVisible) {
@@ -738,8 +753,9 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
-    // Just pass this up to the upstream onKeydown handler
-    if (!this._hasHint()) {
+    // Just pass this up to the upstream onKeydown handler.
+    // Also skip if the user is pressing the shift key, since none of our handlers are looking for shift
+    if (!this._hasHint() || event.shiftKey) {
       return this.props.onKeyDown(event);
     }
 
@@ -821,9 +837,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
         mapper = IDENTITY_FN;
       }
       return function(value, options) {
-        var transformedOptions = options.map(mapper);
         return fuzzy
-          .filter(value, transformedOptions)
+          .filter(value, options, {extract: mapper})
           .map(function(res) { return options[res.index]; });
       };
     }
