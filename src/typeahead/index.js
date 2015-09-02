@@ -9,6 +9,7 @@ var fuzzy = require('fuzzy');
 var classNames = require('classnames');
 
 var IDENTITY_FN = function(input) { return input; };
+var SHOULD_SEARCH_VALUE = function(input) { return input && input.trim().length > 0; };
 var _generateAccessor = function(field) {
   return function(object) { return object[field]; };
 };
@@ -95,6 +96,7 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
+    if (!SHOULD_SEARCH_VALUE(value)) { return []; }
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
     if (this.props.maxVisible) {
@@ -348,9 +350,8 @@ var Typeahead = React.createClass({
         mapper = IDENTITY_FN;
       }
       return function(value, options) {
-        var transformedOptions = options.map(mapper);
         return fuzzy
-          .filter(value, transformedOptions)
+          .filter(value, options, {extract: mapper})
           .map(function(res) { return options[res.index]; });
       };
     }
