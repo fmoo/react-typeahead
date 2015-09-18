@@ -186,6 +186,7 @@ var Typeahead = React.createClass({
     var value = this.refs.entry.getDOMNode().value;
     this.setState({visible: this.getOptionsForValue(value, this.props.options),
                    selection: null,
+                   selectionIndex: 0,
                    entryValue: value});
   },
 
