@@ -130,6 +130,12 @@ Type: `Function`
 
 Event handler for the `focus` event on the typeahead input.
 
+#### props.onClick
+
+Type: `Function`
+
+Event handler for the `click` event on the typeahead input.
+
 #### props.onOptionSelected
 
 Type: `Function`
@@ -268,6 +274,12 @@ Event handler for the `blur` event on the typeahead input.
 Type: `Function`
 
 Event handler for the `focus` event on the typeahead input.
+
+#### props.onClick
+
+Type: `Function`
+
+Event handler for the `click` event on the typeahead input.
 
 #### props.defaultSelected
 
