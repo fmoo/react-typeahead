@@ -165,20 +165,26 @@ var Typeahead = React.createClass({
     return this.state.visible[index];
   },
 
-  _onOptionSelected: function(option, event) {
-    var nEntry = this.refs.entry.getDOMNode();
-    nEntry.focus();
-
+  _setOptionValue: function(option) {
     var displayOption = this._generateOptionToStringFor(this.props.displayOption);
     var optionString = displayOption(option, 0);
 
     var formInputOption = this._generateOptionToStringFor(this.props.formInputOption || displayOption);
     var formInputOptionString = formInputOption(option);
 
-    nEntry.value = optionString;
     this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
                    selection: formInputOptionString,
                    entryValue: optionString});
+
+    this.refs.entry.getDOMNode().value = optionString;
+  },
+
+  _onOptionSelected: function(option, event) {
+    var nEntry = this.refs.entry.getDOMNode();
+    nEntry.focus();
+
+    this._setOptionValue(option);
+
     return this.props.onOptionSelected(option, event);
   },
 
@@ -284,9 +290,22 @@ var Typeahead = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
+    var options = null;
+
     this.setState({
       visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
     });
+
+    // The value prop is changed
+    if (nextProps.value !== this.props.value) {
+      options = this.getOptionsForValue(nextProps.value, nextProps.options);
+
+      // if we have only one option matching, we can choose it
+      if (options.length === 1) {
+        this._setOptionValue(options[0]);
+      }
+    }
+
   },
 
   render: function() {
