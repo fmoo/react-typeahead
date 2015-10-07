@@ -11,7 +11,7 @@ var Keyevent = require('../src/keyevent');
 var TestUtils = React.addons.TestUtils;
 
 function simulateTextInput(component, value) {
-  var node = component.refs.entry.getDOMNode();
+  var node = component.refs.entry;
   node.value = value;
   TestUtils.Simulate.change(node);
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
@@ -81,7 +81,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should have custom and default token classes', function() {
       simulateTokenInput(this.component, 'o');
-      var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var entry = this.component.refs.typeahead.refs.entry;
       TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
       TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
 
@@ -172,7 +172,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should provide an exposed component function to get the selected tokens', function() {
       simulateTokenInput(this.component, 'o');
-      var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var entry = this.component.refs.typeahead.refs.entry;
       TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
       TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
 
@@ -184,7 +184,7 @@ describe('TypeaheadTokenizer Component', function() {
       it('down arrow + return creates a token', function() {
         var results = simulateTokenInput(this.component, 'o');
         var secondItem = results[1].getDOMNode().innerText;
-        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var node = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
@@ -195,7 +195,7 @@ describe('TypeaheadTokenizer Component', function() {
       it('up arrow + return navigates and creates a token', function() {
         var results = simulateTokenInput(this.component, 'o');
         var firstItem = results[0].getDOMNode().innerText;
-        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var node = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
@@ -207,7 +207,7 @@ describe('TypeaheadTokenizer Component', function() {
       it('should remove a token when BKSPC is pressed on an empty input', function() {
         // Select two items
         simulateTokenInput(this.component, 'o');
-        var entry = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var entry = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
 
@@ -230,7 +230,7 @@ describe('TypeaheadTokenizer Component', function() {
       });
 
       it('should not remove a token on BKSPC when input is not empty', function() {
-        var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var input = this.component.refs.typeahead.refs.entry;
         var startLength = getTokens(this.component).length;
 
         input.value = "hello";
@@ -244,7 +244,7 @@ describe('TypeaheadTokenizer Component', function() {
       it('tab to choose first item', function() {
         var results = simulateTokenInput(this.component, 'o');
         var itemText = results[0].getDOMNode().innerText;
-        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var node = this.component.refs.typeahead.refs.entry;
         var tokens = getTokens(this.component);
 
         // Need to check Token list for props.children
@@ -258,7 +258,7 @@ describe('TypeaheadTokenizer Component', function() {
       it('tab to selected current item', function() {
         var results = simulateTokenInput(this.component, 'o');
         var itemText = results[1].getDOMNode().innerText;
-        var node = this.component.refs.typeahead.refs.entry.getDOMNode();
+        var node = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
@@ -326,7 +326,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should allow selection of custom token', function() {
       var results = simulateTokenInput(this.component, "abzz");
-      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var input = this.component.refs.typeahead.refs.entry;
       var tokens = getTokens(this.component);
 
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
@@ -338,7 +338,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should call onTokenAdd for custom token', function() {
       var results = simulateTokenInput(this.component, "abzz");
-      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var input = this.component.refs.typeahead.refs.entry;
       var tokens = getTokens(this.component);
 
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
@@ -350,7 +350,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should call onTokenRemove for custom token', function() {
       var results = simulateTokenInput(this.component, "abzz");
-      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var input = this.component.refs.typeahead.refs.entry;
       var tokens = getTokens(this.component);
 
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_DOWN})
@@ -360,7 +360,7 @@ describe('TypeaheadTokenizer Component', function() {
       assert(this.tokenAdd.calledWith( "abzz" ))
 
       tokens = getTokens(this.component);
-      var tokenClose = TestUtils.scryRenderedDOMComponentsWithTag(tokens[0], "a")[0].getDOMNode();
+      var tokenClose = TestUtils.scryRenderedDOMComponentsWithTag(tokens[0], "a")[0];
       TestUtils.Simulate.click(tokenClose);
       assert(this.tokenRemove.called);
       assert(this.tokenRemove.calledWith("abzz"));
@@ -368,7 +368,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should not return undefined for a custom token when not selected', function() {
       var results = simulateTokenInput(this.component, "abzz");
-      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var input = this.component.refs.typeahead.refs.entry;
       var tokens = getTokens(this.component);
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
 
@@ -381,7 +381,7 @@ describe('TypeaheadTokenizer Component', function() {
 
     it('should not select value for a custom token when too short', function() {
       var results = simulateTokenInput(this.component, "abz");
-      var input = this.component.refs.typeahead.refs.entry.getDOMNode();
+      var input = this.component.refs.typeahead.refs.entry;
       var tokens = getTokens(this.component);
       TestUtils.Simulate.keyDown(input, {keyCode: Keyevent.DOM_VK_TAB})
 

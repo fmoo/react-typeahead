@@ -9,7 +9,7 @@ var Keyevent = require('../src/keyevent');
 var TestUtils = React.addons.TestUtils;
 
 function simulateTextInput(component, value) {
-  var node = component.refs.entry.getDOMNode();
+  var node = component.refs.entry;
   node.value = value;
   TestUtils.Simulate.change(node);
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
@@ -74,7 +74,7 @@ describe('Typeahead Component', function() {
       it('down arrow + return selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var secondItem = results[1].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
@@ -84,7 +84,7 @@ describe('Typeahead Component', function() {
       it('up arrow + return navigates and selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = results[0].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
@@ -95,7 +95,7 @@ describe('Typeahead Component', function() {
       it('escape clears selection', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = results[0].getDOMNode();
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         assert.ok(firstItem.classList.contains('hover'));
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
@@ -105,7 +105,7 @@ describe('Typeahead Component', function() {
       it('tab to choose first item', function() {
         var results = simulateTextInput(this.component, 'o');
         var itemText = results[0].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal(node.value, itemText);
       });
@@ -113,7 +113,7 @@ describe('Typeahead Component', function() {
       it('tab to selected current item', function() {
         var results = simulateTextInput(this.component, 'o');
         var itemText = results[1].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
@@ -123,14 +123,14 @@ describe('Typeahead Component', function() {
       it('tab on no selection should not be undefined', function() {
         var results = simulateTextInput(this.component, 'oz');
         assert(results.length == 0);
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal("oz", node.value);
       });
 
       it('should set hover', function() {
         var results = simulateTextInput(this.component, 'o');
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         assert.equal(true, results[1].props.hover);
@@ -212,7 +212,7 @@ describe('Typeahead Component', function() {
       })
 
       it('should not display custom value if input length is less than entered', function() {
-        var input = this.component.refs.entry.getDOMNode();
+        var input = this.component.refs.entry;
         input.value = "zz";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
@@ -221,7 +221,7 @@ describe('Typeahead Component', function() {
       });
 
       it('should display custom value if input exceeds props.allowCustomValues', function() {
-        var input = this.component.refs.entry.getDOMNode();
+        var input = this.component.refs.entry;
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
@@ -232,7 +232,7 @@ describe('Typeahead Component', function() {
       it('should call onOptionSelected when selecting from options', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = results[0].getDOMNode().innerText;
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
@@ -243,7 +243,7 @@ describe('Typeahead Component', function() {
       })
 
       it('should call onOptionSelected when custom value is selected', function() {
-        var input = this.component.refs.entry.getDOMNode();
+        var input = this.component.refs.entry;
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
@@ -253,7 +253,7 @@ describe('Typeahead Component', function() {
       })
 
       it('should add hover prop to customValue', function() {
-        var input = this.component.refs.entry.getDOMNode();
+        var input = this.component.refs.entry;
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
@@ -307,7 +307,7 @@ describe('Typeahead Component', function() {
 
       it('adds a custom class to the list items when active', function() {
         var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
-        var node = this.component.refs.entry.getDOMNode();
+        var node = this.component.refs.entry;
 
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
 
@@ -337,7 +337,7 @@ describe('Typeahead Component', function() {
           value={ 'John' }
         />);
 
-        var input = component.refs.entry.getDOMNode();
+        var input = component.refs.entry;
         assert.equal(input.value, 'John');
       });
     });
@@ -352,7 +352,7 @@ describe('Typeahead Component', function() {
           }
         />);
 
-        var input = component.refs.entry.getDOMNode();
+        var input = component.refs.entry;
         TestUtils.Simulate.keyDown(input, { keyCode: 87 });
       });
     });
@@ -367,7 +367,7 @@ describe('Typeahead Component', function() {
           }
         />);
 
-        var input = component.refs.entry.getDOMNode();
+        var input = component.refs.entry;
         TestUtils.Simulate.keyUp(input, { keyCode: 87 });
       });
     });
@@ -491,7 +491,7 @@ describe('Typeahead Component', function() {
           />);
           var results = simulateTextInput(component, 'john');
 
-          var node = component.refs.entry.getDOMNode();
+          var node = component.refs.entry;
           TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
           TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
 
@@ -526,7 +526,7 @@ describe('Typeahead Component', function() {
       });
 
       it('should show the customListComponent when the input is not empty', function() {
-        var input = this.component.refs.entry.getDOMNode();
+        var input = this.component.refs.entry;
         input.value = "o";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, this.ListComponent);
@@ -534,7 +534,7 @@ describe('Typeahead Component', function() {
       });
 
       it('should no longer show the customListComponent after an option has been selected', function() {
-        var input = this.component.refs.entry.getDOMNode();
+        var input = this.component.refs.entry;
         input.value = "o";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_TAB });
