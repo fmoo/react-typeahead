@@ -328,6 +328,27 @@ Type: `Function`
 
 A function to return the currently selected tokens.
 
+#### tokenizer.addSelectedToken
+
+Type: `Function`
+
+A function to add a token to the selected list.
+> This does not call `props.onTokenAdd(value)`
+
+#### tokenizer.removeSelectedToken
+
+Type: `Function`
+
+A function to remove a token to the selected list.
+> This does not call `props.onTokenRemove(value)`
+
+#### tokenizer.setSelectedTokens
+
+Type: `Function`
+
+A function to remove all currently selected tokens and overwrite the selected list.
+> This does not call `props.onTokenAdd(value) or props.onTokenRemove(value)`
+
 ## Developing
 
 ### Setting Up

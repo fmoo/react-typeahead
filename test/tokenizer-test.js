@@ -170,16 +170,37 @@ describe('TypeaheadTokenizer Component', function() {
         this.component.focus();
         assert.equal(this.component.refs.typeahead.focus.calledOnce, true);
       });
-    });
 
-    it('should provide an exposed component function to get the selected tokens', function() {
-      simulateTokenInput(this.component, 'o');
-      var entry = this.component.refs.typeahead.refs.entry;
-      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
-      TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+      it('should provide an exposed component function to get the selected tokens', function() {
+        simulateTokenInput(this.component, 'o');
+        var entry = this.component.refs.typeahead.refs.entry;
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+        TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
 
-      assert.equal(this.component.getSelectedTokens().length, 1);
-      assert.equal(this.component.getSelectedTokens()[0], "John");
+        assert.equal(this.component.getSelectedTokens().length, 1);
+        assert.equal(this.component.getSelectedTokens()[0], "John");
+      });
+
+      it('should provide an exposed component function to add tokens', function() {
+        this.component.addSelectedToken("John")
+        assert.equal(this.component.getSelectedTokens().length, 1);
+        assert.equal(this.component.getSelectedTokens()[0], "John");
+      });
+
+      it('should provide an exposed component function to remove tokens', function() {
+        this.component.addSelectedToken("John")
+        assert.equal(this.component.getSelectedTokens().length, 1);
+        this.component.removeSelectedToken("John")
+        assert.equal(this.component.getSelectedTokens().length, 0);
+      });
+
+      it('should provide an exposed component function to remove tokens', function() {
+        this.component.addSelectedToken("John")
+        this.component.setSelectedTokens(["Paul", "George"])
+        assert.equal(this.component.getSelectedTokens().length, 2);
+        assert.equal(this.component.getSelectedTokens()[0], "Paul");
+        assert.equal(this.component.getSelectedTokens()[1], "George");
+      });
     });
 
     describe('keyboard controls', function() {
