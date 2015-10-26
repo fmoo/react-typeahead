@@ -171,6 +171,13 @@ Default: true
 
 If false, the default classNames are removed from the typeahead.
 
+#### props.propagateKeyDownEvents
+
+Type: `boolean`
+Default: false
+
+If true, allows keyDown events to propagate. This is useful if you want the `tab` key to focus the next element, for example.
+
 #### props.customListComponent
 
 Type: `React Component`
