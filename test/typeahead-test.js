@@ -372,6 +372,21 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('onClick', function() {
+      it('should bind to input', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          onClick={ function(e) {
+              assert.equal(e.constructor.name, 'SyntheticEvent');
+            }
+          }
+        />);
+
+        var input = component.refs.entry.getDOMNode();
+        TestUtils.Simulate.click(input);
+      });
+    });
+
     context('inputProps', function() {
       it('should forward props to the input element', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead

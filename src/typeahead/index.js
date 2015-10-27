@@ -38,6 +38,7 @@ var Typeahead = React.createClass({
     onKeyUp: React.PropTypes.func,
     onFocus: React.PropTypes.func,
     onBlur: React.PropTypes.func,
+    onClick: React.PropTypes.func,
     filterOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
@@ -73,6 +74,7 @@ var Typeahead = React.createClass({
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
+      onClick: function(event) {},
       filterOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector
@@ -316,6 +318,7 @@ var Typeahead = React.createClass({
           onKeyUp={this.props.onKeyUp}
           onFocus={this.props.onFocus}
           onBlur={this.props.onBlur}
+          onClick={this.props.onClick}
         />
         { this._renderIncrementalSearchResults() }
       </div>

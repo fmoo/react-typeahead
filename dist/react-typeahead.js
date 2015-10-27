@@ -99,7 +99,7 @@ fuzzy.match = function(pattern, string, opts) {
   pattern = opts.caseSensitive && pattern || pattern.toLowerCase();
 
   // For each character in the string, either add it to the result
-  // or wrap in template if its the next string in the pattern
+  // or wrap in template if it's the next string in the pattern
   for(var idx = 0; idx < len; idx++) {
     ch = string[idx];
     if(compareString[idx] === pattern[patternIdx]) {
@@ -141,8 +141,8 @@ fuzzy.match = function(pattern, string, opts) {
 //        // string to put after matching character
 //      , post:    '</b>'
 //
-//        // Optional function. Input is an element from the passed in
-//        // `arr`, output should be the string to test `pattern` against.
+//        // Optional function. Input is an entry in the given arr`,
+//        // output should be the string to test `pattern` against.
 //        // In this example, if `arr = [{crying: 'koala'}]` we would return
 //        // 'koala'.
 //      , extract: function(arg) { return arg.crying; }
@@ -150,31 +150,31 @@ fuzzy.match = function(pattern, string, opts) {
 fuzzy.filter = function(pattern, arr, opts) {
   opts = opts || {};
   return arr
-          .reduce(function(prev, element, idx, arr) {
-            var str = element;
-            if(opts.extract) {
-              str = opts.extract(element);
-            }
-            var rendered = fuzzy.match(pattern, str, opts);
-            if(rendered != null) {
-              prev[prev.length] = {
-                  string: rendered.rendered
-                , score: rendered.score
-                , index: idx
-                , original: element
-              };
-            }
-            return prev;
-          }, [])
+    .reduce(function(prev, element, idx, arr) {
+      var str = element;
+      if(opts.extract) {
+        str = opts.extract(element);
+      }
+      var rendered = fuzzy.match(pattern, str, opts);
+      if(rendered != null) {
+        prev[prev.length] = {
+            string: rendered.rendered
+          , score: rendered.score
+          , index: idx
+          , original: element
+        };
+      }
+      return prev;
+    }, [])
 
-          // Sort by score. Browsers are inconsistent wrt stable/unstable
-          // sorting, so force stable by using the index in the case of tie.
-          // See http://ofb.net/~sethml/is-sort-stable.html
-          .sort(function(a,b) {
-            var compare = b.score - a.score;
-            if(compare) return compare;
-            return a.index - b.index;
-          });
+    // Sort by score. Browsers are inconsistent wrt stable/unstable
+    // sorting, so force stable by using the index in the case of tie.
+    // See http://ofb.net/~sethml/is-sort-stable.html
+    .sort(function(a,b) {
+      var compare = b.score - a.score;
+      if(compare) return compare;
+      return a.index - b.index;
+    });
 };
 
 
@@ -525,6 +525,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     onKeyUp: React.PropTypes.func,
     onFocus: React.PropTypes.func,
     onBlur: React.PropTypes.func,
+    onClick: React.PropTypes.func,
     filterOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
@@ -560,6 +561,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
+      onClick: function(event) {},
       filterOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector
@@ -802,7 +804,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
           onKeyDown: this._onKeyDown, 
           onKeyUp: this.props.onKeyUp, 
           onFocus: this.props.onFocus, 
-          onBlur: this.props.onBlur})
+          onBlur: this.props.onBlur, 
+          onClick: this.props.onClick})
         ), 
          this._renderIncrementalSearchResults() 
       )

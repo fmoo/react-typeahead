@@ -123,6 +123,22 @@ describe('TypeaheadTokenizer Component', function() {
         TestUtils.Simulate.keyUp(input, { keyCode: 87 });
       });
     });
+
+    context('onClick', function() {
+      it('should bind to input', function() {
+        var component = TestUtils.renderIntoDocument(<Tokenizer
+          options={ BEATLES }
+          onClick={ function(e) {
+              assert.equal(e.constructor.name, 'SyntheticEvent');
+            }
+          }
+        />);
+
+        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        TestUtils.Simulate.click(input);
+      });
+    });
+
     describe('props', function(){
       context('displayOption', function() {
         it('renders simple options verbatim when not specified', function() {
