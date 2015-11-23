@@ -49,7 +49,11 @@ var TypeaheadTokenizer = React.createClass({
       React.PropTypes.func
     ]),
     maxVisible: React.PropTypes.number,
-    defaultClassNames: React.PropTypes.bool
+    defaultClassNames: React.PropTypes.bool,
+    customOptionComponent: React.PropTypes.oneOfType([
+      React.PropTypes.element,
+      React.PropTypes.func
+    ])
   },
 
   getInitialState: function() {
@@ -185,6 +189,7 @@ var TypeaheadTokenizer = React.createClass({
           inputProps={this.props.inputProps}
           allowCustomValues={this.props.allowCustomValues}
           customClasses={this.props.customClasses}
+          customOptionComponent={this.props.customOptionComponent}
           options={this._getOptionsForTypeahead()}
           defaultValue={this.props.defaultValue}
           maxVisible={this.props.maxVisible}
