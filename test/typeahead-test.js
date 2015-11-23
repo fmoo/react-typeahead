@@ -543,6 +543,42 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('customOptionComponent', function() {
+      before(function() {
+        OptionComponent = React.createClass({
+          render: function() {
+            return <div>{this.props.children}</div>;
+          }
+        });
+
+        this.OptionComponent = OptionComponent;
+      })
+
+      beforeEach(function() {
+
+        this.component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+            customOptionComponent={this.OptionComponent}/>
+        );
+      });
+
+      it('should not show the OptionComponent when the input is empty', function() {
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, this.OptionComponent);
+        assert.equal(0, results.length);
+      });
+
+      it('should show the OptionComponent for each input when customOptionComponent is set', function() {
+        var input = this.component.refs.entry.getDOMNode();
+        input.value = "o";
+        TestUtils.Simulate.change(input);
+        var results = TestUtils.scryRenderedComponentsWithType(this.component, this.OptionComponent);
+        // expect 3 = John, Ringo, George
+        assert.equal(3, results.length);
+      });
+
+    });
+
     context('textarea', function() {
       it('should render a <textarea> input', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead

@@ -54,6 +54,10 @@ var Typeahead = React.createClass({
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
+    ]),
+    customOptionComponent: React.PropTypes.oneOfType([
+      React.PropTypes.element,
+      React.PropTypes.func
     ])
   },
 
@@ -147,6 +151,7 @@ var Typeahead = React.createClass({
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
+        customOptionComponent={this.props.customOptionComponent}
         selectionIndex={this.state.selectionIndex}
         defaultClassNames={this.props.defaultClassNames}
         displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
