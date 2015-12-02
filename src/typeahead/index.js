@@ -143,6 +143,7 @@ var Typeahead = React.createClass({
 
     return (
       <this.props.customListComponent
+        {...this.props.customListComponentProps}
         ref="sel" options={this.state.visible}
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
