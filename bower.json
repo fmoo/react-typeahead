@@ -1,0 +1,16 @@
+{
+  "name": "react-typeahead",
+  "main": [
+    "dist/react-typeahead.js"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".gitignore",
+    "package.json",
+    "src",
+    "examples",
+    "test",
+    "LICENSE",
+    "README.md"
+  ]
+}
