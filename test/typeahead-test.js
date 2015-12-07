@@ -564,4 +564,50 @@ describe('Typeahead Component', function() {
       });
     })
   });
+
+  context("issue-37", function(){
+    var WrappingComponent = React.createClass({
+      getInitialState: function(){
+        return {
+          value: "",
+          options: [
+            {value: "a"},
+            {value: "ab"},
+            {value: "abc"},
+            {value: "other"}
+          ]
+        };
+      },
+      onChange: function(event) {
+        var newState = {
+          value: event.target.value,
+          options: this.state.options
+        };
+        this.setState(newState);
+      },
+      render: function() {
+        return (<Typeahead
+          filterOption="value"
+          displayOption="value"
+          options={this.state.options}
+          onChange={this.onChange}
+        />);
+      }
+    });
+
+    beforeEach(function() {
+      this.wrappingComponent = TestUtils.renderIntoDocument(
+        <WrappingComponent />
+      );
+      this.component = TestUtils.findRenderedComponentWithType(
+        this.wrappingComponent,
+        Typeahead
+      );
+    });
+
+    it("should not autocomplete one step behind the input", function() {
+      var results = simulateTextInput(this.component, "a");
+      assert.equal(results.length, 3);
+    });
+  });
 });
