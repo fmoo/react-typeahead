@@ -565,7 +565,7 @@ describe('Typeahead Component', function() {
     })
   });
 
-  context("issue-37", function(){
+  context("issue-128", function(){
     var WrappingComponent = React.createClass({
       getInitialState: function(){
         return {
