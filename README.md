@@ -94,7 +94,7 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
-#### props.disable
+#### props.disabled
 
 Type: `Boolean`
 
