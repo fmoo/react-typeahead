@@ -30,6 +30,7 @@ var Typeahead = React.createClass({
     defaultValue: React.PropTypes.string,
     value: React.PropTypes.string,
     placeholder: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
     textarea: React.PropTypes.bool,
     inputProps: React.PropTypes.object,
     onOptionSelected: React.PropTypes.func,
@@ -65,6 +66,7 @@ var Typeahead = React.createClass({
       defaultValue: "",
       value: null,
       placeholder: "",
+      disabled: false,
       textarea: false,
       inputProps: {},
       onOptionSelected: function(option) {},
@@ -308,6 +310,7 @@ var Typeahead = React.createClass({
         <InputElement ref="entry" type="text"
           {...this.props.inputProps}
           placeholder={this.props.placeholder}
+          disabled={this.props.disable}
           className={inputClassList}
           value={this.state.entryValue}
           defaultValue={this.props.defaultValue}

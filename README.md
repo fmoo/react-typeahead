@@ -94,6 +94,12 @@ Type: `String`
 
 Placeholder text for the typeahead input.
 
+#### props.disable
+
+Type: `Boolean`
+
+Set to `true` to add disable attribute in the `<input>` or `<textarea>` element
+
 #### props.textarea
 
 Type: `Boolean`
