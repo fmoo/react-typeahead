@@ -171,6 +171,9 @@ var Typeahead = React.createClass({
 
     var displayOption = this._generateOptionToStringFor(this.props.displayOption);
     var optionString = displayOption(option, 0);
+    if (typeof optionString !== 'string') {
+      optionString = String(option)
+    }
 
     var formInputOption = this._generateOptionToStringFor(this.props.formInputOption || displayOption);
     var formInputOptionString = formInputOption(option);

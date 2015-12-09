@@ -193,6 +193,41 @@ describe('Typeahead Component', function() {
         var results = simulateTextInput(component, 'john');
         assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
       });
+
+      it('renders custom element options when specified as a function returning an element', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX }
+          filterOption='firstName'
+          displayOption={ function(o, i) { return <span>{i + ' ' + o.firstName + ' ' + o.lastName}</span>; } }
+        />);
+        var results = simulateTextInput(component, 'john');
+        assert.equal(results[0].getDOMNode().firstChild.firstChild.nodeName, 'SPAN');
+        assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
+      });
+
+      it('uses toString of the option if displayOption returns an element', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES_COMPLEX.map(function (o) {
+            var newO = {
+              firstName: o.firstName,
+              lastName: o.lastName,
+            }
+            newO.toString = function () {
+              return this.firstName + ' ' + this.lastName
+            }
+            return newO
+          }) }
+          filterOption='firstName'
+          displayOption={ function(o, i) { return <span>{i + ' ' + o.firstName + ' ' + o.lastName}</span>; } }
+        />);
+        var results = simulateTextInput(component, 'john');
+        var node = component.refs.entry;
+        assert.equal(results[0].getDOMNode().firstChild.firstChild.nodeName, 'SPAN');
+        assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
+        console.log(typeof 'string', typeof {})
+        TestUtils.Simulate.click(results[0].getDOMNode().firstChild);
+        assert.equal(node.value, 'John Lennon');
+      });
     });
 
     context('allowCustomValues', function() {

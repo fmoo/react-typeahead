@@ -148,9 +148,11 @@ If provided as a string, it will interpret it as a field name and fuzzy filter o
 
 Type: `String` or `Function`
 
-A function to map an option onto a string for display in the list. Receives `(option, index)` where index is relative to the results list, not all the options. Must return a string.
+A function to map an option onto a string for display in the list. Receives `(option, index)` where index is relative to the results list, not all the options. Must return a string or an element.
 
 If provided as a string, it will interpret it as a field name and use that field from each option object.
+
+If provided function returns an element, toString method of the option is used to determine the value set to the input and passed to onOptionSelected. If toString is not implemented, the value will most likely be `[object Object]`.
 
 #### props.formInputOption
 
