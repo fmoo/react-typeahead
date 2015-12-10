@@ -102,7 +102,7 @@ var Typeahead = React.createClass({
     return result;
   },
 
-  visibleOptions: function(){
+  getVisibleOptions: function() {
     return this.getOptionsForValue(this.state.entryValue, this.props.options);
   },
 
@@ -118,7 +118,7 @@ var Typeahead = React.createClass({
   _hasCustomValue: function() {
     if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
-      this.visibleOptions().indexOf(this.state.entryValue) < 0) {
+      this.getVisibleOptions().indexOf(this.state.entryValue) < 0) {
       return true;
     }
     return false;
@@ -144,7 +144,7 @@ var Typeahead = React.createClass({
 
     return (
       <this.props.customListComponent
-        ref="sel" options={this.visibleOptions()}
+        ref="sel" options={this.getVisibleOptions()}
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
@@ -163,7 +163,7 @@ var Typeahead = React.createClass({
         index--;
       }
     }
-    return this.visibleOptions()[index];
+    return this.getVisibleOptions()[index];
   },
 
   _onOptionSelected: function(option, event) {
@@ -205,7 +205,7 @@ var Typeahead = React.createClass({
   _onTab: function(event) {
     var selection = this.getSelection();
     var option = selection ?
-      selection : (this.visibleOptions().length > 0 ? this.visibleOptions()[0] : null);
+      selection : (this.getVisibleOptions().length > 0 ? this.getVisibleOptions()[0] : null);
 
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
@@ -233,7 +233,7 @@ var Typeahead = React.createClass({
       return;
     }
     var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
-    var length = this.visibleOptions().length;
+    var length = this.getVisibleOptions().length;
     if (this._hasCustomValue()) {
       length += 1;
     }
@@ -361,7 +361,7 @@ var Typeahead = React.createClass({
   },
 
   _hasHint: function() {
-    return this.visibleOptions().length > 0 || this._hasCustomValue();
+    return this.getVisibleOptions().length > 0 || this._hasCustomValue();
   }
 });
 
