@@ -36,6 +36,7 @@ var TypeaheadTokenizer = React.createClass({
     inputProps: React.PropTypes.object,
     onTokenRemove: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
+    onKeyPress: React.PropTypes.func,
     onKeyUp: React.PropTypes.func,
     onTokenAdd: React.PropTypes.func,
     onFocus: React.PropTypes.func,
@@ -73,6 +74,7 @@ var TypeaheadTokenizer = React.createClass({
       filterOption: null,
       displayOption: function(token){return token },
       onKeyDown: function(event) {},
+      onKeyPress: function(event) {},
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
@@ -190,6 +192,7 @@ var TypeaheadTokenizer = React.createClass({
           maxVisible={this.props.maxVisible}
           onOptionSelected={this._addTokenForValue}
           onKeyDown={this._onKeyDown}
+          onKeyPress={this.props.onKeyPress}
           onKeyUp={this.props.onKeyUp}
           onFocus={this.props.onFocus}
           onBlur={this.props.onBlur}

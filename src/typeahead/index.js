@@ -35,6 +35,7 @@ var Typeahead = React.createClass({
     onOptionSelected: React.PropTypes.func,
     onChange: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
+    onKeyPress: React.PropTypes.func,
     onKeyUp: React.PropTypes.func,
     onFocus: React.PropTypes.func,
     onBlur: React.PropTypes.func,
@@ -70,6 +71,7 @@ var Typeahead = React.createClass({
       onOptionSelected: function(option) {},
       onChange: function(event) {},
       onKeyDown: function(event) {},
+      onKeyPress: function(event) {},
       onKeyUp: function(event) {},
       onFocus: function(event) {},
       onBlur: function(event) {},
@@ -313,6 +315,7 @@ var Typeahead = React.createClass({
           defaultValue={this.props.defaultValue}
           onChange={this._onChange}
           onKeyDown={this._onKeyDown}
+          onKeyPress={this.props.onKeyPress}
           onKeyUp={this.props.onKeyUp}
           onFocus={this.props.onFocus}
           onBlur={this.props.onBlur}
