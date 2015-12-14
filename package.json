@@ -40,12 +40,14 @@
   },
   "main": "lib/react-typeahead.js",
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "browserify": "^8.0.2",
     "chai": "^1.9.1",
     "es5-shim": "^4.0.1",
     "gulp": "^3.8.7",
     "gulp-mocha-phantomjs": "^0.8.1",
     "gulp-react": "^3.0.1",
+    "jsdom": "^7.2.1",
     "literalify": "^0.4.0",
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
@@ -61,7 +63,8 @@
     "build": "browserify ./src/react-typeahead.js -t reactify -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
     "watchify": "watchify ./src/react-typeahead.js -t reactify -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
     "lib": "gulp build",
-    "prepublish": "npm run lib"
+    "prepublish": "npm run lib",
+    "benchmark": "node ./benchmark.js"
   },
   "literalify": {
     "react": "window.React || require('react')"
