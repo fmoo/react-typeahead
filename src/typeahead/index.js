@@ -2,16 +2,12 @@
  * @jsx React.DOM
  */
 
+var Accessor = require('../accessor');
 var React = require('react');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
 var classNames = require('classnames');
-
-var IDENTITY_FN = function(input) { return input; };
-var _generateAccessor = function(field) {
-  return function(object) { return object[field]; };
-};
 
 /**
  * A "typeahead", an auto-completing text input
@@ -156,7 +152,7 @@ var Typeahead = React.createClass({
         customClasses={this.props.customClasses}
         selectionIndex={this.state.selectionIndex}
         defaultClassNames={this.props.defaultClassNames}
-        displayOption={this._generateOptionToStringFor(this.props.displayOption)} />
+        displayOption={Accessor.generateOptionToStringFor(this.props.displayOption)} />
     );
   },
 
@@ -176,10 +172,10 @@ var Typeahead = React.createClass({
     var nEntry = this.refs.entry;
     nEntry.focus();
 
-    var displayOption = this._generateOptionToStringFor(this.props.displayOption);
+    var displayOption = Accessor.generateOptionToStringFor(this.props.displayOption);
     var optionString = displayOption(option, 0);
 
-    var formInputOption = this._generateOptionToStringFor(this.props.formInputOption || displayOption);
+    var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
     var formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
@@ -352,25 +348,15 @@ var Typeahead = React.createClass({
     } else {
       var mapper;
       if (typeof filterOptionProp === 'string') {
-        mapper = _generateAccessor(filterOptionProp);
+        mapper = Accessor.generateAccessor(filterOptionProp);
       } else {
-        mapper = IDENTITY_FN;
+        mapper = Accessor.IDENTITY_FN;
       }
       return function(value, options) {
         return fuzzy
           .filter(value, options, {extract: mapper})
           .map(function(res) { return options[res.index]; });
       };
-    }
-  },
-
-  _generateOptionToStringFor: function(prop) {
-    if (typeof prop === 'string') {
-      return _generateAccessor(prop);
-    } else if (typeof prop === 'function') {
-      return prop;
-    } else {
-      return IDENTITY_FN;
     }
   },
 

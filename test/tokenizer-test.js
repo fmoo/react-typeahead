@@ -154,6 +154,46 @@ describe('TypeaheadTokenizer Component', function() {
           var results = simulateTokenInput(component, 'john');
           assert.equal(ReactDOM.findDOMNode(results[0]).textContent, '0 John Lennon');
         });
+
+        it('renders custom option value when specified as a string', function() {
+          var component = TestUtils.renderIntoDocument(<Tokenizer
+            options={ BEATLES_COMPLEX }
+            filterOption='firstName'
+            displayOption='nameWithTitle'
+            formInputOption='lastName'
+          />);
+          var results = simulateTokenInput(component, 'john');
+
+          var entry = component.refs.typeahead.refs.entry;
+          TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+          TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+          var tokens = getTokens(component);
+          assert.equal(tokens.length, 1);
+          assert.isDefined(tokens[0]);
+
+          assert.equal(tokens[0].props.value, 'Lennon');
+        });
+
+        it('renders custom option value when specified as a function', function() {
+          var component = TestUtils.renderIntoDocument(<Tokenizer
+            options={ BEATLES_COMPLEX }
+            filterOption='firstName'
+            displayOption='nameWithTitle'
+            formInputOption={ function(o, i) { return o.firstName + ' ' + o.lastName; } }
+          />);
+          results = simulateTokenInput(component, 'john');
+
+          var entry = component.refs.typeahead.refs.entry;
+          TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+          TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+          var tokens = getTokens(component);
+          assert.equal(tokens.length, 1);
+          assert.isDefined(tokens[0]);
+
+          assert.equal(tokens[0].props.value, 'John Lennon');
+        });
       });
     });
 
