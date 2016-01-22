@@ -1,14 +1,15 @@
 var _ = require('lodash');
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var React = require('react/addons');
+var React = require('react');
+var ReactDOM = require('react-dom');
 var Typeahead = require('../src/typeahead');
 var TypeaheadOption = require('../src/typeahead/option');
 var TypeaheadSelector = require('../src/typeahead/selector');
 var Tokenizer = require('../src/tokenizer');
 var Token = require('../src/tokenizer/token');
 var Keyevent = require('../src/keyevent');
-var TestUtils = React.addons.TestUtils;
+var TestUtils = require('react-addons-test-utils');
 
 function simulateTextInput(component, value) {
   var node = component.refs.entry;
@@ -103,7 +104,7 @@ describe('TypeaheadTokenizer Component', function() {
             }
           }
         />);
-        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        var input = ReactDOM.findDOMNode(component.refs.typeahead.refs.entry);
         TestUtils.Simulate.keyDown(input, { keyCode: 87 });
       });
     });
@@ -119,10 +120,11 @@ describe('TypeaheadTokenizer Component', function() {
           }
         />);
 
-        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        var input = ReactDOM.findDOMNode(component.refs.typeahead.refs.entry);
         TestUtils.Simulate.keyUp(input, { keyCode: 87 });
       });
     });
+
     describe('props', function(){
       context('displayOption', function() {
         it('renders simple options verbatim when not specified', function() {
@@ -130,7 +132,7 @@ describe('TypeaheadTokenizer Component', function() {
             options={ BEATLES }
           />);
           var results = simulateTokenInput(component, 'john');
-          assert.equal(results[0].getDOMNode().textContent, 'John');
+          assert.equal(ReactDOM.findDOMNode(results[0]).textContent, 'John');
         });
 
         it('renders custom options when specified as a string', function() {
@@ -140,7 +142,7 @@ describe('TypeaheadTokenizer Component', function() {
             displayOption='nameWithTitle'
           />);
           var results = simulateTokenInput(component, 'john');
-          assert.equal(results[0].getDOMNode().textContent, 'John Winston Ono Lennon MBE');
+          assert.equal(ReactDOM.findDOMNode(results[0]).textContent, 'John Winston Ono Lennon MBE');
         });
 
         it('renders custom options when specified as a function', function() {
@@ -150,7 +152,7 @@ describe('TypeaheadTokenizer Component', function() {
             displayOption={ function(o, i) { return i + ' ' + o.firstName + ' ' + o.lastName; } }
           />);
           var results = simulateTokenInput(component, 'john');
-          assert.equal(results[0].getDOMNode().textContent, '0 John Lennon');
+          assert.equal(ReactDOM.findDOMNode(results[0]).textContent, '0 John Lennon');
         });
       });
     });
@@ -183,7 +185,7 @@ describe('TypeaheadTokenizer Component', function() {
     describe('keyboard controls', function() {
       it('down arrow + return creates a token', function() {
         var results = simulateTokenInput(this.component, 'o');
-        var secondItem = results[1].getDOMNode().innerText;
+        var secondItem = ReactDOM.findDOMNode(results[1]).innerText;
         var node = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
@@ -194,7 +196,7 @@ describe('TypeaheadTokenizer Component', function() {
 
       it('up arrow + return navigates and creates a token', function() {
         var results = simulateTokenInput(this.component, 'o');
-        var firstItem = results[0].getDOMNode().innerText;
+        var firstItem = ReactDOM.findDOMNode(results[0]).innerText;
         var node = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
@@ -243,7 +245,7 @@ describe('TypeaheadTokenizer Component', function() {
 
       it('tab to choose first item', function() {
         var results = simulateTokenInput(this.component, 'o');
-        var itemText = results[0].getDOMNode().innerText;
+        var itemText = ReactDOM.findDOMNode(results[0]).innerText;
         var node = this.component.refs.typeahead.refs.entry;
         var tokens = getTokens(this.component);
 
@@ -257,7 +259,7 @@ describe('TypeaheadTokenizer Component', function() {
 
       it('tab to selected current item', function() {
         var results = simulateTokenInput(this.component, 'o');
-        var itemText = results[1].getDOMNode().innerText;
+        var itemText = ReactDOM.findDOMNode(results[1]).innerText;
         var node = this.component.refs.typeahead.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
@@ -315,13 +317,13 @@ describe('TypeaheadTokenizer Component', function() {
     it('should not add custom class to non-custom selection', function() {
       var results = simulateTokenInput(this.component, "o");
       assert.equal(3, results.length);
-      assert(!results[0].getDOMNode().getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
+      assert(!ReactDOM.findDOMNode(results[0]).getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
     })
 
     it('should add custom class to custom selection', function() {
       var results = simulateTokenInput(this.component, "abzz");
       assert(1, results.length)
-      assert(results[0].getDOMNode().getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
+      assert(ReactDOM.findDOMNode(results[0]).getAttribute('class').match(new RegExp(this.component.props.customClasses.customAdd)));
     })
 
     it('should allow selection of custom token', function() {
@@ -399,7 +401,7 @@ describe('TypeaheadTokenizer Component', function() {
         defaultClassNames={false}
       />);
 
-      assert.notOk(component.getDOMNode().classList.contains("tokenizer-typeahead"));
+      assert.notOk(ReactDOM.findDOMNode(component).classList.contains("tokenizer-typeahead"));
       assert.equal(false, component.refs.typeahead.props.defaultClassNames);
     });
   });

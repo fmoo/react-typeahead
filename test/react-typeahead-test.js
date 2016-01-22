@@ -1,18 +1,19 @@
 var assert = require('chai').assert;
-var React = require('react/addons');
+var React = require('react');
+var TestUtils = require('react-addons-test-utils');
 var ReactTypeahead = require('../src/react-typeahead').Typeahead;
 var ReactTokenizer = require('../src/react-typeahead').Tokenizer;
 
 describe('Main entry point', function() {
 
   it('exports a Typeahead component', function() {
-    var typeahead = React.addons.TestUtils.renderIntoDocument(<ReactTypeahead />);
-    assert.ok(React.addons.TestUtils.isCompositeComponent(typeahead));
+    var typeahead = TestUtils.renderIntoDocument(<ReactTypeahead />);
+    assert.ok(TestUtils.isCompositeComponent(typeahead));
   });
 
   it('exports a Tokenizer component', function() {
-    var tokenizer = React.addons.TestUtils.renderIntoDocument(<ReactTokenizer />);
-    assert.ok(React.addons.TestUtils.isCompositeComponent(tokenizer));
+    var tokenizer = TestUtils.renderIntoDocument(<ReactTokenizer />);
+    assert.ok(TestUtils.isCompositeComponent(tokenizer));
   });
 
 });
