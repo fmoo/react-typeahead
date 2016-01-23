@@ -81,9 +81,6 @@ var Typeahead = React.createClass({
 
   getInitialState: function() {
     return {
-      // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
-
       // This should be called something else, "entryValue"
       entryValue: this.props.value || this.props.defaultValue,
 
@@ -105,6 +102,10 @@ var Typeahead = React.createClass({
     return result;
   },
 
+  getVisibleOptions: function() {
+    return this.getOptionsForValue(this.state.entryValue, this.props.options);
+  },
+
   setEntryText: function(value) {
     this.refs.entry.value = value;
     this._onTextEntryUpdated();
@@ -117,7 +118,7 @@ var Typeahead = React.createClass({
   _hasCustomValue: function() {
     if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
-      this.state.visible.indexOf(this.state.entryValue) < 0) {
+      this.getVisibleOptions().indexOf(this.state.entryValue) < 0) {
       return true;
     }
     return false;
@@ -143,7 +144,7 @@ var Typeahead = React.createClass({
 
     return (
       <this.props.customListComponent
-        ref="sel" options={this.state.visible}
+        ref="sel" options={this.getVisibleOptions()}
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
@@ -162,7 +163,7 @@ var Typeahead = React.createClass({
         index--;
       }
     }
-    return this.state.visible[index];
+    return this.getVisibleOptions()[index];
   },
 
   _onOptionSelected: function(option, event) {
@@ -176,16 +177,14 @@ var Typeahead = React.createClass({
     var formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
-    this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
-                   selection: formInputOptionString,
+    this.setState({selection: formInputOptionString,
                    entryValue: optionString});
     return this.props.onOptionSelected(option, event);
   },
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.value;
-    this.setState({visible: this.getOptionsForValue(value, this.props.options),
-                   selection: null,
+    this.setState({selection: null,
                    entryValue: value});
   },
 
@@ -206,7 +205,7 @@ var Typeahead = React.createClass({
   _onTab: function(event) {
     var selection = this.getSelection();
     var option = selection ?
-      selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
+      selection : (this.getVisibleOptions().length > 0 ? this.getVisibleOptions()[0] : null);
 
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
@@ -234,7 +233,7 @@ var Typeahead = React.createClass({
       return;
     }
     var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
-    var length = this.state.visible.length;
+    var length = this.getVisibleOptions().length;
     if (this._hasCustomValue()) {
       length += 1;
     }
@@ -281,12 +280,6 @@ var Typeahead = React.createClass({
     }
     // Don't propagate the keystroke back to the DOM/browser
     event.preventDefault();
-  },
-
-  componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
-    });
   },
 
   render: function() {
@@ -368,7 +361,7 @@ var Typeahead = React.createClass({
   },
 
   _hasHint: function() {
-    return this.state.visible.length > 0 || this._hasCustomValue();
+    return this.getVisibleOptions().length > 0 || this._hasCustomValue();
   }
 });
 
