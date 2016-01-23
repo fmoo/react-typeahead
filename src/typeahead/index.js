@@ -145,6 +145,7 @@ var Typeahead = React.createClass({
       <this.props.customListComponent
         ref="sel" options={this.state.visible}
         onOptionSelected={this._onOptionSelected}
+        allowCustomValues={this.props.allowCustomValues}
         customValue={this._getCustomValue()}
         customClasses={this.props.customClasses}
         selectionIndex={this.state.selectionIndex}
