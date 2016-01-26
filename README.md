@@ -191,6 +191,12 @@ This component receives the following props :
 - `props.selectionIndex`
   - The index of the highlighted option for rendering
 
+#### props.customListComponentProps
+
+Type: `Object`
+
+Props to pass directly to the `customListComponent` element.
+
 
 ### Typeahead ([Exposed Component Functions][reactecf])
 

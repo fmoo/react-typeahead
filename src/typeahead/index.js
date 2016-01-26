@@ -54,7 +54,8 @@ var Typeahead = React.createClass({
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
-    ])
+    ]),
+    customListComponentProps: React.PropTypes.object
   },
 
   getDefaultProps: function() {
@@ -75,7 +76,8 @@ var Typeahead = React.createClass({
       onBlur: function(event) {},
       filterOption: null,
       defaultClassNames: true,
-      customListComponent: TypeaheadSelector
+      customListComponent: TypeaheadSelector,
+      customListComponentProps: {}
     };
   },
 
@@ -143,6 +145,7 @@ var Typeahead = React.createClass({
 
     return (
       <this.props.customListComponent
+        {...this.props.customListComponentProps}
         ref="sel" options={this.state.visible}
         onOptionSelected={this._onOptionSelected}
         customValue={this._getCustomValue()}
