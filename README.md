@@ -191,6 +191,19 @@ This component receives the following props :
 - `props.selectionIndex`
   - The index of the highlighted option for rendering
 
+#### props.customOptionComponent
+
+Type: `React Component`
+
+A React Component that is rendered within the default list structure. Replaces the `<a>` tag, with a custom component. This allows you to render a different component for different items in a typeahead list.
+
+##### Passed through
+
+- `props.option`
+  - This is the single option which is being mapped over in the list view.
+- `props.children`
+  - This is the result of `displayOption`.
+
 
 ### Typeahead ([Exposed Component Functions][reactecf])
 
