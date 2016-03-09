@@ -49,7 +49,8 @@ var TypeaheadTokenizer = React.createClass({
       React.PropTypes.func
     ]),
     maxVisible: React.PropTypes.number,
-    defaultClassNames: React.PropTypes.bool
+    defaultClassNames: React.PropTypes.bool,
+    propagateKeyDownEvents: React.PropTypes.bool
   },
 
   getInitialState: function() {
@@ -78,6 +79,7 @@ var TypeaheadTokenizer = React.createClass({
       onBlur: function(event) {},
       onTokenAdd: function() {},
       onTokenRemove: function() {}
+      propagateKeyDownEvents: false,
     };
   },
 
@@ -126,6 +128,10 @@ var TypeaheadTokenizer = React.createClass({
     if (event.keyCode === KeyEvent.DOM_VK_BACK_SPACE) {
       return this._handleBackspace(event);
     }
+    // or tabs
+    if (event.keyCode === KeyEvent.DOM_VK_TAB) {
+      this._handleTab(event);
+    }
     this.props.onKeyDown(event);
   },
 
@@ -135,15 +141,27 @@ var TypeaheadTokenizer = React.createClass({
       return;
     }
 
-    // Remove token ONLY when bksp pressed at beginning of line
-    // without a selection
-    var entry = this.refs.typeahead.refs.entry;
-    if (entry.selectionStart == entry.selectionEnd &&
-        entry.selectionStart == 0) {
+    if (this._inputIsEmpty()) {
       this._removeTokenForValue(
         this.state.selected[this.state.selected.length - 1]);
       event.preventDefault();
     }
+  },
+
+  _handleTab: function(event) {
+    // Intercept tab to prevent focusing on next element, unless
+    // nothing is selected and the input is empty
+    var entry = this.refs.typeahead.refs.entry;
+    if (!this._inputIsEmpty()) {
+      event.preventDefault();
+    }
+  },
+
+  _inputIsEmpty: function() {
+    // beginning of line, without a selection
+    var entry = this.refs.typeahead.refs.entry;
+    return entry.selectionStart == entry.selectionEnd &&
+        entry.selectionStart == 0;
   },
 
   _removeTokenForValue: function(value) {
@@ -195,7 +213,8 @@ var TypeaheadTokenizer = React.createClass({
           onBlur={this.props.onBlur}
           displayOption={this.props.displayOption}
           defaultClassNames={this.props.defaultClassNames}
-          filterOption={this.props.filterOption} />
+          filterOption={this.props.filterOption}
+          propagateKeyDownEvents={this.props.propagateKeyDownEvents} />
       </div>
     );
   }

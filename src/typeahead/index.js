@@ -51,6 +51,7 @@ var Typeahead = React.createClass({
       React.PropTypes.func
     ]),
     defaultClassNames: React.PropTypes.bool,
+    propagateKeyDownEvents: React.PropTypes.bool,
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
@@ -75,6 +76,7 @@ var Typeahead = React.createClass({
       onBlur: function(event) {},
       filterOption: null,
       defaultClassNames: true,
+      propagateKeyDownEvents: false,
       customListComponent: TypeaheadSelector
     };
   },
@@ -279,8 +281,10 @@ var Typeahead = React.createClass({
     } else {
       return this.props.onKeyDown(event);
     }
-    // Don't propagate the keystroke back to the DOM/browser
-    event.preventDefault();
+    // By default, don't propagate the keystroke back to the DOM/browser
+    if (!this.props.propagateKeyDownEvents) {
+      event.preventDefault();
+    }
   },
 
   componentWillReceiveProps: function(nextProps) {
