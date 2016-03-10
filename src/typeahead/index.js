@@ -54,7 +54,8 @@ var Typeahead = React.createClass({
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
-    ])
+    ]),
+    skipBlankSearch: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -75,7 +76,8 @@ var Typeahead = React.createClass({
       onBlur: function(event) {},
       filterOption: null,
       defaultClassNames: true,
-      customListComponent: TypeaheadSelector
+      customListComponent: TypeaheadSelector,
+      skipBlankSearch: true
     };
   },
 
@@ -96,7 +98,7 @@ var Typeahead = React.createClass({
   },
 
   getOptionsForValue: function(value, options) {
-    if (!SHOULD_SEARCH_VALUE(value)) { return []; }
+    if (this.props.skipBlankSearch && !SHOULD_SEARCH_VALUE(value)) { return []; }
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
     if (this.props.maxVisible) {
@@ -132,7 +134,7 @@ var Typeahead = React.createClass({
 
   _renderIncrementalSearchResults: function() {
     // Nothing has been entered into the textbox
-    if (!this.state.entryValue) {
+    if (this.props.skipBlankSearch && !this.state.entryValue) {
       return "";
     }
 

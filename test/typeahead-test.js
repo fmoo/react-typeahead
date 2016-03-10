@@ -563,6 +563,27 @@ describe('Typeahead Component', function() {
         var input = component.refs.entry;
         assert.equal(input.tagName.toLowerCase(), 'input');
       });
-    })
+    });
+
+    context('skipBlankSearch', function() {
+      it('does not perform a search by default', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+        />);
+
+        var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
+        assert.equal(0, results.length);
+      });
+
+      it('does perform a search when set to false', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          skipBlankSearch={ false }
+        />);
+
+        var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
+        assert.equal(4, results.length);
+      });
+    });
   });
 });
