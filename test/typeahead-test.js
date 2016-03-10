@@ -565,21 +565,25 @@ describe('Typeahead Component', function() {
       });
     });
 
-    context('skipBlankSearch', function() {
-      it('does not perform a search by default', function() {
-        var component = TestUtils.renderIntoDocument(<Typeahead
-          options={ BEATLES }
-        />);
+    context('showOptionsWhenEmpty', function() {
+      it('do not render options when value is empty by default', function() {
+        var component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+          />
+        );
 
         var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
         assert.equal(0, results.length);
       });
 
-      it('does perform a search when set to false', function() {
-        var component = TestUtils.renderIntoDocument(<Typeahead
-          options={ BEATLES }
-          skipBlankSearch={ false }
-        />);
+      it('render options when value is empty when set to true', function() {
+        var component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+            showOptionsWhenEmpty={ true }
+          />
+        );
 
         var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
         assert.equal(4, results.length);
