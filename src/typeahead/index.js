@@ -53,7 +53,8 @@ var Typeahead = React.createClass({
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
-    ])
+    ]),
+    showOptionsWhenEmpty: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -74,7 +75,8 @@ var Typeahead = React.createClass({
       onBlur: function(event) {},
       filterOption: null,
       defaultClassNames: true,
-      customListComponent: TypeaheadSelector
+      customListComponent: TypeaheadSelector,
+      showOptionsWhenEmpty: false
     };
   },
 
@@ -94,7 +96,14 @@ var Typeahead = React.createClass({
     };
   },
 
+  _shouldSkipSearch: function(input) {
+    var emptyValue = !input || input.trim().length == 0;
+    return !this.props.showOptionsWhenEmpty && emptyValue;
+  },
+
   getOptionsForValue: function(value, options) {
+    if (this._shouldSkipSearch(value)) { return []; }
+
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
     if (this.props.maxVisible) {
@@ -104,12 +113,12 @@ var Typeahead = React.createClass({
   },
 
   setEntryText: function(value) {
-    this.refs.entry.getDOMNode().value = value;
+    this.refs.entry.value = value;
     this._onTextEntryUpdated();
   },
 
   focus: function(){
-    React.findDOMNode(this.refs.entry).focus()
+    this.refs.entry.focus()
   },
 
   _hasCustomValue: function() {
@@ -130,7 +139,7 @@ var Typeahead = React.createClass({
 
   _renderIncrementalSearchResults: function() {
     // Nothing has been entered into the textbox
-    if (!this.state.entryValue) {
+    if (this._shouldSkipSearch(this.state.entryValue)) {
       return "";
     }
 
@@ -166,7 +175,7 @@ var Typeahead = React.createClass({
   },
 
   _onOptionSelected: function(option, event) {
-    var nEntry = this.refs.entry.getDOMNode();
+    var nEntry = this.refs.entry;
     nEntry.focus();
 
     var displayOption = this._generateOptionToStringFor(this.props.displayOption);
@@ -183,7 +192,7 @@ var Typeahead = React.createClass({
   },
 
   _onTextEntryUpdated: function() {
-    var value = this.refs.entry.getDOMNode().value;
+    var value = this.refs.entry.value;
     this.setState({visible: this.getOptionsForValue(value, this.props.options),
                    selection: null,
                    entryValue: value});
@@ -266,8 +275,9 @@ var Typeahead = React.createClass({
 
   _onKeyDown: function(event) {
     // If there are no visible elements, don't perform selector navigation.
-    // Just pass this up to the upstream onKeydown handler
-    if (!this._hasHint()) {
+    // Just pass this up to the upstream onKeydown handler.
+    // Also skip if the user is pressing the shift key, since none of our handlers are looking for shift
+    if (!this._hasHint() || event.shiftKey) {
       return this.props.onKeyDown(event);
     }
 
@@ -284,7 +294,7 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      visible: this.getOptionsForValue(nextProps.entryValue, nextProps.options)
     });
   },
 
@@ -349,9 +359,8 @@ var Typeahead = React.createClass({
         mapper = IDENTITY_FN;
       }
       return function(value, options) {
-        var transformedOptions = options.map(mapper);
         return fuzzy
-          .filter(value, transformedOptions)
+          .filter(value, options, {extract: mapper})
           .map(function(res) { return options[res.index]; });
       };
     }
