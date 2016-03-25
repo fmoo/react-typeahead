@@ -191,6 +191,12 @@ This component receives the following props :
 - `props.selectionIndex`
   - The index of the highlighted option for rendering
 
+#### props.showOptionsWhenEmpty
+
+Type: `boolean`
+Default: false
+
+If true, options will still be rendered when there is no value.
 
 ### Typeahead ([Exposed Component Functions][reactecf])
 
