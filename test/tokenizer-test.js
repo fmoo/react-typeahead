@@ -109,6 +109,22 @@ describe('TypeaheadTokenizer Component', function() {
       });
     });
 
+    context('onKeyPress', function() {
+      it('should bind to key events on the input', function(done) {
+        var component = TestUtils.renderIntoDocument(<Tokenizer
+          options={ BEATLES }
+          onKeyPress={ function(e) {
+              assert.equal(e.keyCode, 87);
+              done();
+            }
+          }
+        />);
+
+        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        TestUtils.Simulate.keyPress(input, { keyCode: 87 });
+      });
+    });
+
     context('onKeyUp', function() {
       it('should bind to key events on the input', function(done) {
         var component = TestUtils.renderIntoDocument(<Tokenizer

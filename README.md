@@ -112,6 +112,12 @@ Type: `Function`
 
 Event handler for the `keyDown` event on the typeahead input.
 
+#### props.onKeyPress
+
+Type: `Function`
+
+Event handler for the `keyPress` event on the typeahead input.
+
 #### props.onKeyUp
 
 Type: `Function`
