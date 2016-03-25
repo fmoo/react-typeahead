@@ -578,6 +578,31 @@ describe('Typeahead Component', function() {
         var input = component.refs.entry;
         assert.equal(input.tagName.toLowerCase(), 'input');
       });
-    })
+    });
+
+    context('showOptionsWhenEmpty', function() {
+      it('do not render options when value is empty by default', function() {
+        var component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+          />
+        );
+
+        var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
+        assert.equal(0, results.length);
+      });
+
+      it('render options when value is empty when set to true', function() {
+        var component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+            showOptionsWhenEmpty={ true }
+          />
+        );
+
+        var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
+        assert.equal(4, results.length);
+      });
+    });
   });
 });

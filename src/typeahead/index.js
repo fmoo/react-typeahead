@@ -9,7 +9,6 @@ var fuzzy = require('fuzzy');
 var classNames = require('classnames');
 
 var IDENTITY_FN = function(input) { return input; };
-var SHOULD_SEARCH_VALUE = function(input) { return input && input.trim().length > 0; };
 var _generateAccessor = function(field) {
   return function(object) { return object[field]; };
 };
@@ -56,7 +55,8 @@ var Typeahead = React.createClass({
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
-    ])
+    ]),
+    showOptionsWhenEmpty: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -79,7 +79,8 @@ var Typeahead = React.createClass({
       onBlur: function(event) {},
       filterOption: null,
       defaultClassNames: true,
-      customListComponent: TypeaheadSelector
+      customListComponent: TypeaheadSelector,
+      showOptionsWhenEmpty: false
     };
   },
 
@@ -99,8 +100,14 @@ var Typeahead = React.createClass({
     };
   },
 
+  _shouldSkipSearch: function(input) {
+    var emptyValue = !input || input.trim().length == 0;
+    return !this.props.showOptionsWhenEmpty && emptyValue;
+  },
+
   getOptionsForValue: function(value, options) {
-    if (!SHOULD_SEARCH_VALUE(value)) { return []; }
+    if (this._shouldSkipSearch(value)) { return []; }
+
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
     if (this.props.maxVisible) {
@@ -136,7 +143,7 @@ var Typeahead = React.createClass({
 
   _renderIncrementalSearchResults: function() {
     // Nothing has been entered into the textbox
-    if (!this.state.entryValue) {
+    if (this._shouldSkipSearch(this.state.entryValue)) {
       return "";
     }
 
