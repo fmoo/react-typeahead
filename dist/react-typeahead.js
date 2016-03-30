@@ -396,7 +396,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
         React.createElement(Typeahead, {ref: "typeahead", 
           className: classList, 
           placeholder: this.props.placeholder, 
-          disabled: this.props.disable, 
+          disabled: this.props.disabled, 
           inputProps: this.props.inputProps, 
           allowCustomValues: this.props.allowCustomValues, 
           customClasses: this.props.customClasses, 
@@ -502,7 +502,6 @@ var fuzzy = require('fuzzy');
 var classNames = require('classnames');
 
 var IDENTITY_FN = function(input) { return input; };
-var SHOULD_SEARCH_VALUE = function(input) { return input && input.trim().length > 0; };
 var _generateAccessor = function(field) {
   return function(object) { return object[field]; };
 };
@@ -549,7 +548,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     customListComponent: React.PropTypes.oneOfType([
       React.PropTypes.element,
       React.PropTypes.func
-    ])
+    ]),
+    showOptionsWhenEmpty: React.PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -572,7 +572,8 @@ var Typeahead = React.createClass({displayName: "Typeahead",
       onBlur: function(event) {},
       filterOption: null,
       defaultClassNames: true,
-      customListComponent: TypeaheadSelector
+      customListComponent: TypeaheadSelector,
+      showOptionsWhenEmpty: false
     };
   },
 
@@ -592,8 +593,14 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     };
   },
 
+  _shouldSkipSearch: function(input) {
+    var emptyValue = !input || input.trim().length == 0;
+    return !this.props.showOptionsWhenEmpty && emptyValue;
+  },
+
   getOptionsForValue: function(value, options) {
-    if (!SHOULD_SEARCH_VALUE(value)) { return []; }
+    if (this._shouldSkipSearch(value)) { return []; }
+
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
     if (this.props.maxVisible) {
@@ -629,7 +636,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 
   _renderIncrementalSearchResults: function() {
     // Nothing has been entered into the textbox
-    if (!this.state.entryValue) {
+    if (this._shouldSkipSearch(this.state.entryValue)) {
       return "";
     }
 
@@ -803,10 +810,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     return (
       React.createElement("div", {className: classList}, 
          this._renderHiddenInput(), 
-        React.createElement(InputElement, React.__spread({ref: "entry", type: "text"}, 
+        React.createElement(InputElement, React.__spread({ref: "entry", type: "text", 
+          disabled: this.props.disabled}, 
           this.props.inputProps, 
           {placeholder: this.props.placeholder, 
-          disabled: this.props.disable, 
           className: inputClassList, 
           value: this.state.entryValue, 
           defaultValue: this.props.defaultValue, 
