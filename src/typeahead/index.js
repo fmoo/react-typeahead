@@ -318,9 +318,9 @@ var Typeahead = React.createClass({
       <div className={classList}>
         { this._renderHiddenInput() }
         <InputElement ref="entry" type="text"
+          disabled={this.props.disabled}
           {...this.props.inputProps}
           placeholder={this.props.placeholder}
-          disabled={this.props.disabled}
           className={inputClassList}
           value={this.state.entryValue}
           defaultValue={this.props.defaultValue}
