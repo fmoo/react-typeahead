@@ -142,6 +142,11 @@ var Typeahead = React.createClass({
   },
 
   _renderIncrementalSearchResults: function() {
+    // A default value was passed in
+    if (this.props.defaultValue && !this.state.hasRendered) {
+      return "";
+    }
+
     // Nothing has been entered into the textbox
     if (this._shouldSkipSearch(this.state.entryValue)) {
       return "";
@@ -198,6 +203,7 @@ var Typeahead = React.createClass({
     var value = this.refs.entry.value;
     this.setState({visible: this.getOptionsForValue(value, this.props.options),
                    selection: null,
+                   hasRendered: true,
                    entryValue: value});
   },
 
