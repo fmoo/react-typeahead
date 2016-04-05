@@ -76,8 +76,8 @@ var TypeaheadTokenizer = React.createClass({
       inputProps: {},
       defaultClassNames: true,
       filterOption: null,
-      displayOption: function(token){return token },
-      formInputOption: function(token){return token },
+      displayOption: function(token){ return token },
+      formInputOption: null,
       onKeyDown: function(event) {},
       onKeyUp: function(event) {},
       onFocus: function(event) {},
@@ -109,8 +109,8 @@ var TypeaheadTokenizer = React.createClass({
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
-      var value = Accessor.valueForOption(this.props.formInputOption, selected);
       var displayString = Accessor.valueForOption(this.props.displayOption, selected);
+      var value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
       return (
         <Token key={ displayString } className={classList}
           onRemove={ this._removeTokenForValue }

@@ -154,6 +154,27 @@ describe('TypeaheadTokenizer Component', function() {
           var results = simulateTokenInput(component, 'john');
           assert.equal(ReactDOM.findDOMNode(results[0]).textContent, '0 John Lennon');
         });
+      });
+
+      context('formInputOption', function() {
+        it('uses displayOption for the custom option value by default', function() {
+          var component = TestUtils.renderIntoDocument(<Tokenizer
+            options={ BEATLES_COMPLEX }
+            filterOption='firstName'
+            displayOption='nameWithTitle'
+          />);
+          var results = simulateTokenInput(component, 'john');
+
+          var entry = component.refs.typeahead.refs.entry;
+          TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_DOWN });
+          TestUtils.Simulate.keyDown(entry, { keyCode: Keyevent.DOM_VK_RETURN });
+
+          var tokens = getTokens(component);
+          assert.equal(tokens.length, 1);
+          assert.isDefined(tokens[0]);
+
+          assert.equal(tokens[0].props.value, 'John Winston Ono Lennon MBE');
+        });
 
         it('renders custom option value when specified as a string', function() {
           var component = TestUtils.renderIntoDocument(<Tokenizer
