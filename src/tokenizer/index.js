@@ -2,6 +2,7 @@
  * @jsx React.DOM
  */
 
+var Accessor = require('../accessor');
 var React = require('react');
 var Token = require('./token');
 var KeyEvent = require('../keyevent');
@@ -50,6 +51,10 @@ var TypeaheadTokenizer = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
+    formInputOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
     maxVisible: React.PropTypes.number,
     defaultClassNames: React.PropTypes.bool
   },
@@ -74,7 +79,8 @@ var TypeaheadTokenizer = React.createClass({
       inputProps: {},
       defaultClassNames: true,
       filterOption: null,
-      displayOption: function(token){return token },
+      displayOption: function(token){ return token },
+      formInputOption: null,
       onKeyDown: function(event) {},
       onKeyPress: function(event) {},
       onKeyUp: function(event) {},
@@ -107,11 +113,13 @@ var TypeaheadTokenizer = React.createClass({
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
-      var displayString = this.props.displayOption(selected);
+      var displayString = Accessor.valueForOption(this.props.displayOption, selected);
+      var value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
       return (
         <Token key={ displayString } className={classList}
           onRemove={ this._removeTokenForValue }
           object={selected}
+          value={value}
           name={ this.props.name }>
           { displayString }
         </Token>

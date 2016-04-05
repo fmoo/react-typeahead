@@ -333,6 +333,16 @@ Type: `Function`
 
 A function to filter the provided `options` based on the current input value. For each option, receives `(inputValue, option)`. If not supplied, defaults to [fuzzy string matching](https://github.com/mattyork/fuzzy).
 
+#### props.formInputOption
+
+Type: `String` or `Function`
+
+A function to map an option onto a string to include in HTML forms (see `props.name`). Receives `(option)` as arguments. Must return a string.
+
+If specified as a string, it will interpret it as a field name and use that field from each option object.
+
+If not specified, it will fall back onto the semantics described in `props.displayOption`.
+
 #### props.defaultClassNames
 
 Type: `boolean`
