@@ -1,6 +1,6 @@
 var gulp = require('gulp');
+var babel = require('gulp-babel');
 var mocha = require('gulp-mocha-phantomjs');
-var react = require('gulp-react');
 
 gulp.task('test', function() {
   return gulp.src('./test/index.html')
@@ -11,8 +11,8 @@ gulp.task('test', function() {
 
 gulp.task('build', function () {
     return gulp.src('./src/**')
-        .pipe(react({
-            harmony: true
+        .pipe(babel({
+            presets: ['react']
         }))
         .pipe(gulp.dest('./lib'));
 });

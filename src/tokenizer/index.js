@@ -1,7 +1,3 @@
-/**
- * @jsx React.DOM
- */
-
 var Accessor = require('../accessor');
 var React = require('react');
 var Token = require('./token');
