@@ -120,7 +120,7 @@ describe('TypeaheadTokenizer Component', function() {
           }
         />);
 
-        var input = React.findDOMNode(component.refs.typeahead.refs.entry);
+        var input = ReactDOM.findDOMNode(component.refs.typeahead.refs.entry);
         TestUtils.Simulate.keyPress(input, { keyCode: 87 });
       });
     });
