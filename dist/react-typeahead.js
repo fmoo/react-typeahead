@@ -182,6 +182,38 @@ fuzzy.filter = function(pattern, arr, opts) {
 
 
 },{}],3:[function(require,module,exports){
+var Accessor = {
+  IDENTITY_FN: function(input) { return input; },
+
+  generateAccessor: function(field) {
+    return function(object) { return object[field]; };
+  },
+
+  generateOptionToStringFor: function(prop) {
+    if (typeof prop === 'string') {
+      return this.generateAccessor(prop);
+    } else if (typeof prop === 'function') {
+      return prop;
+    } else {
+      return this.IDENTITY_FN;
+    }
+  },
+
+  valueForOption: function(option, object) {
+    if (typeof option === 'string') {
+      return object[option];
+    } else if (typeof option === 'function') {
+      return option(object);
+    } else {
+      return object;
+    }
+  },
+};
+
+module.exports = Accessor;
+
+
+},{}],4:[function(require,module,exports){
 /**
  * PolyFills make me sad
  */
@@ -197,7 +229,7 @@ KeyEvent.DOM_VK_TAB = KeyEvent.DOM_VK_TAB || 9;
 module.exports = KeyEvent;
 
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var Typeahead = require('./typeahead');
 var Tokenizer = require('./tokenizer');
 
@@ -207,11 +239,8 @@ module.exports = {
 };
 
 
-},{"./tokenizer":5,"./typeahead":7}],5:[function(require,module,exports){
-/**
- * @jsx React.DOM
- */
-
+},{"./tokenizer":6,"./typeahead":8}],6:[function(require,module,exports){
+var Accessor = require('../accessor');
 var React = window.React || require('react');
 var Token = require('./token');
 var KeyEvent = require('../keyevent');
@@ -260,6 +289,10 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       React.PropTypes.string,
       React.PropTypes.func
     ]),
+    formInputOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
     maxVisible: React.PropTypes.number,
     defaultClassNames: React.PropTypes.bool
   },
@@ -284,7 +317,8 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
       inputProps: {},
       defaultClassNames: true,
       filterOption: null,
-      displayOption: function(token){return token },
+      displayOption: function(token){ return token },
+      formInputOption: null,
       onKeyDown: function(event) {},
       onKeyPress: function(event) {},
       onKeyUp: function(event) {},
@@ -317,11 +351,13 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
     var classList = classNames(tokenClasses);
     var result = this.state.selected.map(function(selected) {
-      var displayString = this.props.displayOption(selected);
+      var displayString = Accessor.valueForOption(this.props.displayOption, selected);
+      var value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
       return (
         React.createElement(Token, {key:  displayString, className: classList, 
           onRemove:  this._removeTokenForValue, 
           object: selected, 
+          value: value, 
           name:  this.props.name}, 
            displayString 
         )
@@ -420,11 +456,7 @@ var TypeaheadTokenizer = React.createClass({displayName: "TypeaheadTokenizer",
 module.exports = TypeaheadTokenizer;
 
 
-},{"../keyevent":3,"../typeahead":7,"./token":6,"classnames":1,"react":"react"}],6:[function(require,module,exports){
-/**
- * @jsx React.DOM
- */
-
+},{"../accessor":3,"../keyevent":4,"../typeahead":8,"./token":7,"classnames":1,"react":"react"}],7:[function(require,module,exports){
 var React = window.React || require('react');
 var classNames = require('classnames');
 
@@ -441,7 +473,8 @@ var Token = React.createClass({displayName: "Token",
       React.PropTypes.string,
       React.PropTypes.object,
     ]),
-    onRemove: React.PropTypes.func
+    onRemove: React.PropTypes.func,
+    value: React.PropTypes.string
   },
 
   render: function() {
@@ -469,7 +502,7 @@ var Token = React.createClass({displayName: "Token",
       React.createElement("input", {
         type: "hidden", 
         name:  this.props.name + '[]', 
-        value:  this.props.object}
+        value:  this.props.value || this.props.object}
       )
     );
   },
@@ -490,21 +523,13 @@ var Token = React.createClass({displayName: "Token",
 module.exports = Token;
 
 
-},{"classnames":1,"react":"react"}],7:[function(require,module,exports){
-/**
- * @jsx React.DOM
- */
-
+},{"classnames":1,"react":"react"}],8:[function(require,module,exports){
+var Accessor = require('../accessor');
 var React = window.React || require('react');
 var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
 var classNames = require('classnames');
-
-var IDENTITY_FN = function(input) { return input; };
-var _generateAccessor = function(field) {
-  return function(object) { return object[field]; };
-};
 
 /**
  * A "typeahead", an auto-completing text input
@@ -654,7 +679,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
         customClasses: this.props.customClasses, 
         selectionIndex: this.state.selectionIndex, 
         defaultClassNames: this.props.defaultClassNames, 
-        displayOption: this._generateOptionToStringFor(this.props.displayOption)})
+        displayOption: Accessor.generateOptionToStringFor(this.props.displayOption)})
     );
   },
 
@@ -674,10 +699,10 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     var nEntry = this.refs.entry;
     nEntry.focus();
 
-    var displayOption = this._generateOptionToStringFor(this.props.displayOption);
+    var displayOption = Accessor.generateOptionToStringFor(this.props.displayOption);
     var optionString = displayOption(option, 0);
 
-    var formInputOption = this._generateOptionToStringFor(this.props.formInputOption || displayOption);
+    var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
     var formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
@@ -852,25 +877,15 @@ var Typeahead = React.createClass({displayName: "Typeahead",
     } else {
       var mapper;
       if (typeof filterOptionProp === 'string') {
-        mapper = _generateAccessor(filterOptionProp);
+        mapper = Accessor.generateAccessor(filterOptionProp);
       } else {
-        mapper = IDENTITY_FN;
+        mapper = Accessor.IDENTITY_FN;
       }
       return function(value, options) {
         return fuzzy
           .filter(value, options, {extract: mapper})
           .map(function(res) { return options[res.index]; });
       };
-    }
-  },
-
-  _generateOptionToStringFor: function(prop) {
-    if (typeof prop === 'string') {
-      return _generateAccessor(prop);
-    } else if (typeof prop === 'function') {
-      return prop;
-    } else {
-      return IDENTITY_FN;
     }
   },
 
@@ -882,11 +897,7 @@ var Typeahead = React.createClass({displayName: "Typeahead",
 module.exports = Typeahead;
 
 
-},{"../keyevent":3,"./selector":9,"classnames":1,"fuzzy":2,"react":"react"}],8:[function(require,module,exports){
-/**
- * @jsx React.DOM
- */
-
+},{"../accessor":3,"../keyevent":4,"./selector":10,"classnames":1,"fuzzy":2,"react":"react"}],9:[function(require,module,exports){
 var React = window.React || require('react');
 var classNames = require('classnames');
 
@@ -950,11 +961,7 @@ var TypeaheadOption = React.createClass({displayName: "TypeaheadOption",
 module.exports = TypeaheadOption;
 
 
-},{"classnames":1,"react":"react"}],9:[function(require,module,exports){
-/**
- * @jsx React.DOM
- */
-
+},{"classnames":1,"react":"react"}],10:[function(require,module,exports){
 var React = window.React || require('react');
 var TypeaheadOption = require('./option');
 var classNames = require('classnames');
@@ -1044,5 +1051,5 @@ var TypeaheadSelector = React.createClass({displayName: "TypeaheadSelector",
 module.exports = TypeaheadSelector;
 
 
-},{"./option":8,"classnames":1,"react":"react"}]},{},[4])(4)
+},{"./option":9,"classnames":1,"react":"react"}]},{},[5])(5)
 });
