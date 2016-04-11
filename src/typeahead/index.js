@@ -120,7 +120,7 @@ var Typeahead = React.createClass({
   _hasCustomValue: function() {
     if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
-      this.state.visible.indexOf(this.state.entryValue) < 0) {
+      this.state.visible.indexOf(this.state.entryValue) === -1) {
       return true;
     }
     return false;
@@ -180,17 +180,21 @@ var Typeahead = React.createClass({
     var formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
-    this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
-                   selection: formInputOptionString,
-                   entryValue: optionString});
+    this.setState({
+      visible: this.getOptionsForValue(optionString, this.props.options),
+      selection: formInputOptionString,
+      entryValue: optionString
+    });
     return this.props.onOptionSelected(option, event);
   },
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.value;
-    this.setState({visible: this.getOptionsForValue(value, this.props.options),
-                   selection: null,
-                   entryValue: value});
+    this.setState({
+      visible: this.getOptionsForValue(value, this.props.options),
+      selection: null,
+      entryValue: value
+    });
   },
 
   _onEnter: function(event) {
@@ -212,7 +216,7 @@ var Typeahead = React.createClass({
     var option = selection ?
       selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
 
-    if (option === null && this._hasCustomValue()) {
+    if (option === null) {
       option = this._getCustomValue();
     }
 
@@ -249,7 +253,9 @@ var Typeahead = React.createClass({
       newIndex -= length;
     }
 
-    this.setState({selectionIndex: newIndex});
+    this.setState({
+      selectionIndex: newIndex
+    });
   },
 
   navDown: function() {
@@ -289,7 +295,8 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      visible: this.getOptionsForValue(nextProps.value, nextProps.options),
+      entryValue: nextProps.value
     });
   },
 
@@ -314,7 +321,6 @@ var Typeahead = React.createClass({
           {...this.props.inputProps}
           placeholder={this.props.placeholder}
           className={inputClassList}
-          value={this.state.entryValue}
           defaultValue={this.props.defaultValue}
           onChange={this._onChange}
           onKeyDown={this._onKeyDown}
@@ -322,6 +328,7 @@ var Typeahead = React.createClass({
           onKeyUp={this.props.onKeyUp}
           onFocus={this.props.onFocus}
           onBlur={this.props.onBlur}
+          value={this.props.value}
         />
         { this._renderIncrementalSearchResults() }
       </div>

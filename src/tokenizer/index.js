@@ -4,6 +4,7 @@ var Token = require('./token');
 var KeyEvent = require('../keyevent');
 var Typeahead = require('../typeahead');
 var classNames = require('classnames');
+var update = require('react-addons-update');
 
 function _arraysAreDifferent(array1, array2) {
   if (array1.length != array2.length){
@@ -59,7 +60,8 @@ var TypeaheadTokenizer = React.createClass({
     return {
       // We need to copy this to avoid incorrect sharing
       // of state across instances (e.g., via getDefaultProps())
-      selected: this.props.defaultSelected.slice(0)
+      selected: this.props.defaultSelected.slice(0),
+      value: this.props.defaultValue
     };
   },
 
@@ -90,7 +92,9 @@ var TypeaheadTokenizer = React.createClass({
   componentWillReceiveProps: function(nextProps){
     // if we get new defaultProps, update selected
     if (_arraysAreDifferent(this.props.defaultSelected, nextProps.defaultSelected)){
-      this.setState({selected: nextProps.defaultSelected.slice(0)})
+      this.setState({
+        selected: nextProps.defaultSelected.slice(0)
+      });
     }
   },
 
@@ -148,8 +152,7 @@ var TypeaheadTokenizer = React.createClass({
     var entry = this.refs.typeahead.refs.entry;
     if (entry.selectionStart == entry.selectionEnd &&
         entry.selectionStart == 0) {
-      this._removeTokenForValue(
-        this.state.selected[this.state.selected.length - 1]);
+      this._removeTokenForValue(this.state.selected[this.state.selected.length - 1]);
       event.preventDefault();
     }
   },
@@ -160,20 +163,28 @@ var TypeaheadTokenizer = React.createClass({
       return;
     }
 
-    this.state.selected.splice(index, 1);
-    this.setState({selected: this.state.selected});
+    this.setState({
+      selected: update(this.state.selected, {$splice: [[index, 1]]})
+    });
     this.props.onTokenRemove(value);
     return;
   },
 
   _addTokenForValue: function(value) {
-    if (this.state.selected.indexOf(value) != -1) {
+    if (this.state.selected.indexOf(value) !== -1) {
       return;
     }
-    this.state.selected.push(value);
-    this.setState({selected: this.state.selected});
-    this.refs.typeahead.setEntryText("");
+    this.setState({
+      selected: update(this.state.selected, {$push: [value]}),
+      value: ""
+    });
     this.props.onTokenAdd(value);
+  },
+
+  _onChange: function(event) {
+    this.setState({
+      value: event.target.value
+    });
   },
 
   render: function() {
@@ -197,6 +208,7 @@ var TypeaheadTokenizer = React.createClass({
           options={this._getOptionsForTypeahead()}
           defaultValue={this.props.defaultValue}
           maxVisible={this.props.maxVisible}
+          onChange={this._onChange}
           onOptionSelected={this._addTokenForValue}
           onKeyDown={this._onKeyDown}
           onKeyPress={this.props.onKeyPress}
@@ -205,7 +217,8 @@ var TypeaheadTokenizer = React.createClass({
           onBlur={this.props.onBlur}
           displayOption={this.props.displayOption}
           defaultClassNames={this.props.defaultClassNames}
-          filterOption={this.props.filterOption} />
+          filterOption={this.props.filterOption}
+          value={this.state.value} />
       </div>
     );
   }
