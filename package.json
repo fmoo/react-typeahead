@@ -1,6 +1,6 @@
 {
   "name": "react-typeahead",
-  "version": "1.1.9",
+  "version": "2.0.0",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -62,8 +62,8 @@
     "build-test": "browserify test/main.js -t [ babelify --presets [ react ] ] -o test/bundle.js",
     "build": "browserify ./src/react-typeahead.js -t [ babelify --presets [ react ] ] -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
     "watchify": "watchify ./src/react-typeahead.js -t [ babelify --presets [ react ] ] -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
-    "react:14" : "npm i react@0.14 react-dom@0.14 react-addons-test-utils@0.14",
-    "react:15" : "npm i react@15 react-dom@15 react-addons-test-utils@15",
+    "react:14": "npm i react@0.14 react-dom@0.14 react-addons-test-utils@0.14",
+    "react:15": "npm i react@15 react-dom@15 react-addons-test-utils@15",
     "test:react:14": "npm run react:14 && npm test",
     "test:react:15": "npm run react:15 && npm test",
     "test:all": "npm run test:react:14 && npm run test:react:15",
