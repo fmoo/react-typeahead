@@ -319,11 +319,11 @@ describe('Typeahead Component', function() {
       });
     });
 
-    context('defaultValue', function() {
+    context('initialValue', function() {
       it('should perform an initial search if a default value is provided', function() {
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
-          defaultValue={ 'o' }
+          initialValue={ 'o' }
         />);
 
         var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
