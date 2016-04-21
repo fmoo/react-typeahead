@@ -273,7 +273,7 @@ var TypeaheadTokenizer = React.createClass({
     customClasses: React.PropTypes.object,
     allowCustomValues: React.PropTypes.number,
     defaultSelected: React.PropTypes.array,
-    defaultValue: React.PropTypes.string,
+    initialValue: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     disabled: React.PropTypes.bool,
     inputProps: React.PropTypes.object,
@@ -305,7 +305,7 @@ var TypeaheadTokenizer = React.createClass({
       defaultSelected: [],
       customClasses: {},
       allowCustomValues: 0,
-      defaultValue: "",
+      initialValue: "",
       placeholder: "",
       disabled: false,
       inputProps: {},
@@ -432,7 +432,7 @@ var TypeaheadTokenizer = React.createClass({
         allowCustomValues: this.props.allowCustomValues,
         customClasses: this.props.customClasses,
         options: this._getOptionsForTypeahead(),
-        defaultValue: this.props.defaultValue,
+        initialValue: this.props.initialValue,
         maxVisible: this.props.maxVisible,
         onOptionSelected: this._addTokenForValue,
         onKeyDown: this._onKeyDown,
@@ -536,7 +536,7 @@ var Typeahead = React.createClass({
     maxVisible: React.PropTypes.number,
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
-    defaultValue: React.PropTypes.string,
+    initialValue: React.PropTypes.string,
     value: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     disabled: React.PropTypes.bool,
@@ -562,8 +562,8 @@ var Typeahead = React.createClass({
       options: [],
       customClasses: {},
       allowCustomValues: 0,
-      defaultValue: "",
-      value: null,
+      initialValue: "",
+      value: "",
       placeholder: "",
       disabled: false,
       textarea: false,
@@ -585,10 +585,10 @@ var Typeahead = React.createClass({
   getInitialState: function () {
     return {
       // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.defaultValue, this.props.options),
+      visible: this.getOptionsForValue(this.props.initialValue, this.props.options),
 
       // This should be called something else, "entryValue"
-      entryValue: this.props.value || this.props.defaultValue,
+      entryValue: this.props.value || this.props.initialValue,
 
       // A valid typeahead value
       selection: this.props.value,
@@ -693,7 +693,7 @@ var Typeahead = React.createClass({
   _onTextEntryUpdated: function () {
     var value = this.refs.entry.value;
     this.setState({ visible: this.getOptionsForValue(value, this.props.options),
-      selection: null,
+      selection: '',
       entryValue: value });
   },
 
@@ -808,7 +808,6 @@ var Typeahead = React.createClass({
     var classList = classNames(classes);
 
     var InputElement = this.props.textarea ? 'textarea' : 'input';
-
     return React.createElement(
       'div',
       { className: classList },
@@ -819,7 +818,6 @@ var Typeahead = React.createClass({
         placeholder: this.props.placeholder,
         className: inputClassList,
         value: this.state.entryValue,
-        defaultValue: this.props.defaultValue,
         onChange: this._onChange,
         onKeyDown: this._onKeyDown,
         onKeyPress: this.props.onKeyPress,
