@@ -1,7 +1,3 @@
-/**
- * @jsx React.DOM
- */
-
 var React = require('react');
 var classNames = require('classnames');
 
@@ -18,7 +14,8 @@ var Token = React.createClass({
       React.PropTypes.string,
       React.PropTypes.object,
     ]),
-    onRemove: React.PropTypes.func
+    onRemove: React.PropTypes.func,
+    value: React.PropTypes.string
   },
 
   render: function() {
@@ -46,7 +43,7 @@ var Token = React.createClass({
       <input
         type="hidden"
         name={ this.props.name + '[]' }
-        value={ this.props.object }
+        value={ this.props.value || this.props.object }
       />
     );
   },

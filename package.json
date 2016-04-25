@@ -1,6 +1,6 @@
 {
   "name": "react-typeahead",
-  "version": "1.1.8",
+  "version": "1.1.9-f",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -40,28 +40,29 @@
   },
   "main": "lib/react-typeahead.js",
   "devDependencies": {
+    "babel-preset-react": "^6.5.0",
+    "babelify": "^7.2.0",
     "browserify": "^8.0.2",
     "chai": "^1.9.1",
     "es5-shim": "^4.0.1",
     "gulp": "^3.8.7",
+    "gulp-babel": "^6.1.2",
     "gulp-mocha-phantomjs": "^0.8.1",
-    "gulp-react": "^3.0.1",
     "literalify": "^0.4.0",
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
     "react-addons-test-utils": "^0.14.2",
     "react-dom": "^0.14.2",
     "react-tools": "^0.13.3",
-    "reactify": "^1.0.0",
     "sinon": "^1.10.3",
     "watchify": "^2.2.1"
   },
   "scripts": {
     "test": "npm run build-test && gulp test",
-    "watchify-test": "watchify test/main.js -t reactify -o test/bundle.js -v",
-    "build-test": "browserify test/main.js -t reactify -o test/bundle.js",
-    "build": "browserify ./src/react-typeahead.js -t reactify -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
-    "watchify": "watchify ./src/react-typeahead.js -t reactify -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
+    "watchify-test": "watchify test/main.js -t [ babelify --presets [ react ] ] -o test/bundle.js -v",
+    "build-test": "browserify test/main.js -t [ babelify --presets [ react ] ] -o test/bundle.js",
+    "build": "browserify ./src/react-typeahead.js -t [ babelify --presets [ react ] ] -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
+    "watchify": "watchify ./src/react-typeahead.js -t [ babelify --presets [ react ] ] -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
     "lib": "gulp build",
     "prepublish": "npm run lib"
   },
