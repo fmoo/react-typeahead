@@ -592,7 +592,7 @@ describe('Typeahead Component', function() {
         assert.equal(0, results.length);
       });
 
-      it('render options when value is empty when set to true', function() {
+      it('do not render options when value is empty when set to true and not focused', function() {
         var component = TestUtils.renderIntoDocument(
           <Typeahead
             options={ BEATLES }
@@ -600,6 +600,19 @@ describe('Typeahead Component', function() {
           />
         );
 
+        var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
+        assert.equal(0, results.length);
+      });
+
+      it('render options when value is empty when set to true and focused', function() {
+        var component = TestUtils.renderIntoDocument(
+          <Typeahead
+            options={ BEATLES }
+            showOptionsWhenEmpty={ true }
+          />
+        );
+
+        TestUtils.Simulate.focus(component.refs.entry);
         var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
         assert.equal(4, results.length);
       });
