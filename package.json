@@ -33,8 +33,7 @@
   },
   "dependencies": {
     "classnames": "^1.2.0",
-    "fuzzy": "^0.1.0",
-    "react": "^15.0.1"
+    "fuzzy": "^0.1.0"
   },
   "peerDependencies": {
     "react": ">= 0.14"
