@@ -97,13 +97,14 @@ var Typeahead = React.createClass({
     return !this.props.showOptionsWhenEmpty && emptyValue;
   },
 
-  getOptionsForValue: function(value, options) {
+  getOptionsForValue: function(value, options, maxVisible) {
     if (this._shouldSkipSearch(value)) { return []; }
 
     var filterOptions = this._generateFilterFunction();
     var result = filterOptions(value, options);
-    if (this.props.maxVisible) {
-      result = result.slice(0, this.props.maxVisible);
+    var maxVisible = maxVisible || this.props.maxVisible;
+    if (maxVisible) {
+      result = result.slice(0, maxVisible);
     }
     return result;
   },
@@ -289,7 +290,7 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options, nextProps.maxVisible)
     });
   },
 
