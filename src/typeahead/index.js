@@ -93,8 +93,16 @@ var Typeahead = React.createClass({
   },
 
   _shouldSkipSearch: function(input) {
-    var emptyValue = !input || input.trim().length == 0;
-    return !this.props.showOptionsWhenEmpty && emptyValue;
+    var result;
+
+    if (this.state.visible.length || this._getCustomValue()) {
+      result = true;
+    } else {
+      var emptyValue = !input || input.trim().length == 0;
+      result = !this.props.showOptionsWhenEmpty && emptyValue;
+    }
+
+    return result;
   },
 
   getOptionsForValue: function(value, options) {
