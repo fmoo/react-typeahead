@@ -202,6 +202,10 @@ var Typeahead = React.createClass({
   },
 
   _onEscape: function() {
+    this.clearSelectionIndex();
+  },
+
+  clearSelectionIndex: function() {
     this.setState({
       selectionIndex: null
     });
