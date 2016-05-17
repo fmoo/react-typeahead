@@ -216,6 +216,14 @@ If true, options will still be rendered when there is no value.
 
 Focuses the typeahead input.
 
+#### typeahead.setEntryText(value)
+
+Sets the value of the input field to `value`.
+
+#### typeahead.clearSelectionIndex
+
+Clears the currently selected option index.
+
 ---
 
 ### Tokenizer(props)
