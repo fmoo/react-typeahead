@@ -343,7 +343,7 @@ A function to filter the provided `options` based on the current input value. Fo
 
 If provided as a string, it will interpret it as a field name and use that field from each option object.
 
-#### props.filterOptions
+#### props.searchOptions
 
 Type: `Function`
 
@@ -358,7 +358,7 @@ Make sure to use the `displayOption`, `inputDisplayOption`, and `formInputOption
 
 Type: `String` or `Function`
 
-A function that maps the internal state of the visible options into the value stored in the text value field of the input when an option is selected.
+A function that maps the internal state of the visible options into the value stored in the text value field of the visible input when an option is selected.
 
 Receives `(option)`.
 
@@ -370,7 +370,7 @@ If no value is set, the input will be set using `displayOption` when an option i
 
 Type: `String` or `Function`
 
-A function to map an option onto a string to include in HTML forms (see `props.name`). Receives `(option)` as arguments. Must return a string.
+A function to map an option onto a string to include in HTML forms as a hidden field (see `props.name`). Receives `(option)` as arguments. Must return a string.
 
 If specified as a string, it will interpret it as a field name and use that field from each option object.
 

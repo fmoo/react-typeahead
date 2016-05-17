@@ -196,7 +196,7 @@ describe('Typeahead Component', function() {
       });
     });
 
-    context('filterOptions', function() {
+    context('searchOptions', function() {
       it('maps correctly when specified with map function', function() {
         var createObject = function(o) {
           return { len: o.length, orig: o };
@@ -204,7 +204,7 @@ describe('Typeahead Component', function() {
 
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
-          filterOptions={ function(inp, opts) { return opts.map(createObject); } }
+          searchOptions={ function(inp, opts) { return opts.map(createObject); } }
           displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
           inputDisplayOption={ function(o, i) { return o.orig; } }
         />);
@@ -220,7 +220,7 @@ describe('Typeahead Component', function() {
 
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
-          filterOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
+          searchOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
           displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
           inputDisplayOption={ function(o, i) { return o.orig; } }
         />);
@@ -238,7 +238,7 @@ describe('Typeahead Component', function() {
 
         var component = TestUtils.renderIntoDocument(<Typeahead
           options={ BEATLES }
-          filterOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
+          searchOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
           displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
           inputDisplayOption={ function(o, i) { return o.orig; } }
         />);

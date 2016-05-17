@@ -35,7 +35,7 @@ var Typeahead = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
-    filterOptions: React.PropTypes.func,
+    searchOptions: React.PropTypes.func,
     displayOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
@@ -75,7 +75,7 @@ var Typeahead = React.createClass({
       onFocus: function(event) {},
       onBlur: function(event) {},
       filterOption: null,
-      filterOptions: null,
+      searchOptions: null,
       inputDisplayOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector,
@@ -107,8 +107,8 @@ var Typeahead = React.createClass({
   getOptionsForValue: function(value, options) {
     if (this._shouldSkipSearch(value)) { return []; }
 
-    var filterOptions = this._generateFilterFunction();
-    var result = filterOptions(value, options);
+    var searchOptions = this._generateSearchFunction();
+    var result = searchOptions(value, options);
     if (this.props.maxVisible) {
       result = result.slice(0, this.props.maxVisible);
     }
@@ -357,14 +357,14 @@ var Typeahead = React.createClass({
     );
   },
 
-  _generateFilterFunction: function() {
-    var filterOptionsProp = this.props.filterOptions;
+  _generateSearchFunction: function() {
+    var searchOptionsProp = this.props.searchOptions;
     var filterOptionProp = this.props.filterOption;
-    if (typeof filterOptionsProp === 'function') {
+    if (typeof searchOptionsProp === 'function') {
       if (filterOptionProp !== null) {
-        console.warn('filterOptions prop is being used, filterOption prop will be ignored');
+        console.warn('searchOptions prop is being used, filterOption prop will be ignored');
       }
-      return filterOptionsProp;
+      return searchOptionsProp;
     } else if (typeof filterOptionProp === 'function') {
       return function(value, options) {
         return options.filter(function(o) { return filterOptionProp(value, o); });
