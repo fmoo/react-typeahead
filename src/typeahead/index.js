@@ -35,7 +35,12 @@ var Typeahead = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
+    filterOptions: React.PropTypes.func,
     displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    inputDisplayOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
     ]),
@@ -70,6 +75,8 @@ var Typeahead = React.createClass({
       onFocus: function(event) {},
       onBlur: function(event) {},
       filterOption: null,
+      filterOptions: null,
+      inputDisplayOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector,
       showOptionsWhenEmpty: false
@@ -178,7 +185,7 @@ var Typeahead = React.createClass({
     var nEntry = this.refs.entry;
     nEntry.focus();
 
-    var displayOption = Accessor.generateOptionToStringFor(this.props.displayOption);
+    var displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
     var optionString = displayOption(option, 0);
 
     var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
@@ -351,8 +358,14 @@ var Typeahead = React.createClass({
   },
 
   _generateFilterFunction: function() {
+    var filterOptionsProp = this.props.filterOptions;
     var filterOptionProp = this.props.filterOption;
-    if (typeof filterOptionProp === 'function') {
+    if (typeof filterOptionsProp === 'function') {
+      if (filterOptionProp !== null) {
+        console.warn('filterOptions prop is being used, filterOption prop will be ignored');
+      }
+      return filterOptionsProp;
+    } else if (typeof filterOptionProp === 'function') {
       return function(value, options) {
         return options.filter(function(o) { return filterOptionProp(value, o); });
       };
