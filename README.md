@@ -80,10 +80,16 @@ Type: `Number`
 
 Limit the number of options rendered in the results list.
 
+#### props.resultsTruncatedMessage
+
+Type: `String`
+
+If `maxVisible` is set, display this custom message at the bottom of the list of results when the result are truncated.
+
 #### props.customClasses
 
 Type: `Object`
-Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`
+Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`, `resultsTruncated`
 
 An object containing custom class names for child elements. Useful for
 integrating with 3rd party UI kits.
