@@ -164,6 +164,16 @@ describe('Typeahead Component', function() {
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
       });
+
+      it('limits the result set based on the maxVisible option, and shows resultsTruncatedMessage when specified', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          maxVisible={ 1 }
+          resultsTruncatedMessage='Results truncated'
+          ></Typeahead>);
+        var results = simulateTextInput(component, 'o');
+        assert.equal(TestUtils.findRenderedDOMComponentWithClass(component, 'results-truncated').textContent, 'Results truncated');
+      });
     });
 
     context('displayOption', function() {
