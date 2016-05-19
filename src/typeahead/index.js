@@ -16,6 +16,7 @@ var Typeahead = React.createClass({
     name: React.PropTypes.string,
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
+    resultsTruncatedMessage: React.PropTypes.string,
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
     initialValue: React.PropTypes.string,
@@ -79,14 +80,15 @@ var Typeahead = React.createClass({
       inputDisplayOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector,
-      showOptionsWhenEmpty: false
+      showOptionsWhenEmpty: false,
+      resultsTruncatedMessage: null
     };
   },
 
   getInitialState: function() {
     return {
-      // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.initialValue, this.props.options),
+      // The options matching the entry value
+      searchResults: this.getOptionsForValue(this.props.initialValue, this.props.options),
 
       // This should be called something else, "entryValue"
       entryValue: this.props.value || this.props.initialValue,
@@ -108,11 +110,7 @@ var Typeahead = React.createClass({
     if (this._shouldSkipSearch(value)) { return []; }
 
     var searchOptions = this._generateSearchFunction();
-    var result = searchOptions(value, options);
-    if (this.props.maxVisible) {
-      result = result.slice(0, this.props.maxVisible);
-    }
-    return result;
+    return searchOptions(value, options);
   },
 
   setEntryText: function(value) {
@@ -127,7 +125,7 @@ var Typeahead = React.createClass({
   _hasCustomValue: function() {
     if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
-      this.state.visible.indexOf(this.state.entryValue) < 0) {
+      this.state.searchResults.indexOf(this.state.entryValue) < 0) {
       return true;
     }
     return false;
@@ -158,7 +156,9 @@ var Typeahead = React.createClass({
 
     return (
       <this.props.customListComponent
-        ref="sel" options={this.state.visible}
+        ref="sel" options={this.state.searchResults.slice(0, this.props.maxVisible)}
+        areResultsTruncated={this.state.searchResults.length > this.props.maxVisible}
+        resultsTruncatedMessage={this.props.resultsTruncatedMessage}
         onOptionSelected={this._onOptionSelected}
         allowCustomValues={this.props.allowCustomValues}
         customValue={this._getCustomValue()}
@@ -178,7 +178,7 @@ var Typeahead = React.createClass({
         index--;
       }
     }
-    return this.state.visible[index];
+    return this.state.searchResults[index];
   },
 
   _onOptionSelected: function(option, event) {
@@ -192,7 +192,7 @@ var Typeahead = React.createClass({
     var formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
-    this.setState({visible: this.getOptionsForValue(optionString, this.props.options),
+    this.setState({searchResults: this.getOptionsForValue(optionString, this.props.options),
                    selection: formInputOptionString,
                    entryValue: optionString});
     return this.props.onOptionSelected(option, event);
@@ -200,7 +200,7 @@ var Typeahead = React.createClass({
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.value;
-    this.setState({visible: this.getOptionsForValue(value, this.props.options),
+    this.setState({searchResults: this.getOptionsForValue(value, this.props.options),
                    selection: '',
                    hasRendered: true,
                    entryValue: value});
@@ -227,7 +227,7 @@ var Typeahead = React.createClass({
   _onTab: function(event) {
     var selection = this.getSelection();
     var option = selection ?
-      selection : (this.state.visible.length > 0 ? this.state.visible[0] : null);
+      selection : (this.state.searchResults.length > 0 ? this.state.searchResults[0] : null);
 
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
@@ -255,7 +255,7 @@ var Typeahead = React.createClass({
       return;
     }
     var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
-    var length = this.state.visible.length;
+    var length = this.state.searchResults.slice(0, this.props.maxVisible).length;
     if (this._hasCustomValue()) {
       length += 1;
     }
@@ -306,7 +306,7 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      searchResults: this.getOptionsForValue(this.state.entryValue, nextProps.options)
     });
   },
 
@@ -385,7 +385,7 @@ var Typeahead = React.createClass({
   },
 
   _hasHint: function() {
-    return this.state.visible.length > 0 || this._hasCustomValue();
+    return this.state.searchResults.length > 0 || this._hasCustomValue();
   }
 });
 
