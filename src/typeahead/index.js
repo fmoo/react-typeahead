@@ -156,8 +156,8 @@ var Typeahead = React.createClass({
 
     return (
       <this.props.customListComponent
-        ref="sel" options={this.state.searchResults.slice(0, this.props.maxVisible)}
-        areResultsTruncated={this.state.searchResults.length > this.props.maxVisible}
+        ref="sel" options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
+        areResultsTruncated={this.props.maxVisible && this.state.searchResults.length > this.props.maxVisible}
         resultsTruncatedMessage={this.props.resultsTruncatedMessage}
         onOptionSelected={this._onOptionSelected}
         allowCustomValues={this.props.allowCustomValues}
@@ -255,7 +255,7 @@ var Typeahead = React.createClass({
       return;
     }
     var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
-    var length = this.state.searchResults.slice(0, this.props.maxVisible).length;
+    var length = this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible).length : this.state.searchResults.length;
     if (this._hasCustomValue()) {
       length += 1;
     }
