@@ -164,6 +164,16 @@ describe('Typeahead Component', function() {
         var results = simulateTextInput(component, 'o');
         assert.equal(results.length, 1);
       });
+
+      it('limits the result set based on the maxVisible option, and shows resultsTruncatedMessage when specified', function() {
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          maxVisible={ 1 }
+          resultsTruncatedMessage='Results truncated'
+          ></Typeahead>);
+        var results = simulateTextInput(component, 'o');
+        assert.equal(TestUtils.findRenderedDOMComponentWithClass(component, 'results-truncated').textContent, 'Results truncated');
+      });
     });
 
     context('displayOption', function() {
@@ -193,6 +203,61 @@ describe('Typeahead Component', function() {
         />);
         var results = simulateTextInput(component, 'john');
         assert.equal(ReactDOM.findDOMNode(results[0]).textContent, '0 John Lennon');
+      });
+    });
+
+    context('searchOptions', function() {
+      it('maps correctly when specified with map function', function() {
+        var createObject = function(o) {
+          return { len: o.length, orig: o };
+        };
+
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          searchOptions={ function(inp, opts) { return opts.map(createObject); } }
+          displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
+          inputDisplayOption={ function(o, i) { return o.orig; } }
+        />);
+
+        var results = simulateTextInput(component, 'john');
+        assert.equal(ReactDOM.findDOMNode(results[0]).textContent, 'Score: 4 John');
+      });
+
+      it('can sort displayed items when specified with map function wrapped with sort', function() {
+        var createObject = function(o) {
+          return { len: o.length, orig: o };
+        };
+
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          searchOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
+          displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
+          inputDisplayOption={ function(o, i) { return o.orig; } }
+        />);
+
+        var results = simulateTextInput(component, 'john');
+        assert.equal(ReactDOM.findDOMNode(results[0]).textContent, 'Score: 6 George');
+      });
+    });
+
+    context('inputDisplayOption', function() {
+      it('displays a different value in input field and in list display', function() {
+        var createObject = function(o) {
+          return { len: o.length, orig: o };
+        };
+
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          searchOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
+          displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
+          inputDisplayOption={ function(o, i) { return o.orig; } }
+        />);
+
+        var results = simulateTextInput(component, 'john');
+        var node = component.refs.entry;
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+
+        assert.equal(node.value, 'George');
       });
     });
 
@@ -578,6 +643,28 @@ describe('Typeahead Component', function() {
         var input = component.refs.entry;
         assert.equal(input.tagName.toLowerCase(), 'input');
       });
+    });
+
+    context('selectFirst', function() {
+      context('options are present', function() {
+        it('sets the selectionIndex to 0 (first option) by default', function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            options={[]} selectFirst={true}
+          />);
+          component.componentWillReceiveProps({options: BEATLES})
+          assert.equal(0, component.state.selectionIndex);
+        });
+      });
+      context('options is empty', function() {
+        it('does not set selectionIndex', function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            options={[]}
+          />);
+          component.componentWillReceiveProps({options: []})
+          assert.equal(null, component.state.selectionIndex);
+        });
+      });
+
     });
 
     context('showOptionsWhenEmpty', function() {
