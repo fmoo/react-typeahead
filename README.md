@@ -216,6 +216,13 @@ Default: false
 
 If true, options will still be rendered when there is no value.
 
+#### props.selectFirst
+
+Type: `boolean`
+Default: false
+
+If true, first option will be selected by default.
+
 ### Typeahead ([Exposed Component Functions][reactecf])
 
 #### typeahead.focus

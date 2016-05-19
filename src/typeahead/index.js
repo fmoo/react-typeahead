@@ -55,6 +55,7 @@ var Typeahead = React.createClass({
       React.PropTypes.element,
       React.PropTypes.func
     ]),
+    selectFirst: React.PropTypes.bool,
     showOptionsWhenEmpty: React.PropTypes.bool
   },
 
@@ -82,6 +83,7 @@ var Typeahead = React.createClass({
       inputDisplayOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector,
+      selectFirst: false,
       showOptionsWhenEmpty: false,
       resultsTruncatedMessage: null
     };
@@ -319,9 +321,15 @@ var Typeahead = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    this.setState({
+    var typeheadOptionsState = {
       searchResults: this.getOptionsForValue(this.state.entryValue, nextProps.options)
-    });
+    };
+
+    if (this.props.selectFirst && nextProps.options.length) {
+      typeheadOptionsState.selectionIndex = 0;
+    }
+
+    this.setState(typeheadOptionsState);
   },
 
   render: function() {

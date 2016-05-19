@@ -645,6 +645,28 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('selectFirst', function() {
+      context('options are present', function() {
+        it('sets the selectionIndex to 0 (first option) by default', function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            options={[]} selectFirst={true}
+          />);
+          component.componentWillReceiveProps({options: BEATLES})
+          assert.equal(0, component.state.selectionIndex);
+        });
+      });
+      context('options is empty', function() {
+        it('does not set selectionIndex', function() {
+          var component = TestUtils.renderIntoDocument(<Typeahead
+            options={[]}
+          />);
+          component.componentWillReceiveProps({options: []})
+          assert.equal(null, component.state.selectionIndex);
+        });
+      });
+
+    });
+
     context('showOptionsWhenEmpty', function() {
       it('do not render options when value is empty by default', function() {
         var component = TestUtils.renderIntoDocument(
