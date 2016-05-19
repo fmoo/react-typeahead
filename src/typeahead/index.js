@@ -17,6 +17,7 @@ var Typeahead = React.createClass({
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
     resultsTruncatedMessage: React.PropTypes.string,
+    delayMillis: React.PropTypes.number,
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
     initialValue: React.PropTypes.string,
@@ -62,6 +63,7 @@ var Typeahead = React.createClass({
       options: [],
       customClasses: {},
       allowCustomValues: 0,
+      delayMillis: 0,
       initialValue: "",
       value: "",
       placeholder: "",
@@ -200,10 +202,22 @@ var Typeahead = React.createClass({
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.value;
-    this.setState({searchResults: this.getOptionsForValue(value, this.props.options),
-                   selection: '',
-                   hasRendered: true,
-                   entryValue: value});
+
+    this.setState({
+      selection: '',
+      entryValue: value
+    });
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+
+    this.timeout = setTimeout(() => {
+      this.setState({
+        searchResults: this.getOptionsForValue(value, this.props.options),
+        hasRendered: true
+      });
+    }, this.props.delayMillis);
   },
 
   _onEnter: function(event) {
