@@ -90,12 +90,17 @@ var Typeahead = React.createClass({
       // Index of the selection
       selectionIndex: null,
 
+      // Keep track of the focus state of the input element, to determine
+      // whether to show options when empty (if showOptionsWhenEmpty is true)
       isFocused: false,
     };
   },
 
   _shouldSkipSearch: function(input) {
     var emptyValue = !input || input.trim().length == 0;
+
+    // this.state must be checked because it may not be defined yet if this function
+    // is called from within getInitialState
     var isFocused = this.state && this.state.isFocused;
     return !(this.props.showOptionsWhenEmpty && isFocused) && emptyValue;
   },
