@@ -52,6 +52,7 @@ var TypeaheadTokenizer = React.createClass({
       React.PropTypes.func
     ]),
     maxVisible: React.PropTypes.number,
+    resultsTruncatedMessage: React.PropTypes.string,
     defaultClassNames: React.PropTypes.bool
   },
 
@@ -197,6 +198,7 @@ var TypeaheadTokenizer = React.createClass({
           options={this._getOptionsForTypeahead()}
           initialValue={this.props.initialValue}
           maxVisible={this.props.maxVisible}
+          resultsTruncatedMessage={this.props.resultsTruncatedMessage}
           onOptionSelected={this._addTokenForValue}
           onKeyDown={this._onKeyDown}
           onKeyPress={this.props.onKeyPress}
