@@ -89,7 +89,7 @@ If `maxVisible` is set, display this custom message at the bottom of the list of
 #### props.customClasses
 
 Type: `Object`
-Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`, `resultsTruncated`
+Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`, `typeahead`, `resultsTruncated`
 
 An object containing custom class names for child elements. Useful for
 integrating with 3rd party UI kits.
@@ -243,6 +243,12 @@ Type: `Number`
 
 Limit the number of options rendered in the results list.
 
+#### props.resultsTruncatedMessage
+
+Type: `String`
+
+If `maxVisible` is set, display this custom message at the bottom of the list of results when the result are truncated.
+
 #### props.name
 
 Type: `String`
@@ -252,7 +258,7 @@ The name for HTML forms to be used for submitting the tokens' values array.
 #### props.customClasses
 
 Type: `Object`
-Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `typeahead`
+Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`, `typeahead`, `resultsTruncated`
 
 An object containing custom class names for child elements. Useful for
 integrating with 3rd party UI kits.
