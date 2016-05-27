@@ -43,6 +43,7 @@ var TypeaheadTokenizer = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
+    searchOptions: React.PropTypes.func,
     displayOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
@@ -76,6 +77,7 @@ var TypeaheadTokenizer = React.createClass({
       inputProps: {},
       defaultClassNames: true,
       filterOption: null,
+      searchOptions: null,
       displayOption: function(token){ return token },
       formInputOption: null,
       onKeyDown: function(event) {},
@@ -113,12 +115,12 @@ var TypeaheadTokenizer = React.createClass({
       var displayString = Accessor.valueForOption(this.props.displayOption, selected);
       var value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
       return (
-        <Token key={ displayString } className={classList}
-          onRemove={ this._removeTokenForValue }
+        <Token key={displayString} className={classList}
+          onRemove={this._removeTokenForValue}
           object={selected}
           value={value}
-          name={ this.props.name }>
-          { displayString }
+          name={this.props.name}>
+          {displayString}
         </Token>
       );
     }, this);
@@ -207,7 +209,8 @@ var TypeaheadTokenizer = React.createClass({
           onBlur={this.props.onBlur}
           displayOption={this.props.displayOption}
           defaultClassNames={this.props.defaultClassNames}
-          filterOption={this.props.filterOption} />
+          filterOption={this.props.filterOption}
+          searchOptions={this.props.searchOptions} />
       </div>
     );
   }
