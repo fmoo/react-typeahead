@@ -285,9 +285,11 @@ var TypeaheadTokenizer = React.createClass({
     onFocus: React.PropTypes.func,
     onBlur: React.PropTypes.func,
     filterOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
+    searchOptions: React.PropTypes.func,
     displayOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
     formInputOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
     maxVisible: React.PropTypes.number,
+    resultsTruncatedMessage: React.PropTypes.string,
     defaultClassNames: React.PropTypes.bool
   },
 
@@ -311,6 +313,7 @@ var TypeaheadTokenizer = React.createClass({
       inputProps: {},
       defaultClassNames: true,
       filterOption: null,
+      searchOptions: null,
       displayOption: function (token) {
         return token;
       },
@@ -434,6 +437,7 @@ var TypeaheadTokenizer = React.createClass({
         options: this._getOptionsForTypeahead(),
         initialValue: this.props.initialValue,
         maxVisible: this.props.maxVisible,
+        resultsTruncatedMessage: this.props.resultsTruncatedMessage,
         onOptionSelected: this._addTokenForValue,
         onKeyDown: this._onKeyDown,
         onKeyPress: this.props.onKeyPress,
@@ -442,7 +446,8 @@ var TypeaheadTokenizer = React.createClass({
         onBlur: this.props.onBlur,
         displayOption: this.props.displayOption,
         defaultClassNames: this.props.defaultClassNames,
-        filterOption: this.props.filterOption })
+        filterOption: this.props.filterOption,
+        searchOptions: this.props.searchOptions })
     );
   }
 });
@@ -534,6 +539,7 @@ var Typeahead = React.createClass({
     name: React.PropTypes.string,
     customClasses: React.PropTypes.object,
     maxVisible: React.PropTypes.number,
+    resultsTruncatedMessage: React.PropTypes.string,
     options: React.PropTypes.array,
     allowCustomValues: React.PropTypes.number,
     initialValue: React.PropTypes.string,
@@ -550,7 +556,9 @@ var Typeahead = React.createClass({
     onFocus: React.PropTypes.func,
     onBlur: React.PropTypes.func,
     filterOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
+    searchOptions: React.PropTypes.func,
     displayOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
+    inputDisplayOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
     formInputOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
     defaultClassNames: React.PropTypes.bool,
     customListComponent: React.PropTypes.oneOfType([React.PropTypes.element, React.PropTypes.func]),
@@ -576,16 +584,19 @@ var Typeahead = React.createClass({
       onFocus: function (event) {},
       onBlur: function (event) {},
       filterOption: null,
+      searchOptions: null,
+      inputDisplayOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector,
-      showOptionsWhenEmpty: false
+      showOptionsWhenEmpty: false,
+      resultsTruncatedMessage: null
     };
   },
 
   getInitialState: function () {
     return {
-      // The currently visible set of options
-      visible: this.getOptionsForValue(this.props.initialValue, this.props.options),
+      // The options matching the entry value
+      searchResults: this.getOptionsForValue(this.props.initialValue, this.props.options),
 
       // This should be called something else, "entryValue"
       entryValue: this.props.value || this.props.initialValue,
@@ -594,13 +605,21 @@ var Typeahead = React.createClass({
       selection: this.props.value,
 
       // Index of the selection
-      selectionIndex: null
+      selectionIndex: null,
+
+      // Keep track of the focus state of the input element, to determine
+      // whether to show options when empty (if showOptionsWhenEmpty is true)
+      isFocused: false
     };
   },
 
   _shouldSkipSearch: function (input) {
     var emptyValue = !input || input.trim().length == 0;
-    return !this.props.showOptionsWhenEmpty && emptyValue;
+
+    // this.state must be checked because it may not be defined yet if this function
+    // is called from within getInitialState
+    var isFocused = this.state && this.state.isFocused;
+    return !(this.props.showOptionsWhenEmpty && isFocused) && emptyValue;
   },
 
   getOptionsForValue: function (value, options) {
@@ -608,12 +627,8 @@ var Typeahead = React.createClass({
       return [];
     }
 
-    var filterOptions = this._generateFilterFunction();
-    var result = filterOptions(value, options);
-    if (this.props.maxVisible) {
-      result = result.slice(0, this.props.maxVisible);
-    }
-    return result;
+    var searchOptions = this._generateSearchFunction();
+    return result = searchOptions(value, options);
   },
 
   setEntryText: function (value) {
@@ -626,7 +641,7 @@ var Typeahead = React.createClass({
   },
 
   _hasCustomValue: function () {
-    if (this.props.allowCustomValues > 0 && this.state.entryValue.length >= this.props.allowCustomValues && this.state.visible.indexOf(this.state.entryValue) < 0) {
+    if (this.props.allowCustomValues > 0 && this.state.entryValue.length >= this.props.allowCustomValues && this.state.searchResults.indexOf(this.state.entryValue) < 0) {
       return true;
     }
     return false;
@@ -651,7 +666,9 @@ var Typeahead = React.createClass({
     }
 
     return React.createElement(this.props.customListComponent, {
-      ref: 'sel', options: this.state.visible,
+      ref: 'sel', options: this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults,
+      areResultsTruncated: this.props.maxVisible && this.state.searchResults.length > this.props.maxVisible,
+      resultsTruncatedMessage: this.props.resultsTruncatedMessage,
       onOptionSelected: this._onOptionSelected,
       allowCustomValues: this.props.allowCustomValues,
       customValue: this._getCustomValue(),
@@ -670,21 +687,21 @@ var Typeahead = React.createClass({
         index--;
       }
     }
-    return this.state.visible[index];
+    return this.state.searchResults[index];
   },
 
   _onOptionSelected: function (option, event) {
     var nEntry = this.refs.entry;
     nEntry.focus();
 
-    var displayOption = Accessor.generateOptionToStringFor(this.props.displayOption);
+    var displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
     var optionString = displayOption(option, 0);
 
     var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
     var formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
-    this.setState({ visible: this.getOptionsForValue(optionString, this.props.options),
+    this.setState({ searchResults: this.getOptionsForValue(optionString, this.props.options),
       selection: formInputOptionString,
       entryValue: optionString });
     return this.props.onOptionSelected(option, event);
@@ -692,7 +709,7 @@ var Typeahead = React.createClass({
 
   _onTextEntryUpdated: function () {
     var value = this.refs.entry.value;
-    this.setState({ visible: this.getOptionsForValue(value, this.props.options),
+    this.setState({ searchResults: this.getOptionsForValue(value, this.props.options),
       selection: '',
       entryValue: value });
   },
@@ -713,7 +730,7 @@ var Typeahead = React.createClass({
 
   _onTab: function (event) {
     var selection = this.getSelection();
-    var option = selection ? selection : this.state.visible.length > 0 ? this.state.visible[0] : null;
+    var option = selection ? selection : this.state.searchResults.length > 0 ? this.state.searchResults[0] : null;
 
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
@@ -741,7 +758,7 @@ var Typeahead = React.createClass({
       return;
     }
     var newIndex = this.state.selectionIndex === null ? delta == 1 ? 0 : delta : this.state.selectionIndex + delta;
-    var length = this.state.visible.length;
+    var length = this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible).length : this.state.searchResults.length;
     if (this._hasCustomValue()) {
       length += 1;
     }
@@ -792,7 +809,7 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function (nextProps) {
     this.setState({
-      visible: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      searchResults: this.getOptionsForValue(this.state.entryValue, nextProps.options)
     });
   },
 
@@ -822,11 +839,29 @@ var Typeahead = React.createClass({
         onKeyDown: this._onKeyDown,
         onKeyPress: this.props.onKeyPress,
         onKeyUp: this.props.onKeyUp,
-        onFocus: this.props.onFocus,
-        onBlur: this.props.onBlur
+        onFocus: this._onFocus,
+        onBlur: this._onBlur
       })),
       this._renderIncrementalSearchResults()
     );
+  },
+
+  _onFocus: function (event) {
+    this.setState({ isFocused: true }, function () {
+      this._onTextEntryUpdated();
+    }.bind(this));
+    if (this.props.onFocus) {
+      return this.props.onFocus(event);
+    }
+  },
+
+  _onBlur: function (event) {
+    this.setState({ isFocused: false }, function () {
+      this._onTextEntryUpdated();
+    }.bind(this));
+    if (this.props.onBlur) {
+      return this.props.onBlur(event);
+    }
   },
 
   _renderHiddenInput: function () {
@@ -841,9 +876,15 @@ var Typeahead = React.createClass({
     });
   },
 
-  _generateFilterFunction: function () {
+  _generateSearchFunction: function () {
+    var searchOptionsProp = this.props.searchOptions;
     var filterOptionProp = this.props.filterOption;
-    if (typeof filterOptionProp === 'function') {
+    if (typeof searchOptionsProp === 'function') {
+      if (filterOptionProp !== null) {
+        console.warn('searchOptions prop is being used, filterOption prop will be ignored');
+      }
+      return searchOptionsProp;
+    } else if (typeof filterOptionProp === 'function') {
       return function (value, options) {
         return options.filter(function (o) {
           return filterOptionProp(value, o);
@@ -865,7 +906,7 @@ var Typeahead = React.createClass({
   },
 
   _hasHint: function () {
-    return this.state.visible.length > 0 || this._hasCustomValue();
+    return this.state.searchResults.length > 0 || this._hasCustomValue();
   }
 });
 
@@ -957,7 +998,9 @@ var TypeaheadSelector = React.createClass({
     selectionIndex: React.PropTypes.number,
     onOptionSelected: React.PropTypes.func,
     displayOption: React.PropTypes.func.isRequired,
-    defaultClassNames: React.PropTypes.bool
+    defaultClassNames: React.PropTypes.bool,
+    areResultsTruncated: React.PropTypes.bool,
+    resultsTruncatedMessage: React.PropTypes.string
   },
 
   getDefaultProps: function () {
@@ -1011,6 +1054,20 @@ var TypeaheadSelector = React.createClass({
         displayString
       );
     }, this);
+
+    if (this.props.areResultsTruncated && this.props.resultsTruncatedMessage !== null) {
+      var resultsTruncatedClasses = {
+        "results-truncated": this.props.defaultClassNames
+      };
+      resultsTruncatedClasses[this.props.customClasses.resultsTruncated] = this.props.customClasses.resultsTruncated;
+      var resultsTruncatedClassList = classNames(resultsTruncatedClasses);
+
+      results.push(React.createElement(
+        'li',
+        { key: 'results-truncated', className: resultsTruncatedClassList },
+        this.props.resultsTruncatedMessage
+      ));
+    }
 
     return React.createElement(
       'ul',
