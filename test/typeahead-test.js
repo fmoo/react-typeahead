@@ -206,6 +206,61 @@ describe('Typeahead Component', function() {
       });
     });
 
+    context('searchOptions', function() {
+      it('maps correctly when specified with map function', function() {
+        var createObject = function(o) {
+          return { len: o.length, orig: o };
+        };
+
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          searchOptions={ function(inp, opts) { return opts.map(createObject); } }
+          displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
+          inputDisplayOption={ function(o, i) { return o.orig; } }
+        />);
+
+        var results = simulateTextInput(component, 'john');
+        assert.equal(ReactDOM.findDOMNode(results[0]).textContent, 'Score: 4 John');
+      });
+
+      it('can sort displayed items when specified with map function wrapped with sort', function() {
+        var createObject = function(o) {
+          return { len: o.length, orig: o };
+        };
+
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          searchOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
+          displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
+          inputDisplayOption={ function(o, i) { return o.orig; } }
+        />);
+
+        var results = simulateTextInput(component, 'john');
+        assert.equal(ReactDOM.findDOMNode(results[0]).textContent, 'Score: 6 George');
+      });
+    });
+
+    context('inputDisplayOption', function() {
+      it('displays a different value in input field and in list display', function() {
+        var createObject = function(o) {
+          return { len: o.length, orig: o };
+        };
+
+        var component = TestUtils.renderIntoDocument(<Typeahead
+          options={ BEATLES }
+          searchOptions={ function(inp, opts) { return opts.map(function(o) { return o; }).sort().map(createObject); } }
+          displayOption={ function(o, i) { return 'Score: ' + o.len + ' ' + o.orig; } }
+          inputDisplayOption={ function(o, i) { return o.orig; } }
+        />);
+
+        var results = simulateTextInput(component, 'john');
+        var node = component.refs.entry;
+        TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
+
+        assert.equal(node.value, 'George');
+      });
+    });
+
     context('allowCustomValues', function() {
 
       beforeEach(function() {

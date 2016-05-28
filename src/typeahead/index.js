@@ -36,7 +36,12 @@ var Typeahead = React.createClass({
       React.PropTypes.string,
       React.PropTypes.func
     ]),
+    searchOptions: React.PropTypes.func,
     displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
+    ]),
+    inputDisplayOption: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.func
     ]),
@@ -71,6 +76,8 @@ var Typeahead = React.createClass({
       onFocus: function(event) {},
       onBlur: function(event) {},
       filterOption: null,
+      searchOptions: null,
+      inputDisplayOption: null,
       defaultClassNames: true,
       customListComponent: TypeaheadSelector,
       showOptionsWhenEmpty: false,
@@ -110,8 +117,8 @@ var Typeahead = React.createClass({
   getOptionsForValue: function(value, options) {
     if (this._shouldSkipSearch(value)) { return []; }
 
-    var filterOptions = this._generateFilterFunction();
-    return filterOptions(value, options);
+    var searchOptions = this._generateSearchFunction();
+    return result = searchOptions(value, options);
   },
 
   setEntryText: function(value) {
@@ -181,7 +188,7 @@ var Typeahead = React.createClass({
     var nEntry = this.refs.entry;
     nEntry.focus();
 
-    var displayOption = Accessor.generateOptionToStringFor(this.props.displayOption);
+    var displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
     var optionString = displayOption(option, 0);
 
     var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
@@ -366,9 +373,15 @@ var Typeahead = React.createClass({
     );
   },
 
-  _generateFilterFunction: function() {
+  _generateSearchFunction: function() {
+    var searchOptionsProp = this.props.searchOptions;
     var filterOptionProp = this.props.filterOption;
-    if (typeof filterOptionProp === 'function') {
+    if (typeof searchOptionsProp === 'function') {
+      if (filterOptionProp !== null) {
+        console.warn('searchOptions prop is being used, filterOption prop will be ignored');
+      }
+      return searchOptionsProp;
+    } else if (typeof filterOptionProp === 'function') {
       return function(value, options) {
         return options.filter(function(o) { return filterOptionProp(value, o); });
       };
