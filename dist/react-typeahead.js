@@ -609,7 +609,10 @@ var Typeahead = React.createClass({
 
       // Keep track of the focus state of the input element, to determine
       // whether to show options when empty (if showOptionsWhenEmpty is true)
-      isFocused: false
+      isFocused: false,
+
+      // true when focused, false onOptionSelected
+      showResults: false
     };
   },
 
@@ -628,7 +631,7 @@ var Typeahead = React.createClass({
     }
 
     var searchOptions = this._generateSearchFunction();
-    return result = searchOptions(value, options);
+    return searchOptions(value, options);
   },
 
   setEntryText: function (value) {
@@ -703,7 +706,8 @@ var Typeahead = React.createClass({
     nEntry.value = optionString;
     this.setState({ searchResults: this.getOptionsForValue(optionString, this.props.options),
       selection: formInputOptionString,
-      entryValue: optionString });
+      entryValue: optionString,
+      showResults: false });
     return this.props.onOptionSelected(option, event);
   },
 
@@ -842,12 +846,12 @@ var Typeahead = React.createClass({
         onFocus: this._onFocus,
         onBlur: this._onBlur
       })),
-      this._renderIncrementalSearchResults()
+      this.state.showResults && this._renderIncrementalSearchResults()
     );
   },
 
   _onFocus: function (event) {
-    this.setState({ isFocused: true }, function () {
+    this.setState({ isFocused: true, showResults: true }, function () {
       this._onTextEntryUpdated();
     }.bind(this));
     if (this.props.onFocus) {
