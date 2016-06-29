@@ -160,9 +160,12 @@ var Typeahead = React.createClass({
       return "";
     }
 
+    var _this = this;
+    var selRef = function(c){ _this.sel = c};
+
     return (
       <this.props.customListComponent
-        ref={function(c){this._sel = c}} options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
+        ref={selRef} options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
         areResultsTruncated={this.props.maxVisible && this.state.searchResults.length > this.props.maxVisible}
         resultsTruncatedMessage={this.props.resultsTruncatedMessage}
         onOptionSelected={this._onOptionSelected}
@@ -324,11 +327,14 @@ var Typeahead = React.createClass({
     var classList = classNames(classes);
 
     var InputElement = this.props.textarea ? 'textarea' : 'input';
+
+    var _this = this;
+    var entryRef = function(c) { _this._entry = c};
     return (
       <div className={classList}>
         { this._renderHiddenInput() }
         <InputElement
-          ref={function(c){this._entry = c}}
+          ref={entryRef}
           type="text"
           disabled={this.props.disabled}
           {...this.props.inputProps}
