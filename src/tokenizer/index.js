@@ -190,7 +190,7 @@ var TypeaheadTokenizer = React.createClass({
     return (
       <div className={tokenizerClassList}>
         { this._renderTokens() }
-        <Typeahead ref={c => this._typeahead = c}
+        <Typeahead ref={function(c){this._typeahead = c}}
           className={classList}
           placeholder={this.props.placeholder}
           disabled={this.props.disabled}
