@@ -98,7 +98,7 @@ var TypeaheadTokenizer = React.createClass({
   },
 
   focus: function(){
-    this.refs.typeahead.focus();
+    this._typeahead.focus();
   },
 
   getSelectedTokens: function(){
@@ -148,7 +148,7 @@ var TypeaheadTokenizer = React.createClass({
 
     // Remove token ONLY when bksp pressed at beginning of line
     // without a selection
-    var entry = this.refs.typeahead.refs.entry;
+    var entry = this._typeahead._entry;
     if (entry.selectionStart == entry.selectionEnd &&
         entry.selectionStart == 0) {
       this._removeTokenForValue(
@@ -175,7 +175,7 @@ var TypeaheadTokenizer = React.createClass({
     }
     this.state.selected.push(value);
     this.setState({selected: this.state.selected});
-    this.refs.typeahead.setEntryText("");
+    this._typeahead.setEntryText("");
     this.props.onTokenAdd(value);
   },
 
@@ -190,7 +190,7 @@ var TypeaheadTokenizer = React.createClass({
     return (
       <div className={tokenizerClassList}>
         { this._renderTokens() }
-        <Typeahead ref="typeahead"
+        <Typeahead ref={c => this._typeahead = c}
           className={classList}
           placeholder={this.props.placeholder}
           disabled={this.props.disabled}
