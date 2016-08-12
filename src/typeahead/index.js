@@ -308,7 +308,7 @@ var Typeahead = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     var searchResults = this.getOptionsForValue(this.state.entryValue, nextProps.options);
-    var showResults = searchResults.length;
+    var showResults = Boolean(searchResults.length);
     this.setState({
       searchResults: searchResults,
       showResults: showResults
@@ -343,7 +343,7 @@ var Typeahead = React.createClass({
           onFocus={this._onFocus}
           onBlur={this._onBlur}
         />
-        { Boolean(this.state.showResults) && this._renderIncrementalSearchResults() }
+        { this.state.showResults && this._renderIncrementalSearchResults() }
       </div>
     );
   },
