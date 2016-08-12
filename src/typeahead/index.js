@@ -343,7 +343,7 @@ var Typeahead = React.createClass({
           onFocus={this._onFocus}
           onBlur={this._onBlur}
         />
-        { this.state.showResults && this._renderIncrementalSearchResults() }
+        { Boolean(this.state.showResults) && this._renderIncrementalSearchResults() }
       </div>
     );
   },
