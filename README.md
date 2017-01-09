@@ -220,7 +220,7 @@ If true, options will still be rendered when there is no value.
 
 Type: `boolean`
 
-If true, tags custom tags can be added without a matching typeahead selection
+If true, custom tags can be added without a matching typeahead selection
 
 ### Typeahead ([Exposed Component Functions][reactecf])
 
