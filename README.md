@@ -258,7 +258,7 @@ The name for HTML forms to be used for submitting the tokens' values array.
 #### props.customClasses
 
 Type: `Object`
-Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`, `typeahead`, `resultsTruncated`
+Allowed Keys: `input`, `results`, `listItem`, `listAnchor`, `hover`, `typeahead`, `resultsTruncated`, `token`
 
 An object containing custom class names for child elements. Useful for
 integrating with 3rd party UI kits.
