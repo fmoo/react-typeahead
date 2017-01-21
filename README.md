@@ -329,7 +329,7 @@ Event handler triggered whenever a token is removed.
 Type: `Function`
 Params: `(addedToken)`
 
-Event handler triggered whenever a token is removed.
+Event handler triggered whenever a token is added.
 
 #### props.displayOption
 
