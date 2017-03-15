@@ -201,6 +201,7 @@ var Typeahead = React.createClass({
     this.setState({searchResults: this.getOptionsForValue(optionString, this.props.options),
                    selection: formInputOptionString,
                    entryValue: optionString,
+                   selectionIndex: null,
                    showResults: false});
     return this.props.onOptionSelected(option, event);
   },
