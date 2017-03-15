@@ -205,10 +205,11 @@ var Typeahead = React.createClass({
     return this.props.onOptionSelected(option, event);
   },
 
-  _onTextEntryUpdated: function() {
+  _onTextEntryUpdated: function(resetSelection = true) {
     var value = this.refs.entry.value;
+
     this.setState({searchResults: this.getOptionsForValue(value, this.props.options),
-                   selection: '',
+                   selection: resetSelection ? '' : this.state.selection,
                    entryValue: value});
   },
 
@@ -340,14 +341,14 @@ var Typeahead = React.createClass({
           onFocus={this._onFocus}
           onBlur={this._onBlur}
         />
-        { this.state.showResults && this._renderIncrementalSearchResults() }
+        { this._renderIncrementalSearchResults() }
       </div>
     );
   },
 
   _onFocus: function(event) {
     this.setState({isFocused: true, showResults: true}, function () {
-      this._onTextEntryUpdated();
+      this._onTextEntryUpdated(false);
     }.bind(this));
     if ( this.props.onFocus ) {
       return this.props.onFocus(event);
@@ -356,7 +357,7 @@ var Typeahead = React.createClass({
 
   _onBlur: function(event) {
     this.setState({isFocused: false}, function () {
-      this._onTextEntryUpdated();
+      this._onTextEntryUpdated(false);
     }.bind(this));
     if ( this.props.onBlur ) {
       return this.props.onBlur(event);
