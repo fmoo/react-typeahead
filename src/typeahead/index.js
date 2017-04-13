@@ -307,9 +307,16 @@ var Typeahead = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      searchResults: this.getOptionsForValue(this.state.entryValue, nextProps.options)
-    });
+    if (this.state.entryValue !== nextProps.value) {
+      this.setState({
+        entryValue: nextProps.value,
+        searchResults: this.getOptionsForValue(nextProps.value, nextProps.options)
+      });
+    } else {
+      this.setState({
+        searchResults: this.getOptionsForValue(this.state.entryValue, nextProps.options)
+      });
+    }
   },
 
   render: function() {
