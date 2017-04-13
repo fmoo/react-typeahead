@@ -125,12 +125,12 @@ var Typeahead = React.createClass({
   },
 
   setEntryText: function(value) {
-    this.refs.entry.value = value;
+    this._entry.value = value;
     this._onTextEntryUpdated();
   },
 
   focus: function(){
-    this.refs.entry.focus()
+    this._entry.focus()
   },
 
   _hasCustomValue: function() {
@@ -160,9 +160,12 @@ var Typeahead = React.createClass({
       return "";
     }
 
+    var _this = this;
+    var selRef = function(c){ _this.sel = c};
+
     return (
       <this.props.customListComponent
-        ref="sel" options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
+        ref={selRef} options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
         areResultsTruncated={this.props.maxVisible && this.state.searchResults.length > this.props.maxVisible}
         resultsTruncatedMessage={this.props.resultsTruncatedMessage}
         onOptionSelected={this._onOptionSelected}
@@ -188,7 +191,7 @@ var Typeahead = React.createClass({
   },
 
   _onOptionSelected: function(option, event) {
-    var nEntry = this.refs.entry;
+    var nEntry = this._entry;
     nEntry.focus();
 
     var displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
@@ -206,7 +209,7 @@ var Typeahead = React.createClass({
   },
 
   _onTextEntryUpdated: function() {
-    var value = this.refs.entry.value;
+    var value = this._entry.value;
     this.setState({searchResults: this.getOptionsForValue(value, this.props.options),
                    selection: '',
                    entryValue: value});
@@ -324,10 +327,15 @@ var Typeahead = React.createClass({
     var classList = classNames(classes);
 
     var InputElement = this.props.textarea ? 'textarea' : 'input';
+
+    var _this = this;
+    var entryRef = function(c) { _this._entry = c};
     return (
       <div className={classList}>
         { this._renderHiddenInput() }
-        <InputElement ref="entry" type="text"
+        <InputElement
+          ref={entryRef}
+          type="text"
           disabled={this.props.disabled}
           {...this.props.inputProps}
           placeholder={this.props.placeholder}
