@@ -32,8 +32,12 @@
     "url": "https://github.com/fmoo/react-typeahead.git"
   },
   "dependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.24.1",
+    "babel-loader": "^7.0.0",
     "classnames": "^1.2.0",
-    "fuzzy": "^0.1.0"
+    "fuzzy": "^0.1.0",
+    "webpack": "^2.4.1"
   },
   "peerDependencies": {
     "react": ">= 0.14"

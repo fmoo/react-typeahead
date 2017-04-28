@@ -189,8 +189,8 @@ var Typeahead = React.createClass({
 
   _onOptionSelected: function(option, event) {
     var nEntry = this.refs.entry;
-    nEntry.focus();
-
+    //nEntry.focus();
+    nEntry.blur();
     var displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
     var optionString = displayOption(option, 0);
 
@@ -215,6 +215,7 @@ var Typeahead = React.createClass({
   _onEnter: function(event) {
     var selection = this.getSelection();
     if (!selection) {
+      this.refs.entry.blur();
       return this.props.onKeyDown(event);
     }
     return this._onOptionSelected(selection, event);
@@ -291,7 +292,9 @@ var Typeahead = React.createClass({
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler.
     // Also skip if the user is pressing the shift key, since none of our handlers are looking for shift
-    if (!this._hasHint() || event.shiftKey) {
+
+    //if (!this._hasHint() || event.shiftKey) {
+    if(event.shiftKey) {
       return this.props.onKeyDown(event);
     }
 
