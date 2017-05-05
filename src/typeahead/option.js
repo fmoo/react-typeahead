@@ -35,7 +35,7 @@ var TypeaheadOption = React.createClass({
 
     return (
       <li className={classList} onClick={this._onClick} onMouseDown={this._onClick}>
-        <a href="javascript: void 0;" className={this._getClasses()}>
+        <a href="javascript: void 0;" className={this._getClasses()} title={this.props.children}>
           { this.props.children }
         </a>
       </li>
