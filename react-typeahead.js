@@ -653,7 +653,7 @@ var TypeaheadOption = React.createClass({
       { className: classList, onClick: this._onClick, onMouseDown: this._onClick },
       React.createElement(
         'a',
-        { href: 'javascript: void 0;', className: this._getClasses() },
+        { href: 'javascript: void 0;', className: this._getClasses(), title: this.props.children },
         this.props.children
       )
     );
@@ -734,7 +734,7 @@ var TypeaheadSelector = React.createClass({
       customValueOffset++;
       customValue = React.createElement(
         TypeaheadOption,
-        { key: this.props.customValue,
+        { ref: this.props.customValue, key: this.props.customValue,
           hover: this.props.selectionIndex === 0,
           customClasses: this.props.customClasses,
           customValue: this.props.customValue,
@@ -748,7 +748,7 @@ var TypeaheadSelector = React.createClass({
       var uniqueKey = displayString + '_' + i;
       return React.createElement(
         TypeaheadOption,
-        { key: uniqueKey,
+        { ref: uniqueKey, key: uniqueKey,
           hover: this.props.selectionIndex === i + customValueOffset,
           customClasses: this.props.customClasses,
           onClick: this._onClick.bind(this, result) },
