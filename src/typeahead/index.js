@@ -222,6 +222,7 @@ var Typeahead = React.createClass({
   },
 
   _onEscape: function() {
+    this.refs.entry.blur();
     this.setState({
       selectionIndex: null,
       isFocused: false
