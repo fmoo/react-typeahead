@@ -348,7 +348,8 @@ var Typeahead = React.createClass({
 
   _onEscape: function () {
     this.setState({
-      selectionIndex: null
+      selectionIndex: null,
+      isFocused: false
     });
   },
 
