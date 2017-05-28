@@ -33,8 +33,11 @@ var TypeaheadOption = React.createClass({
 
     var classList = classNames(classes);
 
+    // For some reason onClick is not fired when clicked on an option
+    // onMouseDown is used here as a workaround of #205 and other
+    // related tickets
     return (
-      <li className={classList} onClick={this._onClick}>
+      <li className={classList} onClick={this._onClick} onMouseDown={this._onClick}>
         <a href="javascript: void 0;" className={this._getClasses()} ref="anchor">
           { this.props.children }
         </a>

@@ -138,6 +138,27 @@ describe('Typeahead Component', function() {
       });
     });
 
+    describe('mouse controls', function() {
+      // as of React 15.5.4 this does not work
+      xit('mouse click selects an option (click event)', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var secondItem = ReactDOM.findDOMNode(results[1]);
+        var secondItemValue = secondItem.innerText;
+        var node = this.component.refs.entry;
+        TestUtils.Simulate.click(secondItem);
+        assert.equal(node.value, secondItemValue);
+      });
+      // but this one works
+      it('mouse click selects an option (mouseDown event)', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var secondItem = ReactDOM.findDOMNode(results[1]);
+        var secondItemValue = secondItem.innerText;
+        var node = this.component.refs.entry;
+        TestUtils.Simulate.mouseDown(secondItem);
+        assert.equal(node.value, secondItemValue);
+      });
+    });
+
     describe('component functions', function() {
       beforeEach(function() {
         this.sinon = sinon.sandbox.create();
