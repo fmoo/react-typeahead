@@ -14,6 +14,7 @@ For a typeahead input:
 
 ```javascript
 import { Typeahead } from 'react-typeahead';
+
 React.render(
   <Typeahead
     options={['John', 'Paul', 'George', 'Ringo']}
@@ -26,6 +27,7 @@ For a tokenizer typeahead input:
 
 ```javascript
 import { Tokenizer } from 'react-typeahead';
+
 React.render(
   <Tokenizer
     options={['John', 'Paul', 'George', 'Ringo']}
@@ -33,19 +35,6 @@ React.render(
   />
 );
 ```
-
-## Examples
-
-* [Basic Typeahead with Topcoat][1]
-* [Typeahead Tokenizer with Topcoat][2]
-* [Typeahead Tokenizer with simple styling][3]
-
-![](https://i.cloudup.com/CeLPJjWvFK.gif)
-
-[1]: http://wookiehangover.github.com/react-typeahead/examples/typeahead-topcoat.html
-[2]: http://wookiehangover.github.com/react-typeahead/examples/tokenizer-topcoat.html
-[3]: http://wookiehangover.github.com/react-typeahead/examples/TypeaheadTokenizer-simple.html
-[4]: http://blog.npmjs.org/post/85484771375/how-to-install-npm
 
 ## API
 
@@ -412,17 +401,8 @@ A function to return the currently selected tokens.
 You will need `npm` to develop on react-typeahead.  [Installing npm][4].
 
 Once that's done, to get started, run `npm install` in your checkout directory.
+Use `npm run build` to generate the dist file.
 
 ### Contributing
 
-Basically, fork the repository and send a pull request.  It can be difficult to review these, so
-here are some general rules to follow for getting your PR accepted more quickly:
-
-- All new properties and exposed component function should be documented in the README.md
-- Break your changes into smaller, easy to understand commits.
-- Send separate PRs for each commit when possible.
-- Feel free to rebase, merge, and rewrite commits to make them more readible.
-- Add comments explaining anything that's not painfully obvious.
-- Add unittests for your change if possible.
-
-[reactecf]: https://facebook.github.io/react/tips/expose-component-functions.html
+Fork the repository and send a pull request!
