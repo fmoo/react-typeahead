@@ -3,4 +3,3 @@ node_modules
 .*.swo
 .*.swn
 npm-debug.log
-dist/*
