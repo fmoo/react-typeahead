@@ -154,6 +154,8 @@ class TypeaheadTokenizer extends Component {
       selected: this.state.selected
     });
     this.typeahead.setEntryText('');
+    this.typeahead.entry.blur();
+    this.typeahead.entry.focus();
     this.props.onTokenAdd(value);
   }
 

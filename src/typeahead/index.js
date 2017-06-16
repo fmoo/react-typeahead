@@ -169,6 +169,7 @@ class Typeahead extends Component {
       showResults: false
     });
 
+    nEntry.blur();
     return this.props.onOptionSelected(option, event);
   }
 
