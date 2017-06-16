@@ -9,7 +9,7 @@
     "autocomplete",
     "react-component"
   ],
-  "main": "./dist/react-typeahead.js",
+  "main": "dist/react-typeahead.js",
   "homepage": "https://github.com/lemonjs/react-typeahead",
   "bugs": {
     "url": "https://github.com/lemonjs/react-typeahead/issues",
