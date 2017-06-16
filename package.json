@@ -35,7 +35,6 @@
     "babel-preset-stage-0": "^6.24.1",
     "classnames": "^1.2.0",
     "fuzzy": "^0.1.0",
-    "lodash": "^2.4.1",
     "react": "^15.6.1",
     "webpack": "^2.6.1"
   },
