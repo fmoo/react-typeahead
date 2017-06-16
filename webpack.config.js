@@ -9,13 +9,6 @@ module.exports = (ARGS = {}) => {
 	const PATH_ROOT = pathJoin(__dirname);
 	const PATH_APP_ENTRY = pathJoin(PATH_ROOT, 'src');
 	const PATH_OUTPUT = pathJoin(PATH_ROOT, 'dist');
-
-	const envPlugins = [
-    new wpUglifyJsPlugin({
-      compress: {warnings: false, unused: true, dead_code: true},
-      output: {comments: false}
-    })
-  ];
   
 	return Object.assign({}, {
 		entry: {
@@ -41,15 +34,26 @@ module.exports = (ARGS = {}) => {
 				},
 			],
 		},
-		resolve: {
-			extensions: ['.js'],
-			modules: ['node_modules', PATH_ROOT],
-		},
-		plugins: envPlugins.concat([
-			new wpLoaderOptionsPlugin({ debug: false, minimize: false }),
+		plugins: [
+			new wpLoaderOptionsPlugin({ 
+				debug: false, 
+				minimize: false 
+			}),
 			new wpDefinePlugin({
-				'process.env': { NODE_ENV: 'production' },
+				'process.env': { 
+					NODE_ENV: JSON.stringify('production')
+				},
+			}),
+			new wpUglifyJsPlugin({
+				compress: {
+					warnings: false, 
+					unused: true, 
+					dead_code: true
+				},
+				output: {
+					comments: false
+				}
 			})
-		]),
+		],
 	});
 };
