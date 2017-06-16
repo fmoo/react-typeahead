@@ -14,48 +14,45 @@ import fuzzy from 'fuzzy';
  */
 
 class Typeahead extends Component {
-  constructor(props) {
-    super(props);
+
+  static defaultProps = {
+    options: [],
+    customClasses: {},
+    allowCustomValues: 0,
+    initialValue: '',
+    value: '',
+    placeholder: '',
+    disabled: false,
+    textarea: false,
+    inputProps: {},
+    onOptionSelected: (option) => {},
+    onChange: (event) => {},
+    onKeyDown: (event) => {},
+    onKeyPress: (event) => {},
+    onKeyUp: (event) => {},
+    onFocus: (event) => {},
+    onBlur: (event) => {},
+    filterOption: null,
+    searchOptions: null,
+    inputDisplayOption: null,
+    defaultClassNames: true,
+    customListComponent: TypeaheadSelector,
+    showOptionsWhenEmpty: false,
+    resultsTruncatedMessage: null
   }
 
-  getDefaultProps() {
-    return {
-      options: [],
-      customClasses: {},
-      allowCustomValues: 0,
-      initialValue: "",
-      value: "",
-      placeholder: "",
-      disabled: false,
-      textarea: false,
-      inputProps: {},
-      onOptionSelected: function(option) {},
-      onChange: function(event) {},
-      onKeyDown: function(event) {},
-      onKeyPress: function(event) {},
-      onKeyUp: function(event) {},
-      onFocus: function(event) {},
-      onBlur: function(event) {},
-      filterOption: null,
-      searchOptions: null,
-      inputDisplayOption: null,
-      defaultClassNames: true,
-      customListComponent: TypeaheadSelector,
-      showOptionsWhenEmpty: false,
-      resultsTruncatedMessage: null
-    };
-  }
+  constructor(props, defaultProps) {
+    super(props, defaultProps);
 
-  getInitialState() {
-    return {
+    this.state = {
       // The options matching the entry value
-      searchResults: this.getOptionsForValue(this.props.initialValue, this.props.options),
+      searchResults: this.getOptionsForValue(props.initialValue, props.options),
 
       // This should be called something else, "entryValue"
-      entryValue: this.props.value || this.props.initialValue,
+      entryValue: props.value || props.initialValue,
 
       // A valid typeahead value
-      selection: this.props.value,
+      selection: props.value,
 
       // Index of the selection
       selectionIndex: null,
@@ -66,7 +63,7 @@ class Typeahead extends Component {
 
       // true when focused, false onOptionSelected
       showResults: false
-    };
+    }
   }
 
   _shouldSkipSearch(input) {
@@ -87,12 +84,12 @@ class Typeahead extends Component {
   }
 
   setEntryText(value) {
-    this.refs.entry.value = value;
+    this.entry.value = value;
     this._onTextEntryUpdated();
   }
 
   focus(){
-    this.refs.entry.focus()
+    this.entry.focus()
   }
 
   _hasCustomValue() {
@@ -125,7 +122,8 @@ class Typeahead extends Component {
 
     return (
       <this.props.customListComponent
-        ref="sel" options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
+        ref={sel => this.sel = sel}
+        options={this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible) : this.state.searchResults}
         areResultsTruncated={this.props.maxVisible && this.state.searchResults.length > this.props.maxVisible}
         resultsTruncatedMessage={this.props.resultsTruncatedMessage}
         onOptionSelected={this._onOptionSelected}
@@ -152,8 +150,8 @@ class Typeahead extends Component {
     return this.state.searchResults[index];
   }
 
-  _onOptionSelected(option, event) {
-    const nEntry = this.refs.entry;
+  _onOptionSelected = (option, event) => {
+    const nEntry = this.entry;
     nEntry.focus();
 
     const displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
@@ -174,8 +172,8 @@ class Typeahead extends Component {
     return this.props.onOptionSelected(option, event);
   }
 
-  _onTextEntryUpdated() {
-    const value = this.refs.entry.value;
+  _onTextEntryUpdated = () => {
+    const value = this.entry.value;
 
     this.setState({
       searchResults: this.getOptionsForValue(value, this.props.options),
@@ -184,7 +182,7 @@ class Typeahead extends Component {
     });
   }
 
-  _onEnter(event) {
+  _onEnter = (event) => {
     const selection = this.getSelection();
 
     if (!selection) {
@@ -194,13 +192,13 @@ class Typeahead extends Component {
     return this._onOptionSelected(selection, event);
   }
 
-  _onEscape() {
+  _onEscape = () => {
     this.setState({
       selectionIndex: null
     });
   }
 
-  _onTab(event) {
+  _onTab = (event) => {
     const selection = this.getSelection();
     let option = selection 
       ? selection 
@@ -250,15 +248,15 @@ class Typeahead extends Component {
     });
   }
 
-  navDown() {
+  navDown = () => {
     this._nav(1);
   }
 
-  navUp() {
+  navUp = () => {
     this._nav(-1);
   }
 
-  _onChange(event) {
+  _onChange = (event) => {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
@@ -266,7 +264,7 @@ class Typeahead extends Component {
     this._onTextEntryUpdated();
   }
 
-  _onKeyDown(event) {
+  _onKeyDown = (event) => {
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler.
     // Also skip if the user is pressing the shift key, since none of our handlers are looking for shift
@@ -291,41 +289,7 @@ class Typeahead extends Component {
     });
   }
 
-  render() {
-    let inputClasses = {};
-    inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
-    const inputClassList = classNames(inputClasses);
-
-    let classes = {
-      typeahead: this.props.defaultClassNames
-    };
-    classes[this.props.className] = !!this.props.className;
-    const classList = classNames(classes);
-
-    const InputElement = this.props.textarea ? 'textarea' : 'input';
-
-    return (
-      <div className={classList}>
-        { this._renderHiddenInput() }
-        <InputElement ref="entry" type="text"
-          disabled={this.props.disabled}
-          {...this.props.inputProps}
-          placeholder={this.props.placeholder}
-          className={inputClassList}
-          value={this.state.entryValue}
-          onChange={this._onChange}
-          onKeyDown={this._onKeyDown}
-          onKeyPress={this.props.onKeyPress}
-          onKeyUp={this.props.onKeyUp}
-          onFocus={this._onFocus}
-          onBlur={this._onBlur}
-        />
-        { this.state.showResults && this._renderIncrementalSearchResults() }
-      </div>
-    );
-  }
-
-  _onFocus(event) {
+  _onFocus = (event) => {
     this.setState({
       isFocused: true, 
       showResults: true
@@ -336,7 +300,7 @@ class Typeahead extends Component {
     }
   }
 
-  _onBlur(event) {
+  _onBlur = (event) => {
     this.setState({
       isFocused: false
     }, () => this._onTextEntryUpdated());
@@ -384,6 +348,42 @@ class Typeahead extends Component {
 
   _hasHint() {
     return this.state.searchResults.length > 0 || this._hasCustomValue();
+  }
+
+  render() {
+    let inputClasses = {};
+    inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
+    const inputClassList = classNames(inputClasses);
+
+    let classes = {
+      typeahead: this.props.defaultClassNames
+    };
+    classes[this.props.className] = !!this.props.className;
+    const classList = classNames(classes);
+
+    const InputElement = this.props.textarea ? 'textarea' : 'input';
+
+    return (
+      <div className={classList}>
+        { this._renderHiddenInput() }
+        <InputElement 
+          ref={entry => this.entry = entry}
+          type="text"
+          disabled={this.props.disabled}
+          {...this.props.inputProps}
+          placeholder={this.props.placeholder}
+          className={inputClassList}
+          value={this.state.entryValue}
+          onChange={this._onChange}
+          onKeyDown={this._onKeyDown}
+          onKeyPress={this.props.onKeyPress}
+          onKeyUp={this.props.onKeyUp}
+          onFocus={this._onFocus}
+          onBlur={this._onBlur}
+        />
+        { this.state.showResults && this._renderIncrementalSearchResults() }
+      </div>
+    );
   }
 }
 

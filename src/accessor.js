@@ -4,7 +4,7 @@ export default {
 
   generateAccessor: field => object => object[field],
 
-  generateOptionToStringFor: prop => {
+  generateOptionToStringFor: function(prop) {
     if (typeof prop === 'string') {
       return this.generateAccessor(prop);
     } else if (typeof prop === 'function') {
@@ -14,7 +14,7 @@ export default {
     }
   },
 
-  valueForOption: (option, object) => {
+  valueForOption: function(option, object) {
     if (typeof option === 'string') {
       return object[option];
     } else if (typeof option === 'function') {

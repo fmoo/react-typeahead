@@ -11,6 +11,7 @@ module.exports = (ARGS = {}) => {
 	const PATH_OUTPUT = pathJoin(PATH_ROOT, 'dist');
   
 	return Object.assign({}, {
+		devtool: 'cheap-module-eval-source-map',
 		entry: {
 			app: [PATH_APP_ENTRY],
 		},

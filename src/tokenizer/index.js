@@ -23,26 +23,14 @@ const _arraysAreDifferent = (array1, array2) => {
  * by pressing backspace on the beginning of the line with the keyboard.
  */
 class TypeaheadTokenizer extends Component {
-  constructor(props) {
-    super(props);
-  }
 
-  getInitialState() {
-    return {
-      // We need to copy this to avoid incorrect sharing
-      // of state across instances (e.g., via getDefaultProps())
-      selected: this.props.defaultSelected.slice(0)
-    };
-  }
-
-  getDefaultProps() {
-    return {
+  static defaultProps = {
       options: [],
       defaultSelected: [],
       customClasses: {},
       allowCustomValues: 0,
-      initialValue: "",
-      placeholder: "",
+      initialValue: '',
+      placeholder: '',
       disabled: false,
       inputProps: {},
       defaultClassNames: true,
@@ -50,14 +38,23 @@ class TypeaheadTokenizer extends Component {
       searchOptions: null,
       displayOption: (token) => token,
       formInputOption: null,
-      onKeyDown: function(event) {},
-      onKeyPress: function(event) {},
-      onKeyUp: function(event) {},
-      onFocus: function(event) {},
-      onBlur: function(event) {},
-      onTokenAdd: function() {},
-      onTokenRemove: function() {}
-    };
+      onKeyDown: (event) => {},
+      onKeyPress: (event) => {},
+      onKeyUp: (event) => {},
+      onFocus: (event) => {},
+      onBlur: (event) => {},
+      onTokenAdd: () => {},
+      onTokenRemove: () => {}
+  }
+
+  constructor(props, defaultProps) {
+    super(props, defaultProps);
+
+    this.state = {
+      // We need to copy this to avoid incorrect sharing
+      // of state across instances (e.g., via getDefaultProps())
+      selected: props.defaultSelected.slice(0)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -70,7 +67,7 @@ class TypeaheadTokenizer extends Component {
   }
 
   focus() {
-    this.refs.typeahead.focus();
+    this.typeahead.focus();
   }
 
   getSelectedTokens() {
@@ -90,7 +87,9 @@ class TypeaheadTokenizer extends Component {
       const value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
 
       return (
-        <Token key={displayString} className={classList}
+        <Token 
+          key={displayString} 
+          className={classList}
           onRemove={this._removeTokenForValue}
           object={selected}
           value={value}
@@ -106,7 +105,7 @@ class TypeaheadTokenizer extends Component {
     return this.props.options;
   }
 
-  _onKeyDown(event) {
+  _onKeyDown = (event) => {
     // We only care about intercepting backspaces
     if (event.keyCode === KeyEvent.DOM_VK_BACK_SPACE) {
       return this._handleBackspace(event);
@@ -115,7 +114,7 @@ class TypeaheadTokenizer extends Component {
     this.props.onKeyDown(event);
   }
 
-  _handleBackspace(event) {
+  _handleBackspace = (event) => {
     // No tokens
     if (!this.state.selected.length) {
       return;
@@ -123,7 +122,7 @@ class TypeaheadTokenizer extends Component {
 
     // Remove token ONLY when bksp pressed at beginning of line
     // without a selection
-    const entry = this.refs.typeahead.refs.entry;
+    const entry = this.typeahead.entry;
 
     if (entry.selectionStart == entry.selectionEnd && entry.selectionStart == 0) {
       this._removeTokenForValue(this.state.selected[this.state.selected.length - 1]);
@@ -145,7 +144,7 @@ class TypeaheadTokenizer extends Component {
     return;
   }
 
-  _addTokenForValue(value) {
+  _addTokenForValue = (value) => {
     if (this.state.selected.indexOf(value) != -1) {
       return;
     }
@@ -154,7 +153,7 @@ class TypeaheadTokenizer extends Component {
     this.setState({
       selected: this.state.selected
     });
-    this.refs.typeahead.setEntryText('');
+    this.typeahead.setEntryText('');
     this.props.onTokenAdd(value);
   }
 
@@ -171,7 +170,8 @@ class TypeaheadTokenizer extends Component {
     return (
       <div className={tokenizerClassList}>
         { this._renderTokens() }
-        <Typeahead ref="typeahead"
+        <Typeahead 
+          ref={typeahead => this.typeahead = typeahead}
           className={classList}
           placeholder={this.props.placeholder}
           disabled={this.props.disabled}

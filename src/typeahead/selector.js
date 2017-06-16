@@ -13,17 +13,6 @@ class TypeaheadSelector extends Component {
     super(props);
   }
 
-  getDefaultProps() {
-    return {
-      selectionIndex: null,
-      customClasses: {},
-      allowCustomValues: 0,
-      customValue: null,
-      onOptionSelected: function(option) { },
-      defaultClassNames: true
-    };
-  }
-
    _onClick = (result, event) => {
     return this.props.onOptionSelected(result, event);
   }
@@ -43,10 +32,13 @@ class TypeaheadSelector extends Component {
     // CustomValue should be added to top of results list with different class name
     let customValue = null;
     let customValueOffset = 0;
+    
     if (this.props.customValue !== null) {
       customValueOffset++;
       customValue = (
-        <TypeaheadOption ref={this.props.customValue} key={this.props.customValue}
+        <TypeaheadOption 
+          ref={a => this[this.props.customValue] = a} 
+          key={this.props.customValue}
           hover={this.props.selectionIndex === 0}
           customClasses={this.props.customClasses}
           customValue={this.props.customValue}
@@ -60,7 +52,9 @@ class TypeaheadSelector extends Component {
       var displayString = this.props.displayOption(result, i);
       var uniqueKey = displayString + '_' + i;
       return (
-        <TypeaheadOption ref={uniqueKey} key={uniqueKey}
+        <TypeaheadOption 
+          ref={a => this[uniqueKey] = a} 
+          key={uniqueKey}
           hover={this.props.selectionIndex === i + customValueOffset}
           customClasses={this.props.customClasses}
           onClick={this._onClick.bind(this, result)}>
