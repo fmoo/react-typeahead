@@ -7,6 +7,8 @@
     "typeahead",
     "tokenizer",
     "autocomplete",
+    "es6",
+    "es2015",
     "react-component"
   ],
   "main": "dist/react-typeahead.js",
