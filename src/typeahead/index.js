@@ -202,8 +202,9 @@ class Typeahead extends Component {
 
   _onTab(event) {
     const selection = this.getSelection();
-    const option = selection ?
-      selection : (this.state.searchResults.length > 0 ? this.state.searchResults[0] : null);
+    let option = selection 
+      ? selection 
+      : (this.state.searchResults.length > 0 ? this.state.searchResults[0] : null);
 
     if (option === null && this._hasCustomValue()) {
       option = this._getCustomValue();
