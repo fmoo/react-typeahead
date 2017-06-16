@@ -2,7 +2,7 @@
 
 > A typeahead/autocomplete component for React
 
-*This is a fork of https://github.com/fmoo/react-typeahead*
+**This is a fork of https://github.com/fmoo/react-typeahead that uses ES6**
 
 react-typeahead is a javascript library that provides a react-based
 typeahead, or autocomplete text entry, as well as a "typeahead tokenizer",
