@@ -1,11 +1,12 @@
-var Accessor = require('../accessor');
-var React = require('react');
-var Token = require('./token');
-var KeyEvent = require('../keyevent');
-var Typeahead = require('../typeahead');
-var classNames = require('classnames');
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import Accessor from '../accessor';
+import Token from './token';
+import KeyEvent from '../keyevent';
+import Typeahead from '../typeahead';
+import classNames from 'classnames';
 
-function _arraysAreDifferent(array1, array2) {
+const _arraysAreDifferent = (array1, array2) => {
   if (array1.length != array2.length){
     return true;
   }
@@ -21,51 +22,20 @@ function _arraysAreDifferent(array1, array2) {
  * the text entry widget, prepends a renderable "token", that may be deleted
  * by pressing backspace on the beginning of the line with the keyboard.
  */
-var TypeaheadTokenizer = React.createClass({
-  propTypes: {
-    name: React.PropTypes.string,
-    options: React.PropTypes.array,
-    customClasses: React.PropTypes.object,
-    allowCustomValues: React.PropTypes.number,
-    defaultSelected: React.PropTypes.array,
-    initialValue: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    inputProps: React.PropTypes.object,
-    onTokenRemove: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
-    onKeyPress: React.PropTypes.func,
-    onKeyUp: React.PropTypes.func,
-    onTokenAdd: React.PropTypes.func,
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    filterOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    searchOptions: React.PropTypes.func,
-    displayOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    formInputOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    maxVisible: React.PropTypes.number,
-    resultsTruncatedMessage: React.PropTypes.string,
-    defaultClassNames: React.PropTypes.bool
-  },
+class TypeaheadTokenizer extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       // We need to copy this to avoid incorrect sharing
       // of state across instances (e.g., via getDefaultProps())
       selected: this.props.defaultSelected.slice(0)
     };
-  },
+  }
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       options: [],
       defaultSelected: [],
@@ -78,7 +48,7 @@ var TypeaheadTokenizer = React.createClass({
       defaultClassNames: true,
       filterOption: null,
       searchOptions: null,
-      displayOption: function(token){ return token },
+      displayOption: (token) => token,
       formInputOption: null,
       onKeyDown: function(event) {},
       onKeyPress: function(event) {},
@@ -88,32 +58,37 @@ var TypeaheadTokenizer = React.createClass({
       onTokenAdd: function() {},
       onTokenRemove: function() {}
     };
-  },
+  }
 
-  componentWillReceiveProps: function(nextProps){
+  componentWillReceiveProps(nextProps) {
     // if we get new defaultProps, update selected
     if (_arraysAreDifferent(this.props.defaultSelected, nextProps.defaultSelected)){
-      this.setState({selected: nextProps.defaultSelected.slice(0)})
+      this.setState({
+        selected: nextProps.defaultSelected.slice(0)
+      });
     }
-  },
+  }
 
-  focus: function(){
+  focus() {
     this.refs.typeahead.focus();
-  },
+  }
 
-  getSelectedTokens: function(){
+  getSelectedTokens() {
     return this.state.selected;
-  },
+  }
 
   // TODO: Support initialized tokens
   //
-  _renderTokens: function() {
-    var tokenClasses = {};
+  _renderTokens() {
+    let tokenClasses = {};
     tokenClasses[this.props.customClasses.token] = !!this.props.customClasses.token;
-    var classList = classNames(tokenClasses);
-    var result = this.state.selected.map(function(selected) {
-      var displayString = Accessor.valueForOption(this.props.displayOption, selected);
-      var value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
+
+    const classList = classNames(tokenClasses);
+
+    return this.state.selected.map(selected => {
+      const displayString = Accessor.valueForOption(this.props.displayOption, selected);
+      const value = Accessor.valueForOption(this.props.formInputOption || this.props.displayOption, selected);
+
       return (
         <Token key={displayString} className={classList}
           onRemove={this._removeTokenForValue}
@@ -123,24 +98,24 @@ var TypeaheadTokenizer = React.createClass({
           {displayString}
         </Token>
       );
-    }, this);
-    return result;
-  },
+    });
+  }
 
-  _getOptionsForTypeahead: function() {
+  _getOptionsForTypeahead() {
     // return this.props.options without this.selected
     return this.props.options;
-  },
+  }
 
-  _onKeyDown: function(event) {
+  _onKeyDown(event) {
     // We only care about intercepting backspaces
     if (event.keyCode === KeyEvent.DOM_VK_BACK_SPACE) {
       return this._handleBackspace(event);
     }
-    this.props.onKeyDown(event);
-  },
 
-  _handleBackspace: function(event){
+    this.props.onKeyDown(event);
+  }
+
+  _handleBackspace(event) {
     // No tokens
     if (!this.state.selected.length) {
       return;
@@ -148,44 +123,50 @@ var TypeaheadTokenizer = React.createClass({
 
     // Remove token ONLY when bksp pressed at beginning of line
     // without a selection
-    var entry = this.refs.typeahead.refs.entry;
-    if (entry.selectionStart == entry.selectionEnd &&
-        entry.selectionStart == 0) {
-      this._removeTokenForValue(
-        this.state.selected[this.state.selected.length - 1]);
+    const entry = this.refs.typeahead.refs.entry;
+
+    if (entry.selectionStart == entry.selectionEnd && entry.selectionStart == 0) {
+      this._removeTokenForValue(this.state.selected[this.state.selected.length - 1]);
       event.preventDefault();
     }
-  },
+  }
 
-  _removeTokenForValue: function(value) {
+  _removeTokenForValue(value) {
     var index = this.state.selected.indexOf(value);
     if (index == -1) {
       return;
     }
 
     this.state.selected.splice(index, 1);
-    this.setState({selected: this.state.selected});
+    this.setState({
+      selected: this.state.selected
+    });
     this.props.onTokenRemove(value);
     return;
-  },
+  }
 
-  _addTokenForValue: function(value) {
+  _addTokenForValue(value) {
     if (this.state.selected.indexOf(value) != -1) {
       return;
     }
-    this.state.selected.push(value);
-    this.setState({selected: this.state.selected});
-    this.refs.typeahead.setEntryText("");
-    this.props.onTokenAdd(value);
-  },
 
-  render: function() {
-    var classes = {};
+    this.state.selected.push(value);
+    this.setState({
+      selected: this.state.selected
+    });
+    this.refs.typeahead.setEntryText('');
+    this.props.onTokenAdd(value);
+  }
+
+  render() {
+    let classes = {};
     classes[this.props.customClasses.typeahead] = !!this.props.customClasses.typeahead;
-    var classList = classNames(classes);
-    var tokenizerClasses = [this.props.defaultClassNames && "typeahead-tokenizer"];
+
+    const classList = classNames(classes);
+    let tokenizerClasses = [this.props.defaultClassNames && "typeahead-tokenizer"];
     tokenizerClasses[this.props.className] = !!this.props.className;
-    var tokenizerClassList = classNames(tokenizerClasses)
+
+    const tokenizerClassList = classNames(tokenizerClasses)
 
     return (
       <div className={tokenizerClassList}>
@@ -214,6 +195,41 @@ var TypeaheadTokenizer = React.createClass({
       </div>
     );
   }
-});
+}
 
-module.exports = TypeaheadTokenizer;
+TypeaheadTokenizer.propTypes = {
+  name: PropTypes.string,
+  options: PropTypes.array,
+  customClasses: PropTypes.object,
+  allowCustomValues: PropTypes.number,
+  defaultSelected: PropTypes.array,
+  initialValue: PropTypes.string,
+  placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
+  inputProps: PropTypes.object,
+  onTokenRemove: PropTypes.func,
+  onKeyDown: PropTypes.func,
+  onKeyPress: PropTypes.func,
+  onKeyUp: PropTypes.func,
+  onTokenAdd: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  filterOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  searchOptions: PropTypes.func,
+  displayOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  formInputOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  maxVisible: PropTypes.number,
+  resultsTruncatedMessage: PropTypes.string,
+  defaultClassNames: PropTypes.bool
+}
+
+export default TypeaheadTokenizer;

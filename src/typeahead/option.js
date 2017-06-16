@@ -1,29 +1,40 @@
-var React = require('react');
-var classNames = require('classnames');
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 /**
  * A single option within the TypeaheadSelector
  */
-var TypeaheadOption = React.createClass({
-  propTypes: {
-    customClasses: React.PropTypes.object,
-    customValue: React.PropTypes.string,
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.string,
-    hover: React.PropTypes.bool
-  },
+class TypeaheadOption extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       customClasses: {},
-      onClick: function(event) {
+      onClick: (event) => {
         event.preventDefault();
       }
     };
-  },
+  }
 
-  render: function() {
-    var classes = {};
+  _getClasses() {
+    let classes = {
+      "typeahead-option": true,
+    };
+    classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
+
+    return classNames(classes);
+  }
+
+  _onClick = event => {
+      event.preventDefault();
+      return this.props.onClick(event);
+  }
+
+  render() {
+    let classes = {};
     classes[this.props.customClasses.hover || "hover"] = !!this.props.hover;
     classes[this.props.customClasses.listItem] = !!this.props.customClasses.listItem;
 
@@ -31,7 +42,7 @@ var TypeaheadOption = React.createClass({
       classes[this.props.customClasses.customAdd] = !!this.props.customClasses.customAdd;
     }
 
-    var classList = classNames(classes);
+    const classList = classNames(classes);
 
     return (
       <li className={classList} onClick={this._onClick}>
@@ -40,22 +51,15 @@ var TypeaheadOption = React.createClass({
         </a>
       </li>
     );
-  },
-
-  _getClasses: function() {
-    var classes = {
-      "typeahead-option": true,
-    };
-    classes[this.props.customClasses.listAnchor] = !!this.props.customClasses.listAnchor;
-
-    return classNames(classes);
-  },
-
-  _onClick: function(event) {
-    event.preventDefault();
-    return this.props.onClick(event);
   }
-});
+}
 
+TypeaheadOption.propTypes = {
+  customClasses: PropTypes.object,
+  customValue: PropTypes.string,
+  onClick: PropTypes.func,
+  children: PropTypes.string,
+  hover: PropTypes.bool
+};
 
-module.exports = TypeaheadOption;
+export default TypeaheadOption;

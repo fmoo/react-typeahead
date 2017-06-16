@@ -1,9 +1,10 @@
-var Accessor = require('../accessor');
-var React = require('react');
-var TypeaheadSelector = require('./selector');
-var KeyEvent = require('../keyevent');
-var fuzzy = require('fuzzy');
-var classNames = require('classnames');
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import Accessor from '../accessor';
+import TypeaheadSelector from './selector';
+import KeyEvent from '../keyevent';
+import fuzzy from 'fuzzy';
 
 /**
  * A "typeahead", an auto-completing text input
@@ -11,53 +12,13 @@ var classNames = require('classnames');
  * Renders an text input that shows options nearby that you can use the
  * keyboard or mouse to select.  Requires CSS for MASSIVE DAMAGE.
  */
-var Typeahead = React.createClass({
-  propTypes: {
-    name: React.PropTypes.string,
-    customClasses: React.PropTypes.object,
-    maxVisible: React.PropTypes.number,
-    resultsTruncatedMessage: React.PropTypes.string,
-    options: React.PropTypes.array,
-    allowCustomValues: React.PropTypes.number,
-    initialValue: React.PropTypes.string,
-    value: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    textarea: React.PropTypes.bool,
-    inputProps: React.PropTypes.object,
-    onOptionSelected: React.PropTypes.func,
-    onChange: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
-    onKeyPress: React.PropTypes.func,
-    onKeyUp: React.PropTypes.func,
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    filterOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    searchOptions: React.PropTypes.func,
-    displayOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    inputDisplayOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    formInputOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
-    ]),
-    defaultClassNames: React.PropTypes.bool,
-    customListComponent: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.func
-    ]),
-    showOptionsWhenEmpty: React.PropTypes.bool
-  },
 
-  getDefaultProps: function() {
+class Typeahead extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  getDefaultProps() {
     return {
       options: [],
       customClasses: {},
@@ -83,9 +44,9 @@ var Typeahead = React.createClass({
       showOptionsWhenEmpty: false,
       resultsTruncatedMessage: null
     };
-  },
+  }
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       // The options matching the entry value
       searchResults: this.getOptionsForValue(this.props.initialValue, this.props.options),
@@ -106,50 +67,52 @@ var Typeahead = React.createClass({
       // true when focused, false onOptionSelected
       showResults: false
     };
-  },
+  }
 
-  _shouldSkipSearch: function(input) {
+  _shouldSkipSearch(input) {
     var emptyValue = !input || input.trim().length == 0;
 
     // this.state must be checked because it may not be defined yet if this function
     // is called from within getInitialState
     var isFocused = this.state && this.state.isFocused;
     return !(this.props.showOptionsWhenEmpty && isFocused) && emptyValue;
-  },
+  }
 
-  getOptionsForValue: function(value, options) {
+
+  getOptionsForValue(value, options) {
     if (this._shouldSkipSearch(value)) { return []; }
 
-    var searchOptions = this._generateSearchFunction();
+    const searchOptions = this._generateSearchFunction();
     return searchOptions(value, options);
-  },
+  }
 
-  setEntryText: function(value) {
+  setEntryText(value) {
     this.refs.entry.value = value;
     this._onTextEntryUpdated();
-  },
+  }
 
-  focus: function(){
+  focus(){
     this.refs.entry.focus()
-  },
+  }
 
-  _hasCustomValue: function() {
+  _hasCustomValue() {
     if (this.props.allowCustomValues > 0 &&
       this.state.entryValue.length >= this.props.allowCustomValues &&
       this.state.searchResults.indexOf(this.state.entryValue) < 0) {
       return true;
     }
-    return false;
-  },
 
-  _getCustomValue: function() {
+    return false;
+  }
+
+  _getCustomValue() {
     if (this._hasCustomValue()) {
       return this.state.entryValue;
     }
     return null;
-  },
+  }
 
-  _renderIncrementalSearchResults: function() {
+  _renderIncrementalSearchResults() {
     // Nothing has been entered into the textbox
     if (this._shouldSkipSearch(this.state.entryValue)) {
       return "";
@@ -173,10 +136,11 @@ var Typeahead = React.createClass({
         defaultClassNames={this.props.defaultClassNames}
         displayOption={Accessor.generateOptionToStringFor(this.props.displayOption)} />
     );
-  },
+  }
 
-  getSelection: function() {
-    var index = this.state.selectionIndex;
+  getSelection() {
+    let index = this.state.selectionIndex;
+
     if (this._hasCustomValue()) {
       if (index === 0) {
         return this.state.entryValue;
@@ -184,51 +148,61 @@ var Typeahead = React.createClass({
         index--;
       }
     }
-    return this.state.searchResults[index];
-  },
 
-  _onOptionSelected: function(option, event) {
-    var nEntry = this.refs.entry;
+    return this.state.searchResults[index];
+  }
+
+  _onOptionSelected(option, event) {
+    const nEntry = this.refs.entry;
     nEntry.focus();
 
-    var displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
-    var optionString = displayOption(option, 0);
+    const displayOption = Accessor.generateOptionToStringFor(this.props.inputDisplayOption || this.props.displayOption);
+    const optionString = displayOption(option, 0);
 
-    var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
-    var formInputOptionString = formInputOption(option);
+    const formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
+    const formInputOptionString = formInputOption(option);
 
     nEntry.value = optionString;
-    this.setState({searchResults: this.getOptionsForValue(optionString, this.props.options),
-                   selection: formInputOptionString,
-                   entryValue: optionString,
-                   showResults: false});
+
+    this.setState({
+      searchResults: this.getOptionsForValue(optionString, this.props.options),
+      selection: formInputOptionString,
+      entryValue: optionString,
+      showResults: false
+    });
+
     return this.props.onOptionSelected(option, event);
-  },
+  }
 
-  _onTextEntryUpdated: function() {
-    var value = this.refs.entry.value;
-    this.setState({searchResults: this.getOptionsForValue(value, this.props.options),
-                   selection: '',
-                   entryValue: value});
-  },
+  _onTextEntryUpdated() {
+    const value = this.refs.entry.value;
 
-  _onEnter: function(event) {
-    var selection = this.getSelection();
+    this.setState({
+      searchResults: this.getOptionsForValue(value, this.props.options),
+      selection: '',
+      entryValue: value
+    });
+  }
+
+  _onEnter(event) {
+    const selection = this.getSelection();
+
     if (!selection) {
       return this.props.onKeyDown(event);
     }
-    return this._onOptionSelected(selection, event);
-  },
 
-  _onEscape: function() {
+    return this._onOptionSelected(selection, event);
+  }
+
+  _onEscape() {
     this.setState({
       selectionIndex: null
     });
-  },
+  }
 
-  _onTab: function(event) {
-    var selection = this.getSelection();
-    var option = selection ?
+  _onTab(event) {
+    const selection = this.getSelection();
+    const option = selection ?
       selection : (this.state.searchResults.length > 0 ? this.state.searchResults[0] : null);
 
     if (option === null && this._hasCustomValue()) {
@@ -238,9 +212,9 @@ var Typeahead = React.createClass({
     if (option !== null) {
       return this._onOptionSelected(option, event);
     }
-  },
+  }
 
-  eventMap: function(event) {
+  eventMap(event) {
     var events = {};
 
     events[KeyEvent.DOM_VK_UP] = this.navUp;
@@ -250,14 +224,16 @@ var Typeahead = React.createClass({
     events[KeyEvent.DOM_VK_TAB] = this._onTab;
 
     return events;
-  },
+  }
 
-  _nav: function(delta) {
+  _nav(delta) {
     if (!this._hasHint()) {
       return;
     }
-    var newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
-    var length = this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible).length : this.state.searchResults.length;
+
+    let newIndex = this.state.selectionIndex === null ? (delta == 1 ? 0 : delta) : this.state.selectionIndex + delta;
+    let length = this.props.maxVisible ? this.state.searchResults.slice(0, this.props.maxVisible).length : this.state.searchResults.length;
+
     if (this._hasCustomValue()) {
       length += 1;
     }
@@ -268,26 +244,28 @@ var Typeahead = React.createClass({
       newIndex -= length;
     }
 
-    this.setState({selectionIndex: newIndex});
-  },
+    this.setState({
+      selectionIndex: newIndex
+    });
+  }
 
-  navDown: function() {
+  navDown() {
     this._nav(1);
-  },
+  }
 
-  navUp: function() {
+  navUp() {
     this._nav(-1);
-  },
+  }
 
-  _onChange: function(event) {
+  _onChange(event) {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
 
     this._onTextEntryUpdated();
-  },
+  }
 
-  _onKeyDown: function(event) {
+  _onKeyDown(event) {
     // If there are no visible elements, don't perform selector navigation.
     // Just pass this up to the upstream onKeydown handler.
     // Also skip if the user is pressing the shift key, since none of our handlers are looking for shift
@@ -295,7 +273,7 @@ var Typeahead = React.createClass({
       return this.props.onKeyDown(event);
     }
 
-    var handler = this.eventMap()[event.keyCode];
+    const handler = this.eventMap()[event.keyCode];
 
     if (handler) {
       handler(event);
@@ -304,26 +282,27 @@ var Typeahead = React.createClass({
     }
     // Don't propagate the keystroke back to the DOM/browser
     event.preventDefault();
-  },
+  }
 
-  componentWillReceiveProps: function(nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
       searchResults: this.getOptionsForValue(this.state.entryValue, nextProps.options)
     });
-  },
+  }
 
-  render: function() {
-    var inputClasses = {};
+  render() {
+    let inputClasses = {};
     inputClasses[this.props.customClasses.input] = !!this.props.customClasses.input;
-    var inputClassList = classNames(inputClasses);
+    const inputClassList = classNames(inputClasses);
 
-    var classes = {
+    let classes = {
       typeahead: this.props.defaultClassNames
     };
     classes[this.props.className] = !!this.props.className;
-    var classList = classNames(classes);
+    const classList = classNames(classes);
 
-    var InputElement = this.props.textarea ? 'textarea' : 'input';
+    const InputElement = this.props.textarea ? 'textarea' : 'input';
+
     return (
       <div className={classList}>
         { this._renderHiddenInput() }
@@ -343,27 +322,30 @@ var Typeahead = React.createClass({
         { this.state.showResults && this._renderIncrementalSearchResults() }
       </div>
     );
-  },
+  }
 
-  _onFocus: function(event) {
-    this.setState({isFocused: true, showResults: true}, function () {
-      this._onTextEntryUpdated();
-    }.bind(this));
+  _onFocus(event) {
+    this.setState({
+      isFocused: true, 
+      showResults: true
+    }, () => this._onTextEntryUpdated());
+
     if ( this.props.onFocus ) {
       return this.props.onFocus(event);
     }
-  },
+  }
 
-  _onBlur: function(event) {
-    this.setState({isFocused: false}, function () {
-      this._onTextEntryUpdated();
-    }.bind(this));
+  _onBlur(event) {
+    this.setState({
+      isFocused: false
+    }, () => this._onTextEntryUpdated());
+
     if ( this.props.onBlur ) {
       return this.props.onBlur(event);
     }
-  },
+  }
 
-  _renderHiddenInput: function() {
+  _renderHiddenInput() {
     if (!this.props.name) {
       return null;
     }
@@ -375,38 +357,78 @@ var Typeahead = React.createClass({
         value={ this.state.selection }
       />
     );
-  },
+  }
 
-  _generateSearchFunction: function() {
-    var searchOptionsProp = this.props.searchOptions;
-    var filterOptionProp = this.props.filterOption;
+  _generateSearchFunction() {
+    const searchOptionsProp = this.props.searchOptions;
+    const filterOptionProp = this.props.filterOption;
+
     if (typeof searchOptionsProp === 'function') {
       if (filterOptionProp !== null) {
         console.warn('searchOptions prop is being used, filterOption prop will be ignored');
       }
       return searchOptionsProp;
     } else if (typeof filterOptionProp === 'function') {
-      return function(value, options) {
-        return options.filter(function(o) { return filterOptionProp(value, o); });
-      };
+      return (value, options) => options.filter((o) => filterOptionProp(value, o));
     } else {
-      var mapper;
-      if (typeof filterOptionProp === 'string') {
-        mapper = Accessor.generateAccessor(filterOptionProp);
-      } else {
-        mapper = Accessor.IDENTITY_FN;
-      }
-      return function(value, options) {
-        return fuzzy
-          .filter(value, options, {extract: mapper})
-          .map(function(res) { return options[res.index]; });
-      };
+      const mapper = typeof filterOptionProp === 'string'
+        ? Accessor.generateAccessor(filterOptionProp)
+        : Accessor.IDENTITY_FN
+      
+      return (value, options) => fuzzy
+          .filter(value, options, { extract: mapper })
+          .map((res) => options[res.index]);
     }
-  },
+  }
 
-  _hasHint: function() {
+  _hasHint() {
     return this.state.searchResults.length > 0 || this._hasCustomValue();
   }
-});
+}
 
-module.exports = Typeahead;
+Typeahead.propTypes = {
+  name: PropTypes.string,
+  customClasses: PropTypes.object,
+  maxVisible: PropTypes.number,
+  resultsTruncatedMessage: PropTypes.string,
+  options: PropTypes.array,
+  allowCustomValues: PropTypes.number,
+  initialValue: PropTypes.string,
+  value: PropTypes.string,
+  placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
+  textarea: PropTypes.bool,
+  inputProps: PropTypes.object,
+  onOptionSelected: PropTypes.func,
+  onChange: PropTypes.func,
+  onKeyDown: PropTypes.func,
+  onKeyPress: PropTypes.func,
+  onKeyUp: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  filterOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  searchOptions: PropTypes.func,
+  displayOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  inputDisplayOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  formInputOption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
+  defaultClassNames: PropTypes.bool,
+  customListComponent: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.func
+  ]),
+  showOptionsWhenEmpty: PropTypes.bool
+};
+
+export default Typeahead;

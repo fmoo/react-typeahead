@@ -1,7 +1,7 @@
-var Typeahead = require('./typeahead');
-var Tokenizer = require('./tokenizer');
+import Typeahead from './typeahead';
+import Tokenizer from './tokenizer';
 
-module.exports = {
-  Typeahead: Typeahead,
-  Tokenizer: Tokenizer
+export {
+  Typeahead,
+  Tokenizer
 };

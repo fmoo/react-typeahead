@@ -1,6 +1,6 @@
 {
   "name": "react-typeahead",
-  "version": "2.0.0-alpha.4",
+  "version": "1.0.0",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -9,67 +9,43 @@
     "autocomplete",
     "react-component"
   ],
-  "homepage": "https://github.com/fmoo/react-typeahead",
+  "homepage": "https://github.com/lemonjs/react-typeahead",
   "bugs": {
-    "url": "https://github.com/fmoo/react-typeahead/issues",
-    "email": "ruibalp@gmail.com"
+    "url": "https://github.com/lemonjs/react-typeahead/issues",
+    "email": "lewismonteith@gmail.com"
   },
   "license": "ISC",
   "author": {
-    "name": "Peter Ruibal",
-    "email": "ruibalp@gmail.com",
-    "url": "https://github.com/fmoo"
+    "name": "Lewis Monteith",
+    "email": "lewismonteith@gmail.com",
+    "url": "https://github.com/lemonjs"
   },
-  "contributors": [
-    {
-      "name": "Sam Breed",
-      "email": "sam@quickleft.com",
-      "url": "http://wookiehangover.com"
-    }
-  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fmoo/react-typeahead.git"
-  },
-  "dependencies": {
-    "classnames": "^1.2.0",
-    "fuzzy": "^0.1.0"
+    "url": "https://github.com/lemonjs/react-typeahead.git"
   },
   "peerDependencies": {
-    "react": ">= 0.14"
+    "react": ">= 0.15"
   },
-  "main": "lib/react-typeahead.js",
   "devDependencies": {
     "babel-preset-react": "^6.5.0",
     "babelify": "^7.2.0",
     "browserify": "^8.0.2",
     "chai": "^1.9.1",
+    "classnames": "^1.2.0",
     "es5-shim": "^4.0.1",
+    "fuzzy": "^0.1.0",
     "gulp": "^3.8.7",
     "gulp-babel": "^6.1.2",
     "gulp-mocha-phantomjs": "^0.8.1",
     "literalify": "^0.4.0",
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
+    "react": "^15.6.1",
+    "react-addons-test-utils": "^15.6.0",
+    "react-dom": "^15.6.1",
     "react-tools": "^0.13.3",
     "sinon": "^1.10.3",
     "watchify": "^2.2.1"
-  },
-  "scripts": {
-    "test": "npm run build-test && gulp test",
-    "watchify-test": "watchify test/main.js -t [ babelify --presets [ react ] ] -o test/bundle.js -v",
-    "build-test": "browserify test/main.js -t [ babelify --presets [ react ] ] -o test/bundle.js",
-    "build": "browserify ./src/react-typeahead.js -t [ babelify --presets [ react ] ] -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
-    "watchify": "watchify ./src/react-typeahead.js -t [ babelify --presets [ react ] ] -t literalify -x react -s ReactTypeahead -o ./dist/react-typeahead.js",
-    "react:14": "npm i react@0.14 react-dom@0.14 react-addons-test-utils@0.14",
-    "react:15": "npm i react@15 react-dom@15 react-addons-test-utils@15",
-    "test:react:14": "npm run react:14 && npm test",
-    "test:react:15": "npm run react:15 && npm test",
-    "test:all": "npm run test:react:14 && npm run test:react:15",
-    "lib": "gulp build",
-    "prepublish": "npm run lib"
-  },
-  "literalify": {
-    "react": "window.React || require('react')"
   }
 }
