@@ -1,55 +1,44 @@
-var React = require('react');
-var TypeaheadOption = require('./option');
-var classNames = require('classnames');
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
+import TypeaheadOption from './option';
 
 /**
  * Container for the options rendered as part of the autocompletion process
  * of the typeahead
  */
-var TypeaheadSelector = React.createClass({
-  propTypes: {
-    options: React.PropTypes.array,
-    allowCustomValues: React.PropTypes.number,
-    customClasses: React.PropTypes.object,
-    customValue: React.PropTypes.string,
-    selectionIndex: React.PropTypes.number,
-    onOptionSelected: React.PropTypes.func,
-    displayOption: React.PropTypes.func.isRequired,
-    defaultClassNames: React.PropTypes.bool,
-    areResultsTruncated: React.PropTypes.bool,
-    resultsTruncatedMessage: React.PropTypes.string
-  },
+class TypeaheadSelector extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-  getDefaultProps: function() {
-    return {
-      selectionIndex: null,
-      customClasses: {},
-      allowCustomValues: 0,
-      customValue: null,
-      onOptionSelected: function(option) { },
-      defaultClassNames: true
-    };
-  },
+   _onClick = (result, event) => {
+    return this.props.onOptionSelected(result, event);
+  }
 
-  render: function() {
+  render() {
     // Don't render if there are no options to display
     if (!this.props.options.length && this.props.allowCustomValues <= 0) {
       return false;
     }
 
-    var classes = {
+    let classes = {
       "typeahead-selector": this.props.defaultClassNames
     };
     classes[this.props.customClasses.results] = this.props.customClasses.results;
-    var classList = classNames(classes);
+    const classList = classNames(classes);
 
     // CustomValue should be added to top of results list with different class name
-    var customValue = null;
-    var customValueOffset = 0;
+    let customValue = null;
+    let customValueOffset = 0;
+    
     if (this.props.customValue !== null) {
       customValueOffset++;
       customValue = (
-        <TypeaheadOption ref={this.props.customValue} key={this.props.customValue}
+        <TypeaheadOption 
+          ref={a => this[this.props.customValue] = a} 
+          key={this.props.customValue}
           hover={this.props.selectionIndex === 0}
           customClasses={this.props.customClasses}
           customValue={this.props.customValue}
@@ -59,11 +48,13 @@ var TypeaheadSelector = React.createClass({
       );
     }
 
-    var results = this.props.options.map(function(result, i) {
+    const results = this.props.options.map((result, i) => {
       var displayString = this.props.displayOption(result, i);
       var uniqueKey = displayString + '_' + i;
       return (
-        <TypeaheadOption ref={uniqueKey} key={uniqueKey}
+        <TypeaheadOption 
+          ref={a => this[uniqueKey] = a} 
+          key={uniqueKey}
           hover={this.props.selectionIndex === i + customValueOffset}
           customClasses={this.props.customClasses}
           onClick={this._onClick.bind(this, result)}>
@@ -92,12 +83,22 @@ var TypeaheadSelector = React.createClass({
         { results }
       </ul>
     );
-  },
-
-  _onClick: function(result, event) {
-    return this.props.onOptionSelected(result, event);
   }
 
-});
+}
 
-module.exports = TypeaheadSelector;
+TypeaheadSelector.propTypes = {
+  options: PropTypes.array,
+  allowCustomValues: PropTypes.number,
+  customClasses: PropTypes.object,
+  customValue: PropTypes.string,
+  selectionIndex: PropTypes.number,
+  onOptionSelected: PropTypes.func,
+  displayOption: PropTypes.func.isRequired,
+  defaultClassNames: PropTypes.bool,
+  areResultsTruncated: PropTypes.bool,
+  resultsTruncatedMessage: PropTypes.string
+}
+
+
+export default TypeaheadSelector;

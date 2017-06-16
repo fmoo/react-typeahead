@@ -1,9 +1,8 @@
-var Accessor = {
-  IDENTITY_FN: function(input) { return input; },
+export default {
 
-  generateAccessor: function(field) {
-    return function(object) { return object[field]; };
-  },
+  IDENTITY_FN: input => input,
+
+  generateAccessor: field => object => object[field],
 
   generateOptionToStringFor: function(prop) {
     if (typeof prop === 'string') {
@@ -24,6 +23,5 @@ var Accessor = {
       return object;
     }
   },
+  
 };
-
-module.exports = Accessor;

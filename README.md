@@ -2,6 +2,8 @@
 
 > A typeahead/autocomplete component for React
 
+*This is a fork of https://github.com/fmoo/react-typeahead*
+
 react-typeahead is a javascript library that provides a react-based
 typeahead, or autocomplete text entry, as well as a "typeahead tokenizer",
 a typeahead that allows you to select multiple results.
@@ -11,7 +13,7 @@ a typeahead that allows you to select multiple results.
 For a typeahead input:
 
 ```javascript
-var Typeahead = require('react-typeahead').Typeahead;
+import { Typeahead } from 'react-typeahead';
 React.render(
   <Typeahead
     options={['John', 'Paul', 'George', 'Ringo']}
@@ -23,13 +25,11 @@ React.render(
 For a tokenizer typeahead input:
 
 ```javascript
-var Tokenizer = require('react-typeahead').Tokenizer;
+import { Tokenizer } from 'react-typeahead';
 React.render(
   <Tokenizer
     options={['John', 'Paul', 'George', 'Ringo']}
-    onTokenAdd={function(token) {
-      console.log('token added: ', token);
-    }}
+    onTokenAdd={token => console.log('token added: ', token)}
   />
 );
 ```
@@ -218,9 +218,9 @@ If true, options will still be rendered when there is no value.
 
 #### props.allowCustomValues
 
-Type: `boolean`
+Type: `number`
 
-If true, custom tags can be added without a matching typeahead selection
+If 1, custom tags can be added without a matching typeahead selection
 
 ### Typeahead ([Exposed Component Functions][reactecf])
 
@@ -412,32 +412,6 @@ A function to return the currently selected tokens.
 You will need `npm` to develop on react-typeahead.  [Installing npm][4].
 
 Once that's done, to get started, run `npm install` in your checkout directory.
-This will install all the local development dependences, such as `gulp` and `mocha`
-
-### Testing
-
-react-typeahead uses mocha for unit tests and gulp for running them.  Large changes should
-include unittests.
-
-After updating or creating new tests, run `npm run-script build-test` to regenerate the
-test package.
-
-Once that's done, running the tests is easy with `gulp`:
-
-```
-> gulp test
-[00:17:25] Using gulpfile ~/src/react-typeahead/gulpfile.js
-[00:17:25] Starting 'test'...
-
-
-  ․․․․․․․․․․․․․․․
-
-  15 passing (43ms)
-
-[00:17:25] Finished 'test' after 448 ms
-[00:17:25] Starting 'default'...
-[00:17:25] Finished 'default' after 6.23 μs
-```
 
 ### Contributing
 
