@@ -17,6 +17,7 @@ module.exports = (ARGS = {}) => {
 		output: {
 			path: PATH_OUTPUT,
 			filename: 'react-typeahead.js',
+			libraryTarget: 'commonjs'
 		},
 		module: {
 			rules: [
@@ -35,10 +36,6 @@ module.exports = (ARGS = {}) => {
 			],
 		},
 		plugins: [
-			new wpLoaderOptionsPlugin({ 
-				debug: false, 
-				minimize: false 
-			}),
 			new wpDefinePlugin({
 				'process.env': { 
 					NODE_ENV: JSON.stringify('production')
