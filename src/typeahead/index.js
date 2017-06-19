@@ -25,6 +25,7 @@ var Typeahead = React.createClass({
     disabled: React.PropTypes.bool,
     textarea: React.PropTypes.bool,
     inputProps: React.PropTypes.object,
+    preventKeyEvents: React.PropTypes.bool,
     onOptionSelected: React.PropTypes.func,
     onChange: React.PropTypes.func,
     onKeyDown: React.PropTypes.func,
@@ -68,6 +69,7 @@ var Typeahead = React.createClass({
       disabled: false,
       textarea: false,
       inputProps: {},
+      preventKeyEvents: true,
       onOptionSelected: function(option) {},
       onChange: function(event) {},
       onKeyDown: function(event) {},
@@ -303,7 +305,9 @@ var Typeahead = React.createClass({
       return this.props.onKeyDown(event);
     }
     // Don't propagate the keystroke back to the DOM/browser
-    event.preventDefault();
+    if (this.props.preventKeyEvents) {
+      event.preventDefault();
+    }
   },
 
   componentWillReceiveProps: function(nextProps) {
