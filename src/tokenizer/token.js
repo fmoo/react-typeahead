@@ -1,21 +1,23 @@
 var React = require('react');
 var classNames = require('classnames');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
 /**
  * Encapsulates the rendering of an option that has been "selected" in a
  * TypeaheadTokenizer
  */
-var Token = React.createClass({
+var Token = createReactClass({
   propTypes: {
-    className: React.PropTypes.string,
-    name: React.PropTypes.string,
-    children: React.PropTypes.string,
-    object: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.object,
+    className: PropTypes.string,
+    name: PropTypes.string,
+    children: PropTypes.string,
+    object: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object,
     ]),
-    onRemove: React.PropTypes.func,
-    value: React.PropTypes.string
+    onRemove: PropTypes.func,
+    value: PropTypes.string
   },
 
   render: function() {

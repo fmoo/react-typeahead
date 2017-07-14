@@ -4,6 +4,8 @@ var TypeaheadSelector = require('./selector');
 var KeyEvent = require('../keyevent');
 var fuzzy = require('fuzzy');
 var classNames = require('classnames');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
 /**
  * A "typeahead", an auto-completing text input
@@ -11,50 +13,50 @@ var classNames = require('classnames');
  * Renders an text input that shows options nearby that you can use the
  * keyboard or mouse to select.  Requires CSS for MASSIVE DAMAGE.
  */
-var Typeahead = React.createClass({
+var Typeahead = createReactClass({
   propTypes: {
-    name: React.PropTypes.string,
-    customClasses: React.PropTypes.object,
-    maxVisible: React.PropTypes.number,
-    resultsTruncatedMessage: React.PropTypes.string,
-    options: React.PropTypes.array,
-    allowCustomValues: React.PropTypes.number,
-    initialValue: React.PropTypes.string,
-    value: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    textarea: React.PropTypes.bool,
-    inputProps: React.PropTypes.object,
-    onOptionSelected: React.PropTypes.func,
-    onChange: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
-    onKeyPress: React.PropTypes.func,
-    onKeyUp: React.PropTypes.func,
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    filterOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
+    name: PropTypes.string,
+    customClasses: PropTypes.object,
+    maxVisible: PropTypes.number,
+    resultsTruncatedMessage: PropTypes.string,
+    options: PropTypes.array,
+    allowCustomValues: PropTypes.number,
+    initialValue: PropTypes.string,
+    value: PropTypes.string,
+    placeholder: PropTypes.string,
+    disabled: PropTypes.bool,
+    textarea: PropTypes.bool,
+    inputProps: PropTypes.object,
+    onOptionSelected: PropTypes.func,
+    onChange: PropTypes.func,
+    onKeyDown: PropTypes.func,
+    onKeyPress: PropTypes.func,
+    onKeyUp: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+    filterOption: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.func
     ]),
-    searchOptions: React.PropTypes.func,
-    displayOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
+    searchOptions: PropTypes.func,
+    displayOption: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.func
     ]),
-    inputDisplayOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
+    inputDisplayOption: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.func
     ]),
-    formInputOption: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.func
+    formInputOption: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.func
     ]),
-    defaultClassNames: React.PropTypes.bool,
-    customListComponent: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.func
+    defaultClassNames: PropTypes.bool,
+    customListComponent: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.func
     ]),
-    showOptionsWhenEmpty: React.PropTypes.bool
+    showOptionsWhenEmpty: PropTypes.bool
   },
 
   getDefaultProps: function() {

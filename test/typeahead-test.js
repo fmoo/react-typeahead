@@ -8,6 +8,7 @@ var TypeaheadOption = require('../src/typeahead/option');
 var TypeaheadSelector = require('../src/typeahead/selector');
 var Keyevent = require('../src/keyevent');
 var TestUtils = require('react-addons-test-utils');
+var createReactClass = require('create-react-class');
 
 function simulateTextInput(component, value) {
   var node = component.refs.entry;
@@ -604,7 +605,7 @@ describe('Typeahead Component', function() {
 
     context('customListComponent', function() {
       before(function() {
-        ListComponent = React.createClass({
+        ListComponent = createReactClass({
           render: function() {
             return <div></div>;
           }
