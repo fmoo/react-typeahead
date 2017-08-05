@@ -1,16 +1,18 @@
 var React = require('react');
 var classNames = require('classnames');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
 /**
  * A single option within the TypeaheadSelector
  */
-var TypeaheadOption = React.createClass({
+var TypeaheadOption = createReactClass({
   propTypes: {
-    customClasses: React.PropTypes.object,
-    customValue: React.PropTypes.string,
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.string,
-    hover: React.PropTypes.bool
+    customClasses: PropTypes.object,
+    customValue: PropTypes.string,
+    onClick: PropTypes.func,
+    children: PropTypes.string,
+    hover: PropTypes.bool
   },
 
   getDefaultProps: function() {
