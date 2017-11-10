@@ -268,29 +268,29 @@ var TypeaheadTokenizer = React.createClass({
   displayName: 'TypeaheadTokenizer',
 
   propTypes: {
-    name: React.PropTypes.string,
-    options: React.PropTypes.array,
-    customClasses: React.PropTypes.object,
-    allowCustomValues: React.PropTypes.number,
-    defaultSelected: React.PropTypes.array,
-    initialValue: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    inputProps: React.PropTypes.object,
-    onTokenRemove: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
-    onKeyPress: React.PropTypes.func,
-    onKeyUp: React.PropTypes.func,
-    onTokenAdd: React.PropTypes.func,
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    filterOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    searchOptions: React.PropTypes.func,
-    displayOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    formInputOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    maxVisible: React.PropTypes.number,
-    resultsTruncatedMessage: React.PropTypes.string,
-    defaultClassNames: React.PropTypes.bool
+    name: PropTypes.string,
+    options: PropTypes.array,
+    customClasses: PropTypes.object,
+    allowCustomValues: PropTypes.number,
+    defaultSelected: PropTypes.array,
+    initialValue: PropTypes.string,
+    placeholder: PropTypes.string,
+    disabled: PropTypes.bool,
+    inputProps: PropTypes.object,
+    onTokenRemove: PropTypes.func,
+    onKeyDown: PropTypes.func,
+    onKeyPress: PropTypes.func,
+    onKeyUp: PropTypes.func,
+    onTokenAdd: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+    filterOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    searchOptions: PropTypes.func,
+    displayOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    formInputOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    maxVisible: PropTypes.number,
+    resultsTruncatedMessage: PropTypes.string,
+    defaultClassNames: PropTypes.bool
   },
 
   getInitialState: function () {
@@ -466,12 +466,12 @@ var Token = React.createClass({
   displayName: 'Token',
 
   propTypes: {
-    className: React.PropTypes.string,
-    name: React.PropTypes.string,
-    children: React.PropTypes.string,
-    object: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
-    onRemove: React.PropTypes.func,
-    value: React.PropTypes.string
+    className: PropTypes.string,
+    name: PropTypes.string,
+    children: PropTypes.string,
+    object: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    onRemove: PropTypes.func,
+    value: PropTypes.string
   },
 
   render: function () {
@@ -536,33 +536,33 @@ var Typeahead = React.createClass({
   displayName: 'Typeahead',
 
   propTypes: {
-    name: React.PropTypes.string,
-    customClasses: React.PropTypes.object,
-    maxVisible: React.PropTypes.number,
-    resultsTruncatedMessage: React.PropTypes.string,
-    options: React.PropTypes.array,
-    allowCustomValues: React.PropTypes.number,
-    initialValue: React.PropTypes.string,
-    value: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    textarea: React.PropTypes.bool,
-    inputProps: React.PropTypes.object,
-    onOptionSelected: React.PropTypes.func,
-    onChange: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
-    onKeyPress: React.PropTypes.func,
-    onKeyUp: React.PropTypes.func,
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    filterOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    searchOptions: React.PropTypes.func,
-    displayOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    inputDisplayOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    formInputOption: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-    defaultClassNames: React.PropTypes.bool,
-    customListComponent: React.PropTypes.oneOfType([React.PropTypes.element, React.PropTypes.func]),
-    showOptionsWhenEmpty: React.PropTypes.bool
+    name: PropTypes.string,
+    customClasses: PropTypes.object,
+    maxVisible: PropTypes.number,
+    resultsTruncatedMessage: PropTypes.string,
+    options: PropTypes.array,
+    allowCustomValues: PropTypes.number,
+    initialValue: PropTypes.string,
+    value: PropTypes.string,
+    placeholder: PropTypes.string,
+    disabled: PropTypes.bool,
+    textarea: PropTypes.bool,
+    inputProps: PropTypes.object,
+    onOptionSelected: PropTypes.func,
+    onChange: PropTypes.func,
+    onKeyDown: PropTypes.func,
+    onKeyPress: PropTypes.func,
+    onKeyUp: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+    filterOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    searchOptions: PropTypes.func,
+    displayOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    inputDisplayOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    formInputOption: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    defaultClassNames: PropTypes.bool,
+    customListComponent: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+    showOptionsWhenEmpty: PropTypes.bool
   },
 
   getDefaultProps: function () {
@@ -927,11 +927,11 @@ var TypeaheadOption = React.createClass({
   displayName: 'TypeaheadOption',
 
   propTypes: {
-    customClasses: React.PropTypes.object,
-    customValue: React.PropTypes.string,
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.string,
-    hover: React.PropTypes.bool
+    customClasses: PropTypes.object,
+    customValue: PropTypes.string,
+    onClick: PropTypes.func,
+    children: PropTypes.string,
+    hover: PropTypes.bool
   },
 
   getDefaultProps: function () {
@@ -995,16 +995,16 @@ var TypeaheadSelector = React.createClass({
   displayName: 'TypeaheadSelector',
 
   propTypes: {
-    options: React.PropTypes.array,
-    allowCustomValues: React.PropTypes.number,
-    customClasses: React.PropTypes.object,
-    customValue: React.PropTypes.string,
-    selectionIndex: React.PropTypes.number,
-    onOptionSelected: React.PropTypes.func,
-    displayOption: React.PropTypes.func.isRequired,
-    defaultClassNames: React.PropTypes.bool,
-    areResultsTruncated: React.PropTypes.bool,
-    resultsTruncatedMessage: React.PropTypes.string
+    options: PropTypes.array,
+    allowCustomValues: PropTypes.number,
+    customClasses: PropTypes.object,
+    customValue: PropTypes.string,
+    selectionIndex: PropTypes.number,
+    onOptionSelected: PropTypes.func,
+    displayOption: PropTypes.func.isRequired,
+    defaultClassNames: PropTypes.bool,
+    areResultsTruncated: PropTypes.bool,
+    resultsTruncatedMessage: PropTypes.string
   },
 
   getDefaultProps: function () {

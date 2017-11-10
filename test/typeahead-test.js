@@ -583,7 +583,7 @@ describe('Typeahead Component', function() {
 
     context('customListComponent', function() {
       before(function() {
-        ListComponent = React.createClass({
+        ListComponent = createReactClass({
           render: function() {
             return <div></div>;
           }
