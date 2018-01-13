@@ -56,7 +56,8 @@ var TypeaheadTokenizer = createReactClass({
     ]),
     maxVisible: PropTypes.number,
     resultsTruncatedMessage: PropTypes.string,
-    defaultClassNames: PropTypes.bool
+    defaultClassNames: PropTypes.bool,
+    showOptionsWhenEmpty: PropTypes.bool,
   },
 
   getInitialState: function() {
@@ -88,7 +89,8 @@ var TypeaheadTokenizer = createReactClass({
       onFocus: function(event) {},
       onBlur: function(event) {},
       onTokenAdd: function() {},
-      onTokenRemove: function() {}
+      onTokenRemove: function() {},
+      showOptionsWhenEmpty: false,
     };
   },
 
@@ -212,7 +214,8 @@ var TypeaheadTokenizer = createReactClass({
           displayOption={this.props.displayOption}
           defaultClassNames={this.props.defaultClassNames}
           filterOption={this.props.filterOption}
-          searchOptions={this.props.searchOptions} />
+          searchOptions={this.props.searchOptions}
+          showOptionsWhenEmpty={this.props.showOptionsWhenEmpty} />
       </div>
     );
   }

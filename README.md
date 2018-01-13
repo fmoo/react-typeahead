@@ -393,6 +393,13 @@ Default: true
 
 If false, the default classNames are removed from the tokenizer and the typeahead.
 
+#### props.showOptionsWhenEmpty
+
+Type: `boolean`
+Default: false
+
+If true, options will still be rendered when there is no value.
+
 ### Tokenizer ([Exposed Component Functions][reactecf])
 
 #### tokenizer.focus
