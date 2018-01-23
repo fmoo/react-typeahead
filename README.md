@@ -112,6 +112,12 @@ Type: `Boolean`
 
 Set to `true` to use a `<textarea>` element rather than an `<input>` element
 
+#### props.clearOnSelect
+
+Type: `Boolean`
+
+Set to `true` to use clear the `<input>` or `<textarea>` element after selecting an option
+
 #### props.inputProps
 
 Type: `Object`
