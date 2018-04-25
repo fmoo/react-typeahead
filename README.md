@@ -55,7 +55,7 @@ Type: React Component
 
 Basic typeahead input and results list.
 
-Typeahead(props) | Type
+Typeahead (props) | Type
 ------------ | ------------
 | options  |  Array |
 | defaultValue  |String |
@@ -211,7 +211,7 @@ Type: React Component
 
 Typeahead component that allows for multiple options to be selected.
 
-Typeahead(props) | Type
+Typeahead (props) | Type
 ------------ | ------------
 | options  |  Array |
 | maxVisible | Number |
