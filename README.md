@@ -57,12 +57,12 @@ Basic typeahead input and results list.
 
 Typeahead(props) | Description
 ------------ | -------------
-|
-#### props.options | Type: `Array`
-Default: []
 
-An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects. In the latter case, `filterOption` and `displayOption` should be provided.|
-|
+| = #### props.options | Type: `Array` =
+== Default: [] ==
+===An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects.===
+====In the latter case,`filterOption` and `displayOption` should be provided.====|
+
 #### props.defaultValue | Type: `String`
 
 A default value used when the component has no value. If it matches any options a option list will show.|
