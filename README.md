@@ -57,30 +57,29 @@ Basic typeahead input and results list.
 
 Typeahead(props) | Type
 ------------ | ------------
-| options  | Type: Array |
-| defaultValue  | Type: String |
-| value | Type: String |
-| maxVisible | Type: Number|
-| resultsTruncatedMessage | Type: Number|
-| resultsTruncatedMessage  | Type: String|
-| customClasse | Type: Object |
-| placeholder | Type : String |
-| disabled | Type: Boolean |
-| textarea | Type: Boolean |
-| inputProps | Type: Object|
-| onKeyDown | Type: Function|
-| onKeyPress | Type: Function |
-| onKeyUp | Type: Function|
-| onBlur|Type: Function |
-| onFocus | Type: Function|
-| onOptionSelected | Type: Function|
-| filterOption | Type: String or Function |
-| displayOption | Type: String or Function |
-| formInputOption | Type: String or Function |
-| defaultClassNames | Type: Boolean |
-| customListComponent | Type: React Component |
-| showOptionsWhenEmpty | Type: Boolean |
-| allowCustomValues  | Type: Boolean |
+| options  |  Array |
+| defaultValue  |String |
+| value |  String |
+| maxVisible |  Number|
+| resultsTruncatedMessage  |  String|
+| customClasse |  Object |
+| placeholder |  String |
+| disabled |  Boolean |
+| textarea |  Boolean |
+| inputProps | Object|
+| onKeyDown |  Function|
+| onKeyPress | Function |
+| onKeyUp |  Function|
+| onBlur| Function |
+| onFocus |  Function|
+| onOptionSelected |  Function|
+| filterOption |  String or Function |
+| displayOption |  String or Function |
+| formInputOption |  String or Function |
+| defaultClassNames | Boolean |
+| customListComponent | React Component |
+| showOptionsWhenEmpty | Boolean |
+| allowCustomValues  | Boolean |
 
 
 #### props.options 
@@ -212,8 +211,32 @@ Type: React Component
 
 Typeahead component that allows for multiple options to be selected.
 
-Tokenizer(props) | Description
------------- | -------------
+Typeahead(props) | Type
+------------ | ------------
+| options  |  Array |
+| maxVisible | Number |
+| resultsTruncatedMessage  |  String|
+| name | String|
+| customClasse |  Object |
+| placeholder |  String |
+| disabled |  Boolean |
+| inputProps | Object|
+| onKeyDown |  Function|
+| onKeyPress | Function |
+| onKeyUp |  Function|
+| onBlur| Function |
+| onFocus |  Function|
+| defaultSelected | Array |
+| onTokenRemove | Function |
+| onTokenAdd | Function |
+| displayOption | String or Function |
+| filterOption | String or Function |
+| searchOptions | Function |
+| inputDisplayOption | String or Function |
+| formInputOption | String or Function |
+| defaultClassNames | Boolean |
+| showOptionsWhenEmpty | Boolean |
+| getSelectedTokens | Function |
 
 #### props.options 
 Type: `Array`
