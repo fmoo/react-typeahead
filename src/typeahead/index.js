@@ -202,7 +202,7 @@ var Typeahead = createReactClass({
     nEntry.value = optionString;
     this.setState({searchResults: this.getOptionsForValue(optionString, this.props.options),
                    selection: formInputOptionString,
-                   entryValue: optionString,
+                   entryValue: '',
                    showResults: false});
     return this.props.onOptionSelected(option, event);
   },
