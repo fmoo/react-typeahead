@@ -57,22 +57,23 @@ Basic typeahead input and results list.
 
 Typeahead(props) | Description
 ------------ | -------------
+|
 #### props.options | Type: `Array`
 Default: []
 
-An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects. In the latter case, `filterOption` and `displayOption` should be provided.
-
+An array supplied to the filtering function. Can be a list of strings or a list of arbitrary objects. In the latter case, `filterOption` and `displayOption` should be provided.|
+|
 #### props.defaultValue | Type: `String`
 
-A default value used when the component has no value. If it matches any options a option list will show.
-
+A default value used when the component has no value. If it matches any options a option list will show.|
+|
 #### props.value | Type: `String`
 
-Specify a value for the text input.
-
+Specify a value for the text input.|
+|
 #### props.maxVisible | Type: `Number`
 
-Limit the number of options rendered in the results list.
+Limit the number of options rendered in the results list.|
 
 #### props.resultsTruncatedMessage | Type: `String`
 
