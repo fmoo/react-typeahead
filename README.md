@@ -57,12 +57,31 @@ Basic typeahead input and results list.
 
 Typeahead(props) | Type
 ------------ | ------------
-| props.options  | Type: `Array` |
-| Type: `Array` | Type: `String` |
-| props.value | Type: `String` |
-| props.maxVisible | Type: `Number`|
-| props.resultsTruncatedMessage | Type: `Number`|
-| props.resultsTruncatedMessage  | Type: `String`|
+| options  | Type: Array |
+| defaultValue  | Type: String |
+| value | Type: String |
+| maxVisible | Type: Number|
+| resultsTruncatedMessage | Type: Number|
+| resultsTruncatedMessage  | Type: String|
+| customClasse | Type: Object |
+| placeholder | Type : String |
+| disabled | Type: Boolean |
+| textarea | Type: Boolean |
+| inputProps | Type: Object|
+| onKeyDown | Type: Function|
+| onKeyPress | Type: Function |
+| onKeyUp | Type: Function|
+| onBlur|Type: Function |
+| onFocus | Type: Function|
+| onOptionSelected | Type: Function|
+| filterOption | Type: String or Function |
+| displayOption | Type: String or Function |
+| formInputOption | Type: String or Function |
+| defaultClassNames | Type: Boolean |
+| customListComponent | Type: React Component |
+| showOptionsWhenEmpty | Type: Boolean |
+| allowCustomValues  | Type: Boolean |
+
 
 #### props.options 
 Type: `Array` 
