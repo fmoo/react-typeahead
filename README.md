@@ -47,6 +47,10 @@ React.render(
 [3]: http://wookiehangover.github.com/react-typeahead/examples/TypeaheadTokenizer-simple.html
 [4]: http://blog.npmjs.org/post/85484771375/how-to-install-npm
 
+## Arrow keys navigation
+
+Typeahead supports selection of elements using the arrow keys (up/down) and ENTER to select. When an item is selected this way, it gains the `hover` class. You can use this class to style the selected item as you wish.
+
 ## API
 
 ### Typeahead(props)
@@ -224,9 +228,30 @@ If true, custom tags can be added without a matching typeahead selection
 
 ### Typeahead ([Exposed Component Functions][reactecf])
 
+The exposed component functions can be used like so:
+
+```jsx
+//In constructor:
+this.typeaheadRef = React.createRef(); //The new way to create refs in react.
+
+//Somewhere later in the code:
+<Typeahead
+    ref={this.typeaheadRef}
+    ...
+/>
+
+//Example usage:
+this.typeaheadRef.current.setEntryText("");
+```
 #### typeahead.focus
 
 Focuses the typeahead input.
+
+#### typeahead.setEntryText(string)
+
+Accepts: `string`
+
+Sets the text in the input box. Set to `""` to clear.
 
 ---
 
