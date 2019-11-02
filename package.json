@@ -51,7 +51,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-mocha-phantomjs": "^0.8.1",
     "literalify": "^0.4.0",
-    "lodash": "^2.4.1",
+    "lodash": "^4.17.15",
     "mocha": "^1.21.4",
     "react-tools": "^0.13.3",
     "sinon": "^1.10.3",
