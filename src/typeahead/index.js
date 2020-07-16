@@ -360,7 +360,7 @@ var Typeahead = createReactClass({
   },
 
   _onBlur: function(event) {
-    this.setState({isFocused: false}, function () {
+    this.setState({isFocused: false, showResults: false}, function () {
       this._onTextEntryUpdated();
     }.bind(this));
     if ( this.props.onBlur ) {
