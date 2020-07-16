@@ -94,19 +94,36 @@ var TypeaheadTokenizer = createReactClass({
     };
   },
 
-  componentWillReceiveProps: function(nextProps){
-    // if we get new defaultProps, update selected
-    if (_arraysAreDifferent(this.props.defaultSelected, nextProps.defaultSelected)){
-      this.setState({selected: nextProps.defaultSelected.slice(0)})
-    }
-  },
-
   focus: function(){
     this.refs.typeahead.focus();
   },
 
   getSelectedTokens: function(){
     return this.state.selected;
+  },
+
+  setSelectedTokens: function(tokens){
+    this.setState({selected: tokens.slice(0)});
+  },
+
+  addSelectedToken: function(value){
+    if (this.state.selected.indexOf(value) != -1) {
+      return;
+    }
+    this.state.selected.push(value);
+    this.setState({selected: this.state.selected});
+    return true;
+  },
+
+  removeSelectedToken: function(value){
+    var index = this.state.selected.indexOf(value);
+    if (index == -1) {
+      return;
+    }
+
+    this.state.selected.splice(index, 1);
+    this.setState({selected: this.state.selected});
+    return true;
   },
 
   // TODO: Support initialized tokens
@@ -162,25 +179,20 @@ var TypeaheadTokenizer = createReactClass({
   },
 
   _removeTokenForValue: function(value) {
-    var index = this.state.selected.indexOf(value);
-    if (index == -1) {
+    if (!this.removeSelectedToken(value)) {
       return;
     }
-
-    this.state.selected.splice(index, 1);
-    this.setState({selected: this.state.selected});
     this.props.onTokenRemove(value);
     return;
   },
 
   _addTokenForValue: function(value) {
-    if (this.state.selected.indexOf(value) != -1) {
+    if (!this.addSelectedToken(value)) {
       return;
     }
-    this.state.selected.push(value);
-    this.setState({selected: this.state.selected});
     this.refs.typeahead.setEntryText("");
     this.props.onTokenAdd(value);
+    return;
   },
 
   render: function() {
