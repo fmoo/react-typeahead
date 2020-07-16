@@ -337,7 +337,7 @@ var Typeahead = createReactClass({
           {...this.props.inputProps}
           placeholder={this.props.placeholder}
           className={inputClassList}
-          value={this.state.entryValue}
+          value={this.props.value || this.state.entryValue}
           onChange={this._onChange}
           onKeyDown={this._onKeyDown}
           onKeyPress={this.props.onKeyPress}
