@@ -26,6 +26,7 @@ var Typeahead = createReactClass({
     placeholder: PropTypes.string,
     disabled: PropTypes.bool,
     textarea: PropTypes.bool,
+    clearOnSelect: PropTypes.bool,
     inputProps: PropTypes.object,
     onOptionSelected: PropTypes.func,
     onChange: PropTypes.func,
@@ -69,6 +70,7 @@ var Typeahead = createReactClass({
       placeholder: "",
       disabled: false,
       textarea: false,
+      clearOnSelect: false,
       inputProps: {},
       onOptionSelected: function(option) {},
       onChange: function(event) {},
@@ -199,11 +201,14 @@ var Typeahead = createReactClass({
     var formInputOption = Accessor.generateOptionToStringFor(this.props.formInputOption || displayOption);
     var formInputOptionString = formInputOption(option);
 
-    nEntry.value = optionString;
-    this.setState({searchResults: this.getOptionsForValue(optionString, this.props.options),
-                   selection: formInputOptionString,
-                   entryValue: optionString,
-                   showResults: false});
+    var valueAfterSelect = this.props.clearOnSelect ? '' : optionString;
+    var selectionAfterSelect = this.props.clearOnSelect ? '' : formInputOptionString;
+
+    nEntry.value = valueAfterSelect;
+    this.setState({searchResults: this.getOptionsForValue(valueAfterSelect, this.props.options),
+                   selection: selectionAfterSelect,
+                   entryValue: valueAfterSelect,
+                   showResults: !!this.props.clearOnSelect});
     return this.props.onOptionSelected(option, event);
   },
 
@@ -310,7 +315,7 @@ var Typeahead = createReactClass({
 
   componentWillReceiveProps: function(nextProps) {
     var searchResults = this.getOptionsForValue(this.state.entryValue, nextProps.options);
-    var showResults = Boolean(searchResults.length) && this.state.isFocused;
+    var showResults = !!this.props.clearOnSelect || (Boolean(searchResults.length) && this.state.isFocused);
     this.setState({
       searchResults: searchResults,
       showResults: showResults

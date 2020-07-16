@@ -1,6 +1,6 @@
 {
-  "name": "react-typeahead",
-  "version": "2.0.0-alpha.7",
+  "name": "@brodrickchilds/react-typeahead",
+  "version": "2.0.14",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -9,9 +9,9 @@
     "autocomplete",
     "react-component"
   ],
-  "homepage": "https://github.com/fmoo/react-typeahead",
+  "homepage": "https://github.com/BrodrickChilds/react-typeahead",
   "bugs": {
-    "url": "https://github.com/fmoo/react-typeahead/issues",
+    "url": "https://github.com/BrodrickChilds/react-typeahead/issues",
     "email": "ruibalp@gmail.com"
   },
   "license": "ISC",
@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fmoo/react-typeahead.git"
+    "url": "https://github.com/BrodrickChilds/react-typeahead"
   },
   "dependencies": {
     "classnames": "^1.2.0",
