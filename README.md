@@ -228,6 +228,14 @@ If true, custom tags can be added without a matching typeahead selection
 
 Focuses the typeahead input.
 
+#### typeahead.setEntryText(value)
+
+Sets the value of the input field to `value`.
+
+#### typeahead.clearSelectionIndex
+
+Clears the currently selected option index.
+
 ---
 
 ### Tokenizer(props)
