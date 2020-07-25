@@ -55,7 +55,7 @@ var Token = createReactClass({
       return "";
     }
     return (
-      <a className={this.props.className || "typeahead-token-close"} href="#" onClick={function(event) {
+      <a className="typeahead-token-close" href="#" onClick={function(event) {
           this.props.onRemove(this.props.object);
           event.preventDefault();
         }.bind(this)}>&#x00d7;</a>
